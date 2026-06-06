@@ -64,3 +64,9 @@ AI_SPEED_MODE=auto
 `GEMINI_MODEL` defaults to `gemini-2.5-flash` in the backend example. Speed-mode prompt switching is defined in `server/ai-trainer-route.example.js`.
 
 The site-wide floating Zentom guide uses automatic mode selection. It chooses a quick, normal, or deep response based on the doubt, so students do not need to choose a mode manually.
+
+## Vercel Deployment
+
+The static academy pages deploy from the project root. Requests under `/api/*` are routed to the Vercel serverless Express handler in `api/index.js`.
+
+Configure `AI_PROVIDER`, `GEMINI_MODEL`, `GEMINI_API_KEY`, and `AI_SPEED_MODE` in the Vercel project environment variables before deploying to production.
