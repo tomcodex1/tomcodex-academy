@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Practice Salesforce interviews with the TomCodex AI Interviewer." />
+  <title>AI Interviewer | TomCodex AI Academy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { brand: { 50: "#eef8ff", 100: "#d9f0ff", 500: "#087ea4", 600: "#056b8d", 700: "#075875", 950: "#062c3a" }, ink: "#172b4d", lime: "#d8ff5f" },
+        fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"] }
+      }}
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/interview.css" />
+  <link rel="stylesheet" href="css/floating-guide.css" />
+  <link rel="stylesheet" href="css/floating-guide-auto.css" />
+</head>
+<body class="bg-slate-50 font-sans text-ink antialiased">
+  <header class="border-b border-slate-200 bg-white">
+    <div class="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 lg:px-8">
+      <a href="index.html" class="flex items-center gap-2"><img src="assets/tomcodex-logo.svg" alt="Tom Codex" class="h-12 w-auto sm:h-14"><span class="hidden border-l border-slate-300 pl-3 text-sm font-bold sm:inline">AI Interviewer</span></a>
+      <nav class="ml-auto flex items-center gap-3 text-sm font-bold"><a href="analytics.html" class="hidden text-slate-500 hover:text-brand-600 sm:block">Analytics</a><a href="dashboard.html" class="rounded-lg border border-brand-600 px-4 py-2 text-brand-700 hover:bg-brand-50">Dashboard</a><a href="index.html" class="hidden text-slate-500 hover:text-brand-600 sm:block">Home</a></nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="bg-brand-950 text-white">
+      <div class="mx-auto grid max-w-7xl items-center gap-8 px-5 py-12 lg:grid-cols-[1fr_.55fr] lg:px-8">
+        <div><span class="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-cyan-200">Unlimited mock interviews</span><h1 class="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl">Practice with your AI Interviewer.</h1><p class="mt-4 max-w-2xl text-lg leading-8 text-slate-300">Answer realistic Salesforce questions, receive instant structured feedback, and keep practicing before and after placement.</p></div>
+        <div class="grid grid-cols-3 gap-3 text-center"><div class="interview-hero-stat"><strong id="heroSessionCount">0</strong><span>Sessions</span></div><div class="interview-hero-stat"><strong id="heroBestScore">0%</strong><span>Best score</span></div><div class="interview-hero-stat"><strong>24/7</strong><span>Available</span></div></div>
+      </div>
+    </section>
+
+    <section class="mx-auto grid max-w-7xl gap-6 px-5 py-10 lg:grid-cols-[.38fr_.62fr] lg:px-8">
+      <aside class="space-y-6">
+        <div class="interview-card">
+          <span class="course-tag">Interview setup</span><h2 class="mt-3">Choose your mock interview</h2>
+          <label for="roleSelect">Target role</label><select id="roleSelect"><option>Salesforce Administrator</option><option>Salesforce Developer</option><option>Salesforce Consultant</option><option>Salesforce Architect</option></select>
+          <label for="difficultySelect">Difficulty</label><select id="difficultySelect"><option>Beginner</option><option selected>Intermediate</option><option>Advanced</option></select>
+          <label for="questionCountSelect">Questions per session</label><select id="questionCountSelect"><option value="3">3 questions</option><option value="5" selected>5 questions</option><option value="10">10 questions</option></select>
+          <button id="startInterviewBtn" class="interview-primary" type="button">Start mock interview</button>
+        </div>
+        <div class="interview-card"><h2>Practice history</h2><div id="historyList" class="history-list"><p class="empty-state">Complete an interview to see your history.</p></div></div>
+      </aside>
+
+      <section class="interview-card interview-stage">
+        <div id="welcomeState" class="stage-welcome">
+          <div class="ai-orb">AI</div><span class="course-tag">TomCodex AI Interviewer</span><h2>Ready when you are.</h2><p>Select your role and difficulty. The AI interviewer will ask one question at a time and evaluate your answer for clarity, technical accuracy, examples, and confidence.</p>
+          <div class="grid gap-3 sm:grid-cols-3"><div><strong>Realistic</strong><span>Role-based questions</span></div><div><strong>Instant</strong><span>Detailed evaluation</span></div><div><strong>Repeatable</strong><span>Unlimited practice</span></div></div>
+        </div>
+
+        <div id="questionState" class="hidden">
+          <div class="flex flex-wrap items-center justify-between gap-3"><div><span id="questionProgress" class="course-tag">Question 1 of 5</span><p id="questionMeta" class="mt-2 text-xs font-bold text-slate-500"></p></div><div id="timer" class="timer">02:00</div></div>
+          <div class="question-box"><span>AI Interviewer asks</span><h2 id="questionText"></h2></div>
+          <div class="flex flex-wrap items-end justify-between gap-3"><label for="answerInput">Your interview answer</label><div class="voice-controls"><select id="speechLanguage" aria-label="Speech language"><option value="en-IN">English (India)</option><option value="en-US">English (US)</option><option value="en-GB">English (UK)</option></select><button id="voiceInputBtn" class="voice-button" type="button" aria-pressed="false"><span class="mic-icon" aria-hidden="true">●</span><span id="voiceButtonText">Start voice answer</span></button></div></div>
+          <textarea id="answerInput" class="answer-input" placeholder="Write your answer or use the microphone to speak..."></textarea>
+          <div id="voiceStatus" class="voice-status" role="status" aria-live="polite">Voice-to-text is ready. Your browser may request microphone permission.</div>
+          <div class="mt-3 flex flex-wrap items-center justify-between gap-3"><span id="wordCount" class="text-xs font-bold text-slate-500">0 words</span><button id="submitAnswerBtn" class="interview-primary interview-inline" type="button">Submit answer for AI review</button></div>
+        </div>
+
+        <div id="feedbackState" class="hidden">
+          <div class="feedback-heading"><div id="scoreRing" class="score-ring">0%</div><div><span class="course-tag">AI evaluation</span><h2 id="feedbackTitle" class="mt-3">Answer reviewed</h2><p id="feedbackSummary" class="mt-2 text-sm text-slate-500"></p></div></div>
+          <div id="scoreGrid" class="score-grid"></div>
+          <div class="grid gap-4 md:grid-cols-2"><div class="feedback-box positive"><h3>What worked well</h3><ul id="strengthList"></ul></div><div class="feedback-box improve"><h3>How to improve</h3><ul id="improvementList"></ul></div></div>
+          <div class="model-answer"><h3>Strong answer structure</h3><p id="modelAnswer"></p></div>
+          <button id="nextQuestionBtn" class="interview-primary" type="button">Next question</button>
+        </div>
+
+        <div id="resultState" class="hidden stage-welcome"><div id="finalScoreRing" class="score-ring large">0%</div><span class="course-tag">Session completed</span><h2 id="resultTitle">Interview complete</h2><p id="resultSummary"></p><div id="resultBreakdown" class="result-breakdown"></div><div class="flex flex-wrap justify-center gap-3"><button id="practiceAgainBtn" class="interview-primary interview-inline" type="button">Practice again</button><a href="dashboard.html" class="interview-secondary">Return to dashboard</a></div></div>
+      </section>
+    </section>
+  </main>
+  <script src="js/learning-records.js"></script>
+  <script src="js/ai-client.js"></script>
+  <script src="js/interview.js"></script>
+  <script src="js/floating-guide.js"></script>
+  <script src="js/voice-input.js"></script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Learn Salesforce Administration with TomCodex AI, official docs, videos, and Trailhead practice." />
+  <title>Salesforce Admin Program | TomCodex AI Academy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { brand: { 50: "#eef8ff", 100: "#d9f0ff", 500: "#087ea4", 600: "#056b8d", 700: "#075875", 950: "#062c3a" }, ink: "#172b4d", lime: "#d8ff5f" }, fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"] } } } };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/course.css" />
+  <link rel="stylesheet" href="css/course-fixes.css" />
+  <link rel="stylesheet" href="css/floating-guide.css" />
+  <link rel="stylesheet" href="css/floating-guide-auto.css" />
+</head>
+<body class="bg-slate-50 font-sans text-ink antialiased">
+  <header class="border-b border-slate-200 bg-white"><div class="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 lg:px-8"><a href="index.html" class="flex items-center gap-2"><img src="assets/tomcodex-logo.svg" alt="Tom Codex" class="h-12 w-auto sm:h-14"><span class="hidden border-l border-slate-300 pl-3 text-sm font-bold sm:inline">Salesforce Admin</span></a><nav class="ml-auto flex items-center gap-4 text-sm font-bold"><a href="analytics.html" class="hidden text-slate-500 hover:text-brand-600 sm:block">Analytics</a><a href="dashboard.html" class="rounded-lg border border-brand-600 px-4 py-2 text-brand-700 hover:bg-brand-50">Dashboard</a></nav></div></header>
+
+  <main>
+    <section class="bg-brand-950 text-white"><div class="mx-auto grid max-w-7xl gap-10 px-5 py-14 lg:grid-cols-[1fr_.42fr] lg:px-8"><div><span class="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-cyan-200">40+ hours · 14 modules · Beginner to advanced</span><h1 class="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl">Salesforce Administrator Program</h1><p class="mt-4 max-w-2xl text-lg leading-8 text-slate-300">Build job-ready Admin skills through 40+ hours of AI lessons, official Salesforce content, Trailhead practice, enterprise scenarios, and senior-admin responsibilities.</p><div class="mt-7 flex flex-wrap gap-3"><button id="continueCourseBtn" class="rounded-lg bg-lime px-6 py-3 font-extrabold text-brand-950">Continue current module</button><a href="interview.html" class="rounded-lg border border-white/30 px-6 py-3 font-bold text-white">Practice Admin interview</a></div></div><div class="course-progress-card"><div class="grid grid-cols-3 gap-3 text-center"><div><span>Course length</span><strong>40+ hrs</strong></div><div><span>Modules</span><strong>14</strong></div><div><span>Level</span><strong>All</strong></div></div><div class="mt-5 flex justify-between gap-3"><div><span>Program progress</span><strong id="courseProgressText">0%</strong></div><div class="text-right"><span>Completed</span><strong id="completedModulesText">0 / 14</strong></div></div><div class="course-progress-track"><div id="courseProgressBar"></div></div><p>Progress is saved automatically and added to your learning analytics.</p></div></div></section>
+
+    <section class="mx-auto grid max-w-7xl gap-6 px-5 py-10 lg:grid-cols-[.34fr_.66fr] lg:px-8">
+      <aside class="space-y-5">
+        <div class="course-panel sticky-panel"><span class="course-tag">Program curriculum</span><h2 class="mt-3">Admin learning path</h2><div id="moduleNav" class="module-nav"></div></div>
+        <div class="course-panel"><span class="course-tag">40+ hour plan</span><h2 class="mt-3">Learning time breakdown</h2><ul class="outcome-list"><li>14 hours of guided AI lessons</li><li>14 hours of Trailhead and official resources</li><li>10 hours of hands-on Admin projects</li><li>4+ hours of mastery tests and interview practice</li></ul></div>
+        <div class="course-panel doubt-guide-card"><div class="zentom-card-heading"><img src="assets/zentom-ai-logo.svg" alt="Zentom AI"><div><span class="course-tag">Zentom · Live</span><h2 class="mt-3">Ask Zentom AI</h2></div></div><p class="mt-2 text-xs leading-5 text-slate-500">Have a doubt about the current module? Ask your AI guide without leaving the course.</p><label for="courseDoubtSpeed">Answer speed</label><select id="courseDoubtSpeed"><option value="flash">Flash Mode</option><option value="normal">Normal Mode</option><option value="deep">Deep Trainer Mode</option></select><label for="courseDoubtInput">Your doubt</label><textarea id="courseDoubtInput" placeholder="Ask anything about this module..."></textarea><button id="askCourseGuideBtn" class="course-primary w-full" type="button">Ask Zentom</button><div id="courseDoubtAnswer" class="course-doubt-answer hidden" aria-live="polite"></div></div>
+        <div class="course-panel"><h2>Program outcomes</h2><ul class="outcome-list"><li>Configure Salesforce confidently</li><li>Design enterprise-grade security</li><li>Build and govern advanced automation</li><li>Manage deployments and releases</li><li>Improve org health and performance</li><li>Lead senior-admin workplace delivery</li></ul></div>
+      </aside>
+
+      <section id="moduleContent" class="course-panel module-content">
+        <div class="flex flex-wrap items-start justify-between gap-4"><div><span id="moduleLabel" class="course-tag">Module 1</span><h2 id="moduleTitle" class="mt-3 text-2xl">Salesforce Platform Foundations</h2><p id="moduleDescription" class="mt-3 text-slate-500"></p></div><button id="completeModuleBtn" class="complete-button" type="button">Mark module complete</button></div>
+
+        <div class="learning-cycle">
+          <div><strong>1. Learn with AI</strong><span>Understand the concept in simple language.</span></div><div><strong>2. Study sources</strong><span>Read official docs and watch free videos.</span></div><div><strong>3. Practice</strong><span>Complete Trailhead and hands-on tasks.</span></div><div><strong>4. Prove mastery</strong><span>Answer recall and workplace questions.</span></div>
+        </div>
+
+        <div class="content-section"><h3>AI lesson overview</h3><div id="lessonPoints" class="lesson-points"></div></div>
+        <div class="grid gap-5 md:grid-cols-2"><div class="content-section"><h3>Official and free resources</h3><div id="resourceList" class="course-resource-list"></div></div><div class="content-section"><h3>Hands-on practice</h3><div id="practiceList" class="practice-list"></div></div></div>
+        <div class="content-section"><div class="flex flex-wrap items-center justify-between gap-3"><div><h3>Zentom AI mastery test</h3><p class="mt-2 text-xs text-slate-500">Zentom generates a fresh minimum of 15 questions for every attempt. Answer all questions and score 80% or higher to unlock the next module.</p></div><button id="startMasteryTestBtn" class="course-primary" type="button">Start 15-question AI test</button></div><div id="questionList" class="mastery-list"></div></div>
+        <div id="masteryTestPanel" class="mastery-test-panel hidden"><div class="flex items-center justify-between gap-3"><div><span class="course-tag">Centralized AI evaluation</span><h3 class="mt-3">15-question module mastery test</h3></div><strong class="pass-score">15 questions · Pass: 80%</strong></div><div id="masteryAnswerList" class="mastery-answer-list"></div><button id="submitMasteryTestBtn" class="course-primary" type="button">Submit 15 answers to AI</button><div id="masteryResult" class="mastery-result hidden" aria-live="polite"></div></div>
+        <div class="flex flex-wrap justify-between gap-3 border-t border-slate-200 pt-5"><button id="previousModuleBtn" class="course-secondary" type="button">Previous module</button><button id="nextModuleBtn" class="course-primary" type="button">Next module</button></div>
+      </section>
+    </section>
+  </main>
+  <script src="js/learning-records.js"></script>
+  <script src="js/ai-client.js"></script>
+  <script src="js/course-admin.js"></script>
+  <script src="js/course-mastery.js"></script>
+  <script src="js/course-guide.js"></script>
+  <script src="js/floating-guide.js"></script>
+  <script src="js/voice-input.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="TomCodex student learning analytics, activity heatmap, and progress curves." />
+  <title>Learning Analytics | TomCodex AI Academy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { brand: { 50: "#eef8ff", 100: "#d9f0ff", 500: "#087ea4", 600: "#056b8d", 700: "#075875", 950: "#062c3a" }, ink: "#172b4d", lime: "#d8ff5f" }, fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"] } } } };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/analytics.css" />
+  <link rel="stylesheet" href="css/floating-guide.css" />
+  <link rel="stylesheet" href="css/floating-guide-auto.css" />
+</head>
+<body class="bg-slate-50 font-sans text-ink antialiased">
+  <header class="border-b border-slate-200 bg-white"><div class="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 lg:px-8"><a href="index.html" class="flex items-center gap-2"><img src="assets/tomcodex-logo.svg" alt="Tom Codex" class="h-12 w-auto sm:h-14"><span class="hidden border-l border-slate-300 pl-3 text-sm font-bold sm:inline">Learning Analytics</span></a><nav class="ml-auto flex items-center gap-3 text-sm font-bold"><a href="dashboard.html" class="rounded-lg border border-brand-600 px-4 py-2 text-brand-700 hover:bg-brand-50">Dashboard</a><a href="interview.html" class="hidden text-slate-500 hover:text-brand-600 sm:block">AI Interviewer</a></nav></div></header>
+
+  <main>
+    <section class="bg-brand-950 text-white"><div class="mx-auto max-w-7xl px-5 py-12 lg:px-8"><span class="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-cyan-200">Continuous growth record</span><h1 class="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl">Your learning activity and growth curve.</h1><p class="mt-4 max-w-2xl text-lg leading-8 text-slate-300">Track consistency, completed work, interview improvement, and career-long Salesforce progress.</p></div></section>
+
+    <section class="mx-auto max-w-7xl px-5 py-10 lg:px-8">
+      <div id="analyticsStats" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"></div>
+
+      <div class="analytics-card mt-6">
+        <div class="flex flex-wrap items-end justify-between gap-3"><div><span class="course-tag">Learning heatmap</span><h2 class="mt-3">Your activity over the last year</h2><p class="mt-2 text-sm text-slate-500">Darker squares show more learning activity.</p></div><div class="heat-legend"><span>Less</span><i class="level-0"></i><i class="level-1"></i><i class="level-2"></i><i class="level-3"></i><i class="level-4"></i><span>More</span></div></div>
+        <div class="heatmap-scroll"><div id="heatmap" class="heatmap" aria-label="Learning activity heatmap"></div></div>
+      </div>
+
+      <div class="mt-6 grid gap-6 lg:grid-cols-2">
+        <div class="analytics-card"><span class="course-tag">Progress curve</span><h2 class="mt-3">Learning points over 12 weeks</h2><div id="learningCurve" class="chart-wrap"></div></div>
+        <div class="analytics-card"><span class="course-tag">Interview curve</span><h2 class="mt-3">AI Interviewer score trend</h2><div id="interviewCurve" class="chart-wrap"></div></div>
+      </div>
+
+      <div class="mt-6 grid gap-6 lg:grid-cols-[.7fr_.3fr]">
+        <div class="analytics-card"><div class="flex items-center justify-between gap-3"><div><span class="course-tag">Learning records</span><h2 class="mt-3">Recent activity</h2></div><button id="addDemoRecordBtn" class="analytics-button" type="button">Add practice record</button></div><div id="recordList" class="record-list"></div></div>
+        <div class="analytics-card"><span class="course-tag">Activity mix</span><h2 class="mt-3">What you practiced</h2><div id="activityMix" class="activity-mix"></div></div>
+      </div>
+    </section>
+  </main>
+  <script src="js/learning-records.js"></script>
+  <script src="js/ai-client.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/floating-guide.js"></script>
+  <script src="js/voice-input.js"></script>
+</body>
+</html>

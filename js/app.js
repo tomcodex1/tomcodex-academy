@@ -1,0 +1,565 @@
+const STORAGE_KEY = "salesforceMasterDashboard.v1";
+const defaultState = {
+  selectedDay: 1,
+  activeTab: "dashboard",
+  completedTasks: {},
+  completedHabits: [],
+  generatedStages: []
+};
+
+let state;
+
+const stats = [
+  { label: "Pathways", value: "24+", detail: "Continuously expanding" },
+  { label: "Access", value: "Unlimited", detail: "No fixed day limit" },
+  { label: "Current", value: "", detail: "" },
+  { label: "Growth", value: "Career-long", detail: "Before and after placement" }
+];
+
+const skillMeters = [
+  ["Admin Foundation", 12],
+  ["Security", 8],
+  ["Flow Automation", 5],
+  ["Apex", 3],
+  ["LWC", 2],
+  ["Integration", 1],
+  ["DevOps", 1]
+];
+
+const dailyChecklist = [
+  "Learn concept",
+  "Build in Salesforce org",
+  "Write notes",
+  "Answer recall questions",
+  "Explain like interview",
+  "Update mistake log"
+];
+
+const habits = [
+  "Wake up on time",
+  "15 minutes meditation",
+  "Walking / fitness",
+  "Salesforce deep work",
+  "Hands-on org practice",
+  "Notes / flashcards",
+  "Interview speaking practice",
+  "English communication practice",
+  "No distraction block",
+  "Sleep discipline"
+];
+
+const studyBlocks = [
+  "30 min: Revise yesterday",
+  "2 hr: Learn new concept",
+  "2 hr: Hands-on in org",
+  "1 hr: Notes making",
+  "1 hr: Interview questions",
+  "30 min: Explain like interview"
+];
+
+const answerModes = [
+  "Simple Mode",
+  "Interview Mode",
+  "Project Mode",
+  "Code Mode",
+  "Quiz Mode",
+  "Correction Mode"
+];
+
+const trainerPrompt = `You are Zentom AI, Vijay's personal Salesforce tutor.
+
+Teach Salesforce from scratch through placement and continue supporting real workplace delivery, certifications, promotions, architecture, and new Salesforce releases.
+
+Answer every doubt in this format:
+1. Simple meaning
+2. Why it matters in Salesforce
+3. Real Salesforce example
+4. SentinelFlow project example
+5. Common beginner mistake
+6. Interview answer in 60 seconds
+7. Hands-on task inside Salesforce org
+8. 5 recall questions
+9. One mini assignment
+10. Confidence score: Weak / Medium / Strong
+
+Use simple English. Use Tanglish only when a concept is difficult. Adapt to the student's progress, give instant feedback, and act as the complete AI learning guide.`;
+
+const projectOutputs = [
+  "Incident__c object",
+  "Incident fields",
+  "Permission sets",
+  "Validation rules",
+  "Critical incident flow",
+  "Reports and dashboard",
+  "IncidentService Apex class",
+  "Incident trigger handler",
+  "Test classes",
+  "LWC command center",
+  "REST integration",
+  "Deployment package"
+];
+
+const phases = [
+  { phase: 1, area: "Org Basics", level: "Admin", goal: "Navigate Salesforce confidently", topics: "Org, Developer Edition, Setup, App Launcher, Object Manager, Quick Find", practice: "Explore your Developer Edition org" },
+  { phase: 2, area: "Data Model", level: "Admin", goal: "Understand how Salesforce stores data", topics: "Object, Field, Record, Tab, App, Standard Objects, Custom Objects", practice: "Create Incident__c object" },
+  { phase: 3, area: "Relationships", level: "Admin", goal: "Connect objects properly", topics: "Lookup, Master-Detail, Junction Object, Related List, Roll-Up Summary", practice: "Create Account to Incident relationship" },
+  { phase: 4, area: "UI Customization", level: "Admin", goal: "Control how users see records", topics: "Page Layout, Compact Layout, Lightning Record Page, Dynamic Forms, List Views", practice: "Create Admin, Operator, Viewer layouts" },
+  { phase: 5, area: "Security Model", level: "Admin", goal: "Control access safely", topics: "Users, Profiles, Permission Sets, Roles, OWD, Sharing Rules, FLS", practice: "Create SentinelFlow permission sets" },
+  { phase: 6, area: "Data Management", level: "Admin", goal: "Import, export, and clean data", topics: "Data Import Wizard, Data Loader, Duplicate Rules, Validation, Backup", practice: "Import 20 Incident records" },
+  { phase: 7, area: "Formula & Validation", level: "Admin", goal: "Build logic without code", topics: "Formula Fields, IF, CASE, ISBLANK, ISPICKVAL, Validation Rules", practice: "Create Incident Age formula" },
+  { phase: 8, area: "Flow Builder", level: "Admin", goal: "Automate business process", topics: "Screen Flow, Record-Triggered Flow, Scheduled Flow, Decision, Loop, Fault Path", practice: "Alert admin for Critical Incident" },
+  { phase: 9, area: "Reports & Dashboards", level: "Admin", goal: "Analyze Salesforce data", topics: "Report Types, Filters, Charts, Dashboard Components", practice: "Build Incident Dashboard" },
+  { phase: 10, area: "App Builder", level: "Admin", goal: "Create complete Salesforce app", topics: "Custom App, Navigation Items, Home Page, Record Page", practice: "Build SentinelFlow App" },
+  { phase: 11, area: "SOQL", level: "Developer", goal: "Retrieve Salesforce data", topics: "SELECT, WHERE, ORDER BY, LIMIT, Relationship Query", practice: "Query Incident records" },
+  { phase: 12, area: "Apex Basics", level: "Developer", goal: "Write backend logic", topics: "Class, Method, Variables, List, Set, Map, DML", practice: "Create IncidentService class" },
+  { phase: 13, area: "Apex Triggers", level: "Developer", goal: "Run code automatically", topics: "Before/After Trigger, Context Variables, Handler Pattern", practice: "Auto-calculate incident risk score" },
+  { phase: 14, area: "Apex Testing", level: "Developer", goal: "Deploy code with confidence", topics: "@isTest, Test Data, startTest, stopTest, System.assert", practice: "Write test class" },
+  { phase: 15, area: "LWC", level: "Developer", goal: "Build modern Salesforce UI", topics: "HTML, JS, XML, @api, @wire, Events, Toast", practice: "Build Incident Command Center" },
+  { phase: 16, area: "Integration", level: "Developer", goal: "Connect Salesforce with external systems", topics: "REST, SOAP, Named Credentials, Apex Callouts, JSON", practice: "Send Incident data to external API" },
+  { phase: 17, area: "DevOps", level: "Developer", goal: "Deploy like a real developer", topics: "VS Code, Salesforce CLI, SFDX, GitHub, Package.xml", practice: "Deploy metadata to another org" },
+  { phase: 18, area: "Advanced Salesforce", level: "Architect", goal: "Design scalable solutions", topics: "Custom Metadata, Queueable, Batch, Shield, Experience Cloud", practice: "Metadata-driven incident rule engine" },
+  { phase: 19, area: "Interview Prep", level: "Career", goal: "Become interview-ready", topics: "Admin, Apex, Trigger, Flow, LWC, Security", practice: "Daily mock interview" },
+  { phase: 20, area: "Capstone Project", level: "Career", goal: "Build portfolio product", topics: "SentinelFlow Incident Intelligence App", practice: "Build complete app end-to-end" },
+  { phase: 21, area: "Workplace Delivery", level: "Career", goal: "Perform confidently after placement", topics: "User Stories, Estimation, Debugging, Documentation, Code Reviews", practice: "Deliver a simulated sprint feature" },
+  { phase: 22, area: "Certification Growth", level: "Career", goal: "Keep advancing your credentials", topics: "Admin, Platform Developer, App Builder, Architect certifications", practice: "Build a personalized certification plan" },
+  { phase: 23, area: "Solution Architecture", level: "Architect", goal: "Design enterprise-grade Salesforce solutions", topics: "Tradeoffs, Scale, Security, Integration, Data Strategy", practice: "Create and defend a solution design" },
+  { phase: 24, area: "Continuous Release Learning", level: "Career", goal: "Stay current throughout your career", topics: "Salesforce Releases, New Features, Deprecations, Best Practices", practice: "Review each release and update a live project" }
+];
+
+const days = [
+  [1, "Org Navigation", "Setup, App Launcher, Object Manager", "Explore your org"],
+  [2, "Objects & Fields", "Standard/custom objects and field types", "Create Incident__c"],
+  [3, "Relationships", "Lookup, Master-Detail, Related List", "Account → Incident"],
+  [4, "Page Layouts", "Layouts, Compact Layout, Record Page", "Customize Incident page"],
+  [5, "Profiles & Users", "User, Profile, access basics", "Check your profile"],
+  [6, "Permission Sets", "Object and field permission", "Create Incident Manager"],
+  [7, "Week 1 Review", "Explain admin foundation", "Mini interview"],
+  [8, "Formula Fields", "IF, CASE, TODAY, NOW", "Incident Age formula"],
+  [9, "Validation Rules", "Required logic and errors", "Critical validation"],
+  [10, "Screen Flow", "Screen, input, create record", "Create Incident flow"],
+  [11, "Record Flow", "Create/update automation", "Auto-set Open status"],
+  [12, "Scheduled Flow", "Time-based automation", "Daily critical check"],
+  [13, "Reports", "Filters and grouping", "Incident report"],
+  [14, "Dashboards", "Charts and dashboard filters", "Incident dashboard"],
+  [15, "SOQL", "SELECT, WHERE, ORDER BY", "Query Incident records"],
+  [16, "Apex Basics", "Class, method, variables", "IncidentService"],
+  [17, "Collections", "List, Set, Map", "Handle records"],
+  [18, "DML & SOQL", "Insert, update, query", "CRUD in Apex"],
+  [19, "Triggers", "Before/After triggers", "Incident trigger"],
+  [20, "Trigger Handler", "Pattern and bulkification", "Handler class"],
+  [21, "Test Class", "@isTest and asserts", "Test IncidentService"],
+  [22, "LWC Basics", "HTML, JS, XML", "Incident card"],
+  [23, "LWC + Apex", "Wire and imperative Apex", "Show incident list"],
+  [24, "Datatable", "Table, action buttons", "Incident table"],
+  [25, "REST Integration", "Named Credential, callout", "Send Incident API"],
+  [26, "Platform Events", "Event-driven design", "Publish Critical event"],
+  [27, "VS Code & CLI", "SFDX, authorize org", "Connect org"],
+  [28, "Deployment", "Package.xml, deploy, validate", "Deploy metadata"],
+  [29, "Interview Prep", "Scenario questions", "Mock interview"],
+  [30, "Portfolio Project", "End-to-end revision", "Explain SentinelFlow"],
+  [31, "First Project Sprint", "User stories, estimation, delivery", "Deliver a simulated sprint feature"],
+  [32, "Production Debugging", "Logs, root-cause analysis, fixes", "Resolve a production-style issue"],
+  [33, "Code Review Practice", "Quality, maintainability, security", "Review and improve a pull request"],
+  [34, "Certification Planning", "Role-based certification pathways", "Create your next certification plan"],
+  [35, "Solution Architecture", "Scale, tradeoffs, integration, security", "Present an architecture design"],
+  [36, "Release Readiness", "New features and platform changes", "Apply a release update to your project"]
+];
+
+const continuousStageTemplates = [
+  ["Workplace Scenario Lab", "Real stakeholder requests, constraints, and tradeoffs", "Solve a new workplace Salesforce scenario"],
+  ["Advanced Project Upgrade", "Performance, security, maintainability, and scale", "Upgrade an existing portfolio project"],
+  ["Certification Deep Dive", "Advanced exam domains and scenario questions", "Complete a focused certification practice set"],
+  ["Release Feature Lab", "Current Salesforce capabilities and best practices", "Test and document a platform feature"],
+  ["Architecture Challenge", "Data, automation, integration, and security design", "Create an architecture decision record"],
+  ["Career Growth Review", "Impact, communication, leadership, and specialization", "Update your professional growth plan"]
+];
+
+state = loadState();
+
+function loadState() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    const generatedStages = Array.isArray(stored?.generatedStages) ? stored.generatedStages : [];
+    generatedStages.forEach((stage) => {
+      if (Array.isArray(stage) && !days.some(([number]) => number === stage[0])) days.push(stage);
+    });
+    const selectedDay = Number(stored?.selectedDay);
+    return {
+      ...defaultState,
+      ...stored,
+      selectedDay: selectedDay >= 1 && selectedDay <= days.length ? selectedDay : defaultState.selectedDay,
+      completedTasks: stored?.completedTasks || {},
+      completedHabits: Array.isArray(stored?.completedHabits) ? stored.completedHabits : [],
+      generatedStages
+    };
+  } catch {
+    return { ...defaultState };
+  }
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // The dashboard remains usable when browser storage is unavailable.
+  }
+}
+
+function createElement(tag, className, text) {
+  const el = document.createElement(tag);
+  if (className) el.className = className;
+  if (text !== undefined) el.textContent = text;
+  return el;
+}
+
+function getSelectedDay() {
+  return days.find(([day]) => day === state.selectedDay) || days[0];
+}
+
+function getMission() {
+  const [day, focus, topics, practice] = getSelectedDay();
+  return {
+    day,
+    title: focus,
+    trainerNote: `Focus on ${focus}. Learn the concepts, complete the hands-on task, and explain the result without reading notes.`,
+    mustFinish: [
+      `Learn: ${topics}`,
+      `Hands-on: ${practice}`,
+      "Write concise notes and one flashcard",
+      "Explain the topic like an interview answer",
+      "Record one mistake or lesson learned"
+    ],
+    recall: [
+      `What is the purpose of ${focus}?`,
+      `Explain the key ideas in: ${topics}.`,
+      `How would you complete this task: ${practice}?`,
+      `What beginner mistake should you avoid in ${focus}?`,
+      `How does ${focus} help the SentinelFlow project?`
+    ]
+  };
+}
+
+function renderStats() {
+  const grid = document.getElementById("statsGrid");
+  const mission = getMission();
+  stats[2] = { label: "Current", value: `Stage ${mission.day}`, detail: mission.title };
+  grid.replaceChildren();
+  stats.forEach((item) => {
+    const card = createElement("div", "stat-card");
+    card.append(
+      createElement("strong", "", item.value),
+      createElement("span", "", item.label),
+      createElement("p", "tiny-text", item.detail)
+    );
+    grid.append(card);
+  });
+}
+
+function updateTodayProgress() {
+  const checks = [...document.querySelectorAll(".today-check")];
+  const completed = checks.filter((c) => c.checked).length;
+  const progress = Math.round((completed / checks.length) * 100) || 0;
+  document.getElementById("todayProgressText").textContent = `${progress}%`;
+  const progressBar = document.getElementById("todayProgressBar");
+  progressBar.style.width = `${progress}%`;
+  progressBar.setAttribute("aria-valuenow", progress);
+}
+
+function renderTodayMission() {
+  const mission = getMission();
+  const completedTasks = state.completedTasks[mission.day] || [];
+  document.getElementById("todayTitle").textContent = `Current Mission: Stage ${mission.day} - ${mission.title}`;
+  document.getElementById("trainerNote").textContent = mission.trainerNote;
+
+  const tasks = document.getElementById("todayTasks");
+  tasks.replaceChildren();
+  mission.mustFinish.forEach((task, index) => {
+    const label = createElement("label", "task-item");
+    const checkbox = createElement("input", "today-check");
+    checkbox.type = "checkbox";
+    checkbox.checked = completedTasks.includes(index);
+    label.classList.toggle("done", checkbox.checked);
+    label.append(checkbox, createElement("span", "", task));
+    checkbox.addEventListener("change", () => {
+      label.classList.toggle("done", checkbox.checked);
+      state.completedTasks[mission.day] = [...document.querySelectorAll(".today-check")]
+        .map((check, taskIndex) => (check.checked ? taskIndex : null))
+        .filter((taskIndex) => taskIndex !== null);
+      saveState();
+      if (checkbox.checked) window.TomCodexLearning?.record("task", 3, `${mission.title}: ${task}`);
+      updateTodayProgress();
+    });
+    tasks.append(label);
+  });
+
+  const questions = document.getElementById("recallQuestions");
+  questions.replaceChildren();
+  mission.recall.forEach((question, index) => {
+    const item = createElement("div");
+    item.append(
+      createElement("span", "small-label", `Question ${index + 1}`),
+      document.createElement("br"),
+      document.createTextNode(question)
+    );
+    questions.append(item);
+  });
+  updateTodayProgress();
+}
+
+function renderSkillMeters() {
+  const list = document.getElementById("skillMeters");
+  list.innerHTML = "";
+  skillMeters.forEach(([skill, value]) => {
+    list.innerHTML += `
+      <div>
+        <div class="meter-label"><span>${skill}</span><strong>${value}%</strong></div>
+        <div class="meter-track"><div class="meter-fill" style="width:${value}%"></div></div>
+      </div>`;
+  });
+}
+
+function renderSimpleList(id, items) {
+  const list = document.getElementById(id);
+  list.innerHTML = "";
+  items.forEach((item) => {
+    list.innerHTML += `<div>${item}</div>`;
+  });
+}
+
+function updateHabitProgress() {
+  const checks = [...document.querySelectorAll(".habit-check")];
+  const completed = checks.filter((c) => c.checked).length;
+  const progress = Math.round((completed / checks.length) * 100) || 0;
+  document.getElementById("habitProgressText").textContent = `${progress}%`;
+  const progressBar = document.getElementById("habitProgressBar");
+  progressBar.style.width = `${progress}%`;
+  progressBar.setAttribute("aria-valuenow", progress);
+}
+
+function renderHabits() {
+  const wrap = document.getElementById("habitTracker");
+  wrap.replaceChildren();
+  habits.forEach((habit, index) => {
+    const label = createElement("label", "task-item");
+    const checkbox = createElement("input", "habit-check");
+    checkbox.type = "checkbox";
+    checkbox.checked = state.completedHabits.includes(index);
+    label.classList.toggle("done", checkbox.checked);
+    label.append(checkbox, createElement("span", "", habit));
+    checkbox.addEventListener("change", () => {
+      label.classList.toggle("done", checkbox.checked);
+      state.completedHabits = [...document.querySelectorAll(".habit-check")]
+        .map((check, habitIndex) => (check.checked ? habitIndex : null))
+        .filter((habitIndex) => habitIndex !== null);
+      saveState();
+      if (checkbox.checked) window.TomCodexLearning?.record("habit", 1, habit);
+      updateHabitProgress();
+    });
+    wrap.append(label);
+  });
+  updateHabitProgress();
+}
+
+function renderProjectOutputs() {
+  const wrap = document.getElementById("projectOutputs");
+  wrap.innerHTML = "";
+  projectOutputs.forEach((item, index) => {
+    wrap.innerHTML += `<div class="output-item"><strong>${index + 1}.</strong> ${item}</div>`;
+  });
+}
+
+function renderModes() {
+  const wrap = document.getElementById("answerModes");
+  wrap.innerHTML = "";
+  answerModes.forEach((mode) => {
+    wrap.innerHTML += `<div class="mode-item">${mode}</div>`;
+  });
+}
+
+function renderPhases() {
+  const filter = document.getElementById("phaseFilter").value;
+  const search = document.getElementById("phaseSearch").value.toLowerCase();
+  const wrap = document.getElementById("phaseCards");
+  wrap.innerHTML = "";
+
+  phases
+    .filter((p) => filter === "All" || p.level === filter)
+    .filter((p) => `${p.area} ${p.goal} ${p.topics} ${p.practice} ${p.level}`.toLowerCase().includes(search))
+    .forEach((p) => {
+      wrap.innerHTML += `
+        <div class="phase-card">
+          <span class="level-badge">${p.level}</span>
+          <h3>Phase ${p.phase}: ${p.area}</h3>
+          <p><strong>Goal:</strong> ${p.goal}</p>
+          <p><strong>Topics:</strong> ${p.topics}</p>
+          <p><strong>Practice:</strong> ${p.practice}</p>
+        </div>`;
+    });
+}
+
+function renderDays() {
+  const tbody = document.getElementById("daysTable");
+  tbody.innerHTML = "";
+  days.forEach(([day, focus, topic, task]) => {
+    tbody.innerHTML += `<tr><td><strong>Stage ${day}</strong></td><td>${focus}</td><td>${topic}</td><td>${task}</td></tr>`;
+  });
+}
+
+function setupDoubtBox() {
+  document.getElementById("trainerPrompt").textContent = trainerPrompt;
+  const speedModeSelect = document.getElementById("speedModeSelect");
+  const speedModeDescription = document.getElementById("speedModeDescription");
+  const speedDescriptions = {
+    normal: "Balanced explanations with examples, practice, and interview guidance.",
+    flash: "Fast answers for doubt clearing, quick recall, and short interview responses.",
+    deep: "Detailed trainer-style explanations, project guidance, practice, and recall."
+  };
+  speedModeSelect.addEventListener("change", () => {
+    speedModeDescription.textContent = speedDescriptions[speedModeSelect.value];
+  });
+
+  document.getElementById("askTrainerBtn").addEventListener("click", async () => {
+    const topic = document.getElementById("topicSelect").value;
+    const mode = document.getElementById("modeSelect").value;
+    const speedMode = speedModeSelect.value;
+    const doubt = document.getElementById("doubtInput").value.trim();
+    const answer = document.getElementById("mockAnswer");
+
+    if (!doubt) {
+      answer.classList.remove("hidden");
+      answer.textContent = "Please type one Salesforce doubt first.";
+      return;
+    }
+
+    window.TomCodexLearning?.record("tutor", 2, `${topic}: ${doubt}`);
+    answer.classList.remove("hidden");
+    answer.textContent = "Zentom AI is preparing your answer...";
+    const result = await window.TomCodexAI.askTrainer({ topic, answerMode: mode, speedMode, doubt });
+    if (!result.connected) {
+      answer.replaceChildren(
+        createElement("strong", "", "Zentom AI is offline"),
+        createElement("p", "", result.error),
+        createElement("p", "", "Zentom AI is temporarily unavailable. Please try again after the service is connected.")
+      );
+      return;
+    }
+    answer.replaceChildren(
+      createElement("strong", "", `${speedModeSelect.options[speedModeSelect.selectedIndex].text} Response`),
+      createElement("p", "", result.answer)
+    );
+  });
+}
+
+function createLabeledParagraph(label, value) {
+  const paragraph = createElement("p");
+  paragraph.append(createElement("b", "", label), document.createTextNode(` ${value}`));
+  return paragraph;
+}
+
+function setupDayNavigation() {
+  const select = document.getElementById("daySelect");
+  const appendStageOption = ([day, focus]) => {
+    const option = createElement("option", "", `Stage ${day}: ${focus}`);
+    option.value = day;
+    select.append(option);
+  };
+  days.forEach(appendStageOption);
+  select.value = state.selectedDay;
+
+  const generateNextStage = () => {
+    const stageNumber = days.length + 1;
+    const template = continuousStageTemplates[(stageNumber - 37) % continuousStageTemplates.length];
+    const stage = [stageNumber, ...template];
+    days.push(stage);
+    state.generatedStages.push(stage);
+    appendStageOption(stage);
+    renderDays();
+    return stageNumber;
+  };
+
+  const setDay = (day) => {
+    const previousStage = state.selectedDay;
+    state.selectedDay = Math.min(days.length, Math.max(1, Number(day)));
+    saveState();
+    select.value = state.selectedDay;
+    document.getElementById("previousDayBtn").disabled = state.selectedDay === 1;
+    const nextButton = document.getElementById("nextDayBtn");
+    nextButton.disabled = false;
+    nextButton.textContent = state.selectedDay === days.length ? "Generate next topic" : "Next topic";
+    renderStats();
+    renderTodayMission();
+    if (state.selectedDay !== previousStage) window.TomCodexLearning?.record("stage", 1, getSelectedDay()[1]);
+  };
+
+  select.addEventListener("change", () => setDay(select.value));
+  document.getElementById("previousDayBtn").addEventListener("click", () => setDay(state.selectedDay - 1));
+  document.getElementById("nextDayBtn").addEventListener("click", () => {
+    const nextStage = state.selectedDay === days.length ? generateNextStage() : state.selectedDay + 1;
+    setDay(nextStage);
+  });
+  setDay(state.selectedDay);
+}
+
+function setupTabs() {
+  const buttons = [...document.querySelectorAll("[data-tab-target]")];
+  const panels = [...document.querySelectorAll("[data-tab-panel]")];
+  const availableTabs = buttons.map((button) => button.dataset.tabTarget);
+
+  const showTab = (tabName, moveFocus = false, scrollToContent = false) => {
+    const activeTab = availableTabs.includes(tabName) ? tabName : "dashboard";
+    state.activeTab = activeTab;
+    saveState();
+
+    buttons.forEach((button) => {
+      const isActive = button.dataset.tabTarget === activeTab;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-selected", isActive);
+      button.tabIndex = isActive ? 0 : -1;
+      if (isActive && moveFocus) button.focus();
+    });
+
+    panels.forEach((panel) => {
+      panel.hidden = panel.dataset.tabPanel !== activeTab;
+    });
+
+    if (scrollToContent) {
+      document.getElementById("tabContent").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  buttons.forEach((button, index) => {
+    button.addEventListener("click", () => showTab(button.dataset.tabTarget, false, true));
+    button.addEventListener("keydown", (event) => {
+      if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+      event.preventDefault();
+      const direction = event.key === "ArrowRight" ? 1 : -1;
+      const nextIndex = (index + direction + buttons.length) % buttons.length;
+      showTab(buttons[nextIndex].dataset.tabTarget, true, true);
+    });
+  });
+
+  document.querySelectorAll("[data-go-tab]").forEach((button) => {
+    button.addEventListener("click", () => showTab(button.dataset.goTab, false, true));
+  });
+
+  showTab(state.activeTab);
+}
+
+function init() {
+  renderSkillMeters();
+  renderSimpleList("dailyChecklist", dailyChecklist);
+  renderSimpleList("studyBlocks", studyBlocks);
+  renderHabits();
+  renderProjectOutputs();
+  renderModes();
+  renderPhases();
+  renderDays();
+  setupDoubtBox();
+  setupDayNavigation();
+  setupTabs();
+
+  document.getElementById("phaseFilter").addEventListener("change", renderPhases);
+  document.getElementById("phaseSearch").addEventListener("input", renderPhases);
+}
+
+document.addEventListener("DOMContentLoaded", init);

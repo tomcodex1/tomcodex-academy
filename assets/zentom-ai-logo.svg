@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="title desc">
+  <title id="title">Zentom AI logo</title>
+  <desc id="desc">A blue and purple technology ring surrounding a bold letter Z.</desc>
+  <defs>
+    <linearGradient id="ring" x1="28" y1="28" x2="212" y2="212" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#19b8ff"/>
+      <stop offset=".52" stop-color="#1677e8"/>
+      <stop offset="1" stop-color="#7847ff"/>
+    </linearGradient>
+    <linearGradient id="core" x1="72" y1="60" x2="174" y2="184" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#102d55"/>
+      <stop offset="1" stop-color="#06162d"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="9" stdDeviation="9" flood-color="#087ea4" flood-opacity=".28"/>
+    </filter>
+  </defs>
+  <circle cx="120" cy="120" r="96" fill="none" stroke="#dff4ff" stroke-width="12"/>
+  <path d="M120 24a96 96 0 0 1 91 66M216 120a96 96 0 0 1-96 96M120 216a96 96 0 0 1-91-66M24 120a96 96 0 0 1 96-96" fill="none" stroke="url(#ring)" stroke-linecap="round" stroke-width="12"/>
+  <g fill="none" stroke="#21aaff" stroke-linecap="round" stroke-width="5">
+    <path d="M24 82H8"/>
+    <path d="M32 158H13"/>
+    <path d="M207 67h18"/>
+    <path d="M211 171h15"/>
+  </g>
+  <g fill="#fff" stroke="#21aaff" stroke-width="5">
+    <circle cx="7" cy="82" r="5"/>
+    <circle cx="12" cy="158" r="5"/>
+    <circle cx="226" cy="67" r="5"/>
+    <circle cx="227" cy="171" r="5"/>
+  </g>
+  <circle cx="120" cy="120" r="67" fill="url(#core)" stroke="#8ddcff" stroke-width="4" filter="url(#shadow)"/>
+  <path d="M84 78h78l-49 67h50v19H79l50-67H84z" fill="#fff"/>
+  <circle cx="120" cy="120" r="76" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="2"/>
+</svg>

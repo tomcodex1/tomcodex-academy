@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 190" role="img" aria-labelledby="title desc">
+  <title id="title">Tom Codex logo</title>
+  <desc id="desc">Tom in white with codeX in bright blue.</desc>
+  <defs>
+    <linearGradient id="blue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#62d6ff"/>
+      <stop offset=".5" stop-color="#1594ff"/>
+      <stop offset="1" stop-color="#3977ff"/>
+    </linearGradient>
+  </defs>
+  <text x="210" y="78" fill="url(#blue)" font-family="Arial, Helvetica, sans-serif" font-size="96" font-weight="900" letter-spacing="-9">codeX</text>
+  <text x="12" y="174" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="144" font-weight="900" letter-spacing="-12">Tom</text>
+</svg>
