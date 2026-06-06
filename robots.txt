@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /login.html
+Disallow: /dashboard.html
+Disallow: /analytics.html
+
+Sitemap: https://tomcodex-academy.vercel.app/sitemap.xml
