@@ -1,6 +1,16 @@
 (function () {
-  const modules = window.TomCodexAdminModules;
-  const MASTERY_KEY = "tomcodex.adminMasteryScores.v1";
+  const config = window.TomCodexCourseConfig || {
+    modules: window.TomCodexAdminModules,
+    masteryKey: "tomcodex.adminMasteryScores.v1",
+    courseName: "Salesforce Administrator",
+    recordLabel: "Admin",
+    moduleHours: 3
+  };
+  const modules = config.modules;
+  const MASTERY_KEY = config.masteryKey;
+  const courseName = config.courseName;
+  const recordLabel = config.recordLabel;
+  const moduleHours = config.moduleHours;
   const AUTH_SESSION_KEY = "tomcodex.authSession.v1";
   let currentModule = 0;
   let masteryScores = loadScores();
@@ -28,7 +38,7 @@
     el("moduleNav").innerHTML = modules.map((module, index) => {
       const isPassed = passed(index);
       const isUnlocked = unlocked(index);
-      const status = isPassed ? `Passed: ${scoreFor(index)}% · 3 hrs` : isAdmin ? "Admin access · 3 hrs" : isUnlocked ? "Ready to learn · 3 hrs" : "Locked: pass previous module";
+      const status = isPassed ? `Passed: ${scoreFor(index)}% · ${moduleHours} hrs` : isAdmin ? `Admin access · ${moduleHours} hrs` : isUnlocked ? `Ready to learn · ${moduleHours} hrs` : "Locked: pass previous module";
       const icon = isPassed ? "\u2713" : isUnlocked ? index + 1 : "\uD83D\uDD12";
       return `<button type="button" data-module="${index}" ${isUnlocked ? "" : "disabled"} class="${index === currentModule ? "active" : ""} ${isPassed ? "done" : ""} ${isUnlocked ? "" : "locked"}"><span class="module-number">${icon}</span><span><strong>${module.title}</strong><span>${status}</span></span></button>`;
     }).join("");
@@ -51,7 +61,7 @@
   function render() {
     const module = modules[currentModule];
     const isPassed = passed(currentModule);
-    el("moduleLabel").textContent = `Module ${currentModule + 1} of ${modules.length} · ${isAdmin ? "Admin access" : "About 3 hours"}`;
+    el("moduleLabel").textContent = `Module ${currentModule + 1} of ${modules.length} · ${isAdmin ? "Admin access" : `About ${moduleHours} hours`}`;
     el("moduleTitle").textContent = module.title;
     el("moduleDescription").textContent = module.description;
     el("lessonPoints").innerHTML = module.points.map((item) => `<div>${item}</div>`).join("");
@@ -76,7 +86,7 @@
     el("masteryResult").className = "mastery-result hidden";
     el("masteryAnswerList").innerHTML = '<div class="mastery-loading">Zentom AI is generating 15 mastery questions...</div>';
     activeTestQuestions = await window.TomCodexAI.generateMasteryQuestions({
-      course: "Salesforce Administrator",
+      course: courseName,
       module: module.title,
       lessonPoints: module.points,
       recallQuestions: module.questions,
@@ -107,7 +117,7 @@
     const button = el("submitMasteryTestBtn");
     button.disabled = true;
     button.textContent = "AI is evaluating...";
-    const result = await window.TomCodexAI.evaluateMastery({ course: "Salesforce Administrator", module: module.title, questions: activeTestQuestions, answers, lessonPoints: module.points, passScore: 80, minimumQuestionCount: 15 });
+    const result = await window.TomCodexAI.evaluateMastery({ course: courseName, module: module.title, questions: activeTestQuestions, answers, lessonPoints: module.points, passScore: 80, minimumQuestionCount: 15 });
     button.disabled = false;
     button.textContent = "Submit answers to AI";
     const best = scoreFor(currentModule);
@@ -115,7 +125,7 @@
       masteryScores[currentModule] = { score: result.score, passed: result.score >= 80, timestamp: new Date().toISOString() };
       saveScores();
     }
-    if (result.score >= 80 && best < 80) window.TomCodexLearning?.record("task", 15, `Passed Admin mastery: ${module.title} (${result.score}%)`);
+    if (result.score >= 80 && best < 80) window.TomCodexLearning?.record("task", 15, `Passed ${recordLabel} mastery: ${module.title} (${result.score}%)`);
     showResult(result);
     renderNav();
     renderProgress();

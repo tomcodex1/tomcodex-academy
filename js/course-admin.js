@@ -17,6 +17,13 @@ const modules = [
 ];
 
 window.TomCodexAdminModules = modules;
+window.TomCodexCourseConfig = {
+  modules,
+  masteryKey: "tomcodex.adminMasteryScores.v1",
+  courseName: "Salesforce Administrator",
+  recordLabel: "Admin",
+  moduleHours: 3
+};
 /*
 let currentModule = 0;
 let completed = loadProgress();

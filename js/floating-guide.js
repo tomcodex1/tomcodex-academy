@@ -7,7 +7,8 @@
     "dashboard.html": "Student dashboard and continuous Salesforce learning",
     "interview.html": "Salesforce AI Interviewer practice",
     "analytics.html": "Learning analytics, heatmap, records, and progress curves",
-    "course-admin.html": "Salesforce Administrator learning program"
+    "course-admin.html": "Salesforce Administrator learning program",
+    "course-apex.html": "Apex Development learning program"
   };
 
   const currentFile = location.pathname.split("/").pop() || "index.html";
