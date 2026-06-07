@@ -12,9 +12,16 @@
   const recordLabel = config.recordLabel;
   const moduleHours = config.moduleHours;
   const AUTH_SESSION_KEY = "tomcodex.authSession.v1";
+  const FINAL_EXAM_KEY = `${MASTERY_KEY}.finalExam`;
+  const FINAL_EXAM_QUESTION_COUNT = 60;
+  const FINAL_EXAM_SECONDS = 60 * 60;
+  const FINAL_EXAM_PASS_SCORE = 65;
   let currentModule = 0;
   let masteryScores = loadScores();
   let activeTestQuestions = [];
+  let finalExamQuestions = [];
+  let finalExamTimer;
+  let finalExamSecondsLeft = FINAL_EXAM_SECONDS;
   const el = (id) => document.getElementById(id);
   const isLocalDevelopment = ["localhost", "127.0.0.1", "::1"].includes(window.location.hostname);
   const isAdmin = isLocalDevelopment || loadRole() === "admin";
@@ -34,6 +41,17 @@
   function scoreFor(index) { return Number(masteryScores[index]?.score) || 0; }
   function passed(index) { return scoreFor(index) >= 80; }
   function unlocked(index) { return isAdmin || index === 0 || passed(index - 1); }
+  function allModulesPassed() { return modules.every((_, index) => passed(index)); }
+  function finalExamUnlocked() { return isAdmin || allModulesPassed(); }
+
+  function loadFinalExamResult() {
+    try { return JSON.parse(localStorage.getItem(FINAL_EXAM_KEY)); } catch { return null; }
+  }
+
+  function saveFinalExamResult(result) {
+    const previous = loadFinalExamResult();
+    if (!previous || result.score >= previous.score) localStorage.setItem(FINAL_EXAM_KEY, JSON.stringify(result));
+  }
 
   function renderNav() {
     el("moduleNav").innerHTML = modules.map((module, index) => {
@@ -57,6 +75,131 @@
     el("courseProgressText").textContent = `${progress}%`;
     el("completedModulesText").textContent = `${count} / ${modules.length}`;
     el("courseProgressBar").style.width = `${progress}%`;
+  }
+
+  function injectFinalExam() {
+    if (el("finalExamSection")) return;
+    el("moduleContent").insertAdjacentHTML("beforeend", `
+      <section id="finalExamSection" class="final-exam-section">
+        <div class="final-exam-intro">
+          <div><span class="course-tag">Course certification test</span><h3>${courseName} final exam</h3><p>Complete a Salesforce certification-style exam after finishing the full course.</p></div>
+          <div class="final-exam-facts"><span><strong>60</strong>MCQs</span><span><strong>60</strong>Minutes</span><span><strong>${FINAL_EXAM_PASS_SCORE}%</strong>Pass</span></div>
+        </div>
+        <div id="finalExamStatus" class="final-exam-status"></div>
+        <button id="startFinalExamBtn" class="course-primary" type="button">Start final 60-question exam</button>
+        <div id="finalExamPanel" class="final-exam-panel hidden">
+          <div class="final-exam-toolbar"><div><span class="course-tag">Certification simulation</span><h3>${courseName} final exam</h3></div><div><span>Answered <strong id="finalExamAnswered">0 / 60</strong></span><span>Time left <strong id="finalExamTimer">60:00</strong></span></div></div>
+          <div id="finalExamQuestions" class="final-exam-questions"></div>
+          <button id="submitFinalExamBtn" class="course-primary" type="button">Submit final exam</button>
+          <div id="finalExamResult" class="mastery-result hidden" aria-live="polite"></div>
+        </div>
+      </section>
+    `);
+    el("startFinalExamBtn").addEventListener("click", startFinalExam);
+    el("submitFinalExamBtn").addEventListener("click", () => submitFinalExam(false));
+    renderFinalExamStatus();
+  }
+
+  function renderFinalExamStatus() {
+    const unlocked = finalExamUnlocked();
+    const result = loadFinalExamResult();
+    const status = el("finalExamStatus");
+    el("startFinalExamBtn").disabled = !unlocked;
+    el("startFinalExamBtn").textContent = result ? "Retake final 60-question exam" : "Start final 60-question exam";
+    if (!unlocked) {
+      const passedCount = modules.filter((_, index) => passed(index)).length;
+      status.className = "final-exam-status locked";
+      status.textContent = `Locked: pass all modules first. Current progress: ${passedCount} of ${modules.length} modules passed.`;
+      return;
+    }
+    if (result) {
+      status.className = `final-exam-status ${result.passed ? "passed" : "ready"}`;
+      status.textContent = `${result.passed ? "Certification exam passed" : "Best attempt"}: ${result.score}% (${result.correctAnswers}/${FINAL_EXAM_QUESTION_COUNT} correct).`;
+      return;
+    }
+    status.className = "final-exam-status ready";
+    status.textContent = isAdmin && !allModulesPassed() ? "Admin preview access: final exam is ready." : "All modules passed. Your final exam is ready.";
+  }
+
+  function seededShuffle(items, seed) {
+    const output = [...items];
+    let value = seed;
+    for (let index = output.length - 1; index > 0; index -= 1) {
+      value = (value * 9301 + 49297) % 233280;
+      const swapIndex = Math.floor(value / 233280 * (index + 1));
+      [output[index], output[swapIndex]] = [output[swapIndex], output[index]];
+    }
+    return output;
+  }
+
+  function buildFinalExamQuestions() {
+    const allPoints = modules.flatMap((module) => module.points.map((point) => ({ module: module.title, point })));
+    const prompts = [
+      (module) => `Which statement is most accurate for ${module}?`,
+      (module) => `During a ${module} implementation, which approach should be selected?`,
+      (module) => `Which option demonstrates correct understanding of ${module}?`
+    ];
+    const candidates = allPoints.flatMap((item, pointIndex) => prompts.map((prompt, promptIndex) => {
+      const distractors = seededShuffle(allPoints.filter((other) => other.point !== item.point).map((other) => other.point), pointIndex * 19 + promptIndex * 31 + modules.length).slice(0, 3);
+      const options = seededShuffle([item.point, ...distractors], pointIndex * 41 + promptIndex * 17 + courseName.length);
+      return { prompt: prompt(item.module), module: item.module, options, correctIndex: options.indexOf(item.point) };
+    }));
+    return seededShuffle(candidates, courseName.length * 97 + modules.length).slice(0, FINAL_EXAM_QUESTION_COUNT);
+  }
+
+  function formatExamTime(seconds) {
+    const minutes = Math.floor(seconds / 60).toString().padStart(2, "0");
+    const remainder = (seconds % 60).toString().padStart(2, "0");
+    return `${minutes}:${remainder}`;
+  }
+
+  function updateExamAnswered() {
+    const answered = document.querySelectorAll("[data-final-answer]:checked").length;
+    el("finalExamAnswered").textContent = `${answered} / ${FINAL_EXAM_QUESTION_COUNT}`;
+  }
+
+  function startFinalExam() {
+    if (!finalExamUnlocked()) return;
+    clearInterval(finalExamTimer);
+    finalExamQuestions = buildFinalExamQuestions();
+    finalExamSecondsLeft = FINAL_EXAM_SECONDS;
+    el("finalExamResult").className = "mastery-result hidden";
+    el("finalExamPanel").classList.remove("hidden");
+    el("finalExamQuestions").innerHTML = finalExamQuestions.map((question, index) => `
+      <fieldset class="final-exam-question">
+        <legend><span>${index + 1}</span>${question.prompt}<small>${question.module}</small></legend>
+        <div>${question.options.map((option, optionIndex) => `<label><input type="radio" name="finalQuestion${index}" value="${optionIndex}" data-final-answer><span><strong>${String.fromCharCode(65 + optionIndex)}.</strong> ${option}</span></label>`).join("")}</div>
+      </fieldset>
+    `).join("");
+    document.querySelectorAll("[data-final-answer]").forEach((input) => input.addEventListener("change", updateExamAnswered));
+    updateExamAnswered();
+    el("finalExamTimer").textContent = formatExamTime(finalExamSecondsLeft);
+    finalExamTimer = setInterval(() => {
+      finalExamSecondsLeft -= 1;
+      el("finalExamTimer").textContent = formatExamTime(finalExamSecondsLeft);
+      if (finalExamSecondsLeft <= 0) submitFinalExam(true);
+    }, 1000);
+    el("finalExamPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function submitFinalExam(timeExpired) {
+    if (!finalExamQuestions.length) return;
+    clearInterval(finalExamTimer);
+    const answers = finalExamQuestions.map((_, index) => {
+      const selected = document.querySelector(`input[name="finalQuestion${index}"]:checked`);
+      return selected ? Number(selected.value) : -1;
+    });
+    const correctAnswers = answers.filter((answer, index) => answer === finalExamQuestions[index].correctIndex).length;
+    const score = Math.round(correctAnswers / FINAL_EXAM_QUESTION_COUNT * 100);
+    const passedExam = score >= FINAL_EXAM_PASS_SCORE;
+    const result = { score, passed: passedExam, correctAnswers, completedAt: new Date().toISOString(), timeExpired };
+    saveFinalExamResult(result);
+    const box = el("finalExamResult");
+    box.className = `mastery-result ${passedExam ? "passed" : "failed"}`;
+    box.innerHTML = `<strong>${passedExam ? "Final exam passed" : "Final exam not passed"}: ${score}%</strong><p>${correctAnswers} of ${FINAL_EXAM_QUESTION_COUNT} answers were correct.${timeExpired ? " Time expired and the exam was submitted automatically." : ""} ${passedExam ? "You completed the certification simulation." : `Review the curriculum and score at least ${FINAL_EXAM_PASS_SCORE}% to pass.`}</p>`;
+    if (passedExam) window.TomCodexLearning?.record("task", 100, `Passed ${recordLabel} final exam (${score}%)`);
+    renderFinalExamStatus();
+    box.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   function topicTitle(point) {
@@ -120,12 +263,13 @@
     el("completeModuleBtn").classList.toggle("done", isPassed);
     el("startMasteryTestBtn").textContent = isPassed ? "Retake AI mastery test" : "Start AI mastery test";
     el("previousModuleBtn").disabled = currentModule === 0;
-    el("nextModuleBtn").disabled = currentModule < modules.length - 1 && !isAdmin && !isPassed;
-    el("nextModuleBtn").textContent = currentModule === modules.length - 1 ? "Continue in dashboard" : isAdmin || isPassed ? "Next module" : "Pass 80% to unlock next";
+    el("nextModuleBtn").disabled = !isAdmin && !isPassed;
+    el("nextModuleBtn").textContent = currentModule === modules.length - 1 ? isAdmin || isPassed ? "Go to final exam" : "Pass 80% to unlock final exam" : isAdmin || isPassed ? "Next module" : "Pass 80% to unlock next";
     el("masteryTestPanel").classList.add("hidden");
     el("masteryResult").className = "mastery-result hidden";
     renderNav();
     renderProgress();
+    renderFinalExamStatus();
   }
 
   async function startTest() {
@@ -177,10 +321,11 @@
     showResult(result);
     renderNav();
     renderProgress();
+    renderFinalExamStatus();
     el("completeModuleBtn").textContent = passed(currentModule) ? `Mastery passed: ${scoreFor(currentModule)}%` : "AI mastery test required";
     el("completeModuleBtn").classList.toggle("done", passed(currentModule));
-    el("nextModuleBtn").disabled = currentModule < modules.length - 1 && !isAdmin && !passed(currentModule);
-    el("nextModuleBtn").textContent = currentModule === modules.length - 1 ? "Continue in dashboard" : isAdmin || passed(currentModule) ? "Next module" : "Pass 80% to unlock next";
+    el("nextModuleBtn").disabled = !isAdmin && !passed(currentModule);
+    el("nextModuleBtn").textContent = currentModule === modules.length - 1 ? isAdmin || passed(currentModule) ? "Go to final exam" : "Pass 80% to unlock final exam" : isAdmin || passed(currentModule) ? "Next module" : "Pass 80% to unlock next";
   }
 
   el("completeModuleBtn").addEventListener("click", startTest);
@@ -188,7 +333,11 @@
   el("submitMasteryTestBtn").addEventListener("click", submitTest);
   el("previousModuleBtn").addEventListener("click", () => { if (currentModule > 0) { currentModule -= 1; render(); } });
   el("nextModuleBtn").addEventListener("click", () => {
-    if (currentModule === modules.length - 1) { window.location.href = "dashboard.html"; return; }
+    if (currentModule === modules.length - 1) {
+      if (!isAdmin && !passed(currentModule)) return;
+      el("finalExamSection").scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
     if (!isAdmin && !passed(currentModule)) return;
     currentModule += 1;
     render();
@@ -199,5 +348,6 @@
     render();
     el("moduleContent").scrollIntoView({ behavior: "smooth" });
   });
+  injectFinalExam();
   render();
 })();
