@@ -5,6 +5,16 @@ import { registerAiEvaluatorRoute } from "../server/ai-evaluator-route.example.j
 
 const app = express();
 
+app.use((_request, response, next) => {
+  response.set({
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' https://cdn.tailwindcss.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+    "Permissions-Policy": "camera=(), geolocation=(), payment=(), usb=()",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY"
+  });
+  next();
+});
 app.use(express.json({ limit: "1mb" }));
 registerAiTrainerRoute(app);
 registerAiEvaluatorRoute(app);

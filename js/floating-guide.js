@@ -3,7 +3,7 @@
 
   const pageContexts = {
     "index.html": "TomCodex AI Academy programs and learning guidance",
-    "login.html": "Student account access and academy onboarding",
+    "access.html": "Password-free academy preview access",
     "dashboard.html": "Student dashboard and continuous Salesforce learning",
     "interview.html": "Salesforce AI Interviewer practice",
     "analytics.html": "Learning analytics, heatmap, records, and progress curves",

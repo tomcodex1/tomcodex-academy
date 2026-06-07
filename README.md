@@ -37,7 +37,7 @@ Opening `index.html` directly does not connect Zentom to Gemini because the secu
 
 ### Demo course roles
 
-The current login screen is a frontend demo. Sign in with user ID `admin` and password `admin123` to create a demo admin session that can open every Admin and Apex course module. All other credential and phone sessions use the `user` role and must pass each module before the next one unlocks. Replace this demo role assignment with backend-verified authorization before using it for sensitive admin access.
+The access screen is a password-free preview. It never requests passwords, OTP codes, payment information, or third-party credentials. Learner preview follows sequential module locks, while admin curriculum preview opens every Admin and Apex course module. Replace preview roles with backend-verified authorization before using the site for sensitive admin access.
 
 Checklist progress is stored locally in the browser. Clearing site data resets the saved progress.
 

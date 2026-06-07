@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Open the TomCodex AI Academy learner experience or admin curriculum preview without entering personal credentials." />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Academy Access | TomCodex AI Academy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { brand: { 50: "#eef8ff", 100: "#d9f0ff", 500: "#087ea4", 600: "#056b8d", 700: "#075875", 950: "#062c3a" }, ink: "#172b4d", lime: "#d8ff5f" },
+        fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"] }
+      }}
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+  <link rel="stylesheet" href="css/floating-guide.css" />
+  <link rel="stylesheet" href="css/floating-guide-auto.css" />
+</head>
+<body class="bg-slate-50 font-sans text-ink antialiased">
+  <main class="auth-shell">
+    <section class="auth-brand-panel">
+      <a href="index.html" aria-label="Return to TomCodex Academy home"><img src="assets/tomcodex-logo-light.svg" alt="Tom Codex" class="h-20 w-auto"></a>
+      <div class="relative z-10 max-w-xl">
+        <span class="auth-eyebrow">Your personal AI academy</span>
+        <h1>Learn Salesforce your way, every day.</h1>
+        <p>Open AI-personalized lessons, Trailhead practice, workplace projects, certifications, and lifelong Salesforce growth without sharing personal credentials.</p>
+        <div class="auth-benefits">
+          <div><strong>24/7</strong><span>AI tutor support</span></div>
+          <div><strong>Instant</strong><span>Feedback and correction</span></div>
+          <div><strong>Adaptive</strong><span>Daily learning plan</span></div>
+        </div>
+      </div>
+      <p class="relative z-10 text-xs text-slate-400">100% AI-powered Salesforce learning. No human tutors.</p>
+    </section>
+
+    <section class="auth-form-panel">
+      <div class="auth-card">
+        <div class="mb-7 flex items-center justify-between gap-4">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-widest text-brand-600">Password-free preview</p>
+            <h2 class="mt-2 text-3xl font-extrabold">Open the academy</h2>
+            <p class="mt-2 text-sm text-slate-500">Choose a preview mode. No account or personal information is required.</p>
+          </div>
+          <a href="index.html" class="rounded-full border border-slate-200 px-3 py-2 text-xs font-bold text-slate-500 hover:bg-slate-50">Home</a>
+        </div>
+
+        <div class="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-900">
+          <strong class="block">Your information stays yours</strong>
+          TomCodex Academy never asks for passwords, OTP codes, payment details, or Google credentials.
+        </div>
+
+        <button id="learnerPreviewBtn" class="auth-primary-button" type="button">Open learner preview</button>
+        <button id="adminPreviewBtn" class="auth-secondary-button" type="button">Open admin curriculum preview</button>
+
+        <div id="authMessage" class="auth-message hidden" role="status" aria-live="polite"></div>
+        <p class="mt-5 text-center text-xs leading-5 text-slate-400">These preview modes only save course progress in this browser. They do not create an account or transmit personal information.</p>
+      </div>
+    </section>
+  </main>
+  <script src="js/auth.js"></script>
+  <script src="js/learning-records.js"></script><script src="js/ai-client.js"></script><script src="js/floating-guide.js"></script><script src="js/voice-input.js"></script>
+</body>
+</html>
