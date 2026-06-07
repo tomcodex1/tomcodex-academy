@@ -8,7 +8,8 @@
     "interview.html": "Salesforce AI Interviewer practice",
     "analytics.html": "Learning analytics, heatmap, records, and progress curves",
     "course-admin.html": "Salesforce Administrator learning program",
-    "course-apex.html": "Apex Development learning program"
+    "course-apex.html": "Apex Development learning program",
+    "course-flow.html": "Salesforce Flow automation learning program"
   };
 
   const currentFile = location.pathname.split("/").pop() || "index.html";
