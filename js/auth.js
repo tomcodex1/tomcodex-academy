@@ -7,6 +7,16 @@ const resendOtpBtn = document.getElementById("resendOtpBtn");
 const otpTimer = document.getElementById("otpTimer");
 let otpInterval;
 let createAccountMode = new URLSearchParams(window.location.search).get("mode") === "signup";
+const AUTH_SESSION_KEY = "tomcodex.authSession.v1";
+
+function saveUserSession(method, identifier, role = "user") {
+  localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify({
+    role,
+    method,
+    identifier,
+    signedInAt: new Date().toISOString()
+  }));
+}
 
 function showMessage(message, type = "info") {
   authMessage.className = `auth-message ${type}`;
@@ -71,7 +81,10 @@ document.getElementById("googleLoginBtn").addEventListener("click", () => showMe
 document.getElementById("credentialsForm").addEventListener("submit", (event) => {
   event.preventDefault();
   if (!event.currentTarget.reportValidity()) return;
-  showMessage(`${createAccountMode ? "Account creation" : "User ID login"} validated. Connecting a secure authentication backend will complete this flow.`, "success");
+  const identifier = document.getElementById("userId").value.trim();
+  const role = identifier.toLowerCase() === "admin" ? "admin" : "user";
+  saveUserSession("credentials", identifier, role);
+  showMessage(role === "admin" ? "Admin session enabled. All course modules are unlocked." : `${createAccountMode ? "Account creation" : "User ID login"} validated. User course locks remain active.`, "success");
 });
 sendOtpBtn.addEventListener("click", sendOtp);
 resendOtpBtn.addEventListener("click", sendOtp);
@@ -81,6 +94,7 @@ document.getElementById("phoneForm").addEventListener("submit", (event) => {
     showMessage("Incorrect demo OTP. Enter 123456.", "error");
     return;
   }
+  saveUserSession("phone", document.getElementById("phoneNumber").value.trim());
   showMessage("Phone number verified. Redirecting to the student dashboard...", "success");
   setTimeout(() => window.location.href = "dashboard.html", 800);
 });

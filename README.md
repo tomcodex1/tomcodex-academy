@@ -35,6 +35,10 @@ salesforce-master-dashboard/
 
 Opening `index.html` directly does not connect Zentom to Gemini because the secure backend routes are unavailable.
 
+### Demo course roles
+
+The current login screen is a frontend demo. Signing in with the exact user ID `admin` creates a demo admin session that can open every Admin course module. All other credential and phone sessions use the `user` role and must pass each module before the next one unlocks. Replace this demo role assignment with backend-verified authorization before using it for sensitive admin access.
+
 Checklist progress is stored locally in the browser. Clearing site data resets the saved progress.
 
 ## Important API Key Rule

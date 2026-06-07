@@ -1,24 +1,34 @@
 (function () {
   const modules = window.TomCodexAdminModules;
   const MASTERY_KEY = "tomcodex.adminMasteryScores.v1";
+  const AUTH_SESSION_KEY = "tomcodex.authSession.v1";
   let currentModule = 0;
   let masteryScores = loadScores();
   let activeTestQuestions = [];
   const el = (id) => document.getElementById(id);
+  const isAdmin = loadRole() === "admin";
 
   function loadScores() {
     try { return JSON.parse(localStorage.getItem(MASTERY_KEY)) || {}; } catch { return {}; }
   }
+  function loadRole() {
+    try {
+      const session = JSON.parse(localStorage.getItem(AUTH_SESSION_KEY));
+      return session?.role === "admin" ? "admin" : "user";
+    } catch {
+      return "user";
+    }
+  }
   function saveScores() { localStorage.setItem(MASTERY_KEY, JSON.stringify(masteryScores)); }
   function scoreFor(index) { return Number(masteryScores[index]?.score) || 0; }
   function passed(index) { return scoreFor(index) >= 80; }
-  function unlocked(index) { return index === 0 || passed(index - 1); }
+  function unlocked(index) { return isAdmin || index === 0 || passed(index - 1); }
 
   function renderNav() {
     el("moduleNav").innerHTML = modules.map((module, index) => {
       const isPassed = passed(index);
       const isUnlocked = unlocked(index);
-      const status = isPassed ? `Passed: ${scoreFor(index)}% · 3 hrs` : isUnlocked ? "Ready to learn · 3 hrs" : "Locked: pass previous module";
+      const status = isPassed ? `Passed: ${scoreFor(index)}% · 3 hrs` : isAdmin ? "Admin access · 3 hrs" : isUnlocked ? "Ready to learn · 3 hrs" : "Locked: pass previous module";
       const icon = isPassed ? "\u2713" : isUnlocked ? index + 1 : "\uD83D\uDD12";
       return `<button type="button" data-module="${index}" ${isUnlocked ? "" : "disabled"} class="${index === currentModule ? "active" : ""} ${isPassed ? "done" : ""} ${isUnlocked ? "" : "locked"}"><span class="module-number">${icon}</span><span><strong>${module.title}</strong><span>${status}</span></span></button>`;
     }).join("");
@@ -41,7 +51,7 @@
   function render() {
     const module = modules[currentModule];
     const isPassed = passed(currentModule);
-    el("moduleLabel").textContent = `Module ${currentModule + 1} of ${modules.length} · About 3 hours`;
+    el("moduleLabel").textContent = `Module ${currentModule + 1} of ${modules.length} · ${isAdmin ? "Admin access" : "About 3 hours"}`;
     el("moduleTitle").textContent = module.title;
     el("moduleDescription").textContent = module.description;
     el("lessonPoints").innerHTML = module.points.map((item) => `<div>${item}</div>`).join("");
@@ -52,8 +62,8 @@
     el("completeModuleBtn").classList.toggle("done", isPassed);
     el("startMasteryTestBtn").textContent = isPassed ? "Retake AI mastery test" : "Start AI mastery test";
     el("previousModuleBtn").disabled = currentModule === 0;
-    el("nextModuleBtn").disabled = currentModule < modules.length - 1 && !isPassed;
-    el("nextModuleBtn").textContent = currentModule === modules.length - 1 ? "Continue in dashboard" : isPassed ? "Next module" : "Pass 80% to unlock next";
+    el("nextModuleBtn").disabled = currentModule < modules.length - 1 && !isAdmin && !isPassed;
+    el("nextModuleBtn").textContent = currentModule === modules.length - 1 ? "Continue in dashboard" : isAdmin || isPassed ? "Next module" : "Pass 80% to unlock next";
     el("masteryTestPanel").classList.add("hidden");
     el("masteryResult").className = "mastery-result hidden";
     renderNav();
@@ -111,8 +121,8 @@
     renderProgress();
     el("completeModuleBtn").textContent = passed(currentModule) ? `Mastery passed: ${scoreFor(currentModule)}%` : "AI mastery test required";
     el("completeModuleBtn").classList.toggle("done", passed(currentModule));
-    el("nextModuleBtn").disabled = currentModule < modules.length - 1 && !passed(currentModule);
-    el("nextModuleBtn").textContent = currentModule === modules.length - 1 ? "Continue in dashboard" : passed(currentModule) ? "Next module" : "Pass 80% to unlock next";
+    el("nextModuleBtn").disabled = currentModule < modules.length - 1 && !isAdmin && !passed(currentModule);
+    el("nextModuleBtn").textContent = currentModule === modules.length - 1 ? "Continue in dashboard" : isAdmin || passed(currentModule) ? "Next module" : "Pass 80% to unlock next";
   }
 
   el("completeModuleBtn").addEventListener("click", startTest);
@@ -121,7 +131,7 @@
   el("previousModuleBtn").addEventListener("click", () => { if (currentModule > 0) { currentModule -= 1; render(); } });
   el("nextModuleBtn").addEventListener("click", () => {
     if (currentModule === modules.length - 1) { window.location.href = "dashboard.html"; return; }
-    if (!passed(currentModule)) return;
+    if (!isAdmin && !passed(currentModule)) return;
     currentModule += 1;
     render();
   });
