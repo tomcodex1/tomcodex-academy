@@ -8,6 +8,8 @@ const otpTimer = document.getElementById("otpTimer");
 let otpInterval;
 let createAccountMode = new URLSearchParams(window.location.search).get("mode") === "signup";
 const AUTH_SESSION_KEY = "tomcodex.authSession.v1";
+const DEMO_ADMIN_ID = "admin";
+const DEMO_ADMIN_PASSWORD = "admin123";
 
 function saveUserSession(method, identifier, role = "user") {
   localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify({
@@ -82,9 +84,16 @@ document.getElementById("credentialsForm").addEventListener("submit", (event) =>
   event.preventDefault();
   if (!event.currentTarget.reportValidity()) return;
   const identifier = document.getElementById("userId").value.trim();
-  const role = identifier.toLowerCase() === "admin" ? "admin" : "user";
+  const password = document.getElementById("password").value;
+  const isAdminId = identifier.toLowerCase() === DEMO_ADMIN_ID;
+  if (isAdminId && password !== DEMO_ADMIN_PASSWORD) {
+    showMessage("Incorrect demo admin password.", "error");
+    return;
+  }
+  const role = isAdminId && !createAccountMode ? "admin" : "user";
   saveUserSession("credentials", identifier, role);
-  showMessage(role === "admin" ? "Admin session enabled. All course modules are unlocked." : `${createAccountMode ? "Account creation" : "User ID login"} validated. User course locks remain active.`, "success");
+  showMessage(role === "admin" ? "Admin login successful. Redirecting to all courses..." : `${createAccountMode ? "Account creation" : "User login"} successful. Redirecting to your dashboard...`, "success");
+  setTimeout(() => window.location.href = role === "admin" ? "index.html#programs" : "dashboard.html", 700);
 });
 sendOtpBtn.addEventListener("click", sendOtp);
 resendOtpBtn.addEventListener("click", sendOtp);
