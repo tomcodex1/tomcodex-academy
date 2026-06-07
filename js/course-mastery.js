@@ -58,6 +58,52 @@
     el("courseProgressBar").style.width = `${progress}%`;
   }
 
+  function topicTitle(point) {
+    return point.replace(/[.!?]+$/, "");
+  }
+
+  function topicCoverage(module, index) {
+    const practice = module.practice[index] || module.practice[0];
+    const question = module.questions[index] || module.questions[0];
+    const isApex = courseName === "Apex Development";
+    const implementation = isApex
+      ? [
+          "Clarify the requirement, transaction context, inputs, outputs, and failure behavior.",
+          "Implement the smallest maintainable solution with bulk processing, security, and governor limits in mind.",
+          "Write positive, negative, bulk, and permission-focused tests before deployment."
+        ]
+      : [
+          "Translate the business request into users, data, access, automation, and reporting requirements.",
+          "Configure and test the solution in a safe environment with representative user personas and records.",
+          "Document the decision, validate acceptance criteria, deploy safely, and monitor adoption."
+        ];
+    const bestPractices = isApex
+      ? ["Keep responsibilities small and names clear.", "Design for collections, security, and failure.", "Use assertions and operational logging."]
+      : ["Use least privilege and standard features first.", "Name and document every important configuration.", "Test both expected and restricted user experiences."];
+    const mistakes = isApex
+      ? ["Writing SOQL or DML inside loops.", "Testing only code coverage instead of behavior.", "Ignoring sharing, CRUD/FLS, limits, or error handling."]
+      : ["Building before confirming the business outcome.", "Testing only as an administrator.", "Skipping documentation, rollback, and post-release checks."];
+    return { title: topicTitle(module.points[index]), concept: module.points[index], implementation, example: practice, bestPractices, mistakes, proof: question };
+  }
+
+  function renderTopicCoverage(module) {
+    const topics = module.points.map((_, index) => topicCoverage(module, index));
+    el("topicCoverageCount").textContent = `${topics.length} subcategories`;
+    el("topicCoverage").innerHTML = topics.map((topic, index) => `
+      <details class="topic-category" ${index === 0 ? "open" : ""}>
+        <summary><span class="topic-number">${index + 1}</span><span><strong>${topic.title}</strong><small>Concept, implementation, example, standards, mistakes, and practice</small></span><span class="topic-toggle" aria-hidden="true">+</span></summary>
+        <div class="topic-category-body">
+          <div class="topic-detail topic-concept"><span>Concept</span><p>${topic.concept}</p></div>
+          <div class="topic-detail topic-example"><span>Realistic example</span><p>${topic.example}</p></div>
+          <div class="topic-detail topic-wide"><span>Implementation path</span><ol>${topic.implementation.map((item) => `<li>${item}</li>`).join("")}</ol></div>
+          <div class="topic-detail"><span>Best practices</span><ul>${topic.bestPractices.map((item) => `<li>${item}</li>`).join("")}</ul></div>
+          <div class="topic-detail topic-warning"><span>Common mistakes</span><ul>${topic.mistakes.map((item) => `<li>${item}</li>`).join("")}</ul></div>
+          <div class="topic-detail topic-proof topic-wide"><span>Prove your skill</span><p>${topic.proof}</p></div>
+        </div>
+      </details>
+    `).join("");
+  }
+
   function render() {
     const module = modules[currentModule];
     const isPassed = passed(currentModule);
@@ -65,6 +111,7 @@
     el("moduleTitle").textContent = module.title;
     el("moduleDescription").textContent = module.description;
     el("lessonPoints").innerHTML = module.points.map((item) => `<div>${item}</div>`).join("");
+    renderTopicCoverage(module);
     el("resourceList").innerHTML = module.resources.map(([name, url]) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${name}<span>\u2197</span></a>`).join("");
     el("practiceList").innerHTML = module.practice.map((item) => `<div>${item}</div>`).join("");
     el("questionList").innerHTML = module.questions.map((item) => `<div>${item}</div>`).join("");
