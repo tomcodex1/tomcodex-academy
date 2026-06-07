@@ -582,7 +582,11 @@
 }
 
 .final-exam-question input {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
   margin-top: 0.2rem;
+  padding: 0;
   accent-color: #7c3aed;
 }
 

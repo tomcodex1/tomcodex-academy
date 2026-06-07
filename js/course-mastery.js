@@ -132,17 +132,61 @@
     return output;
   }
 
-  function buildFinalExamQuestions() {
-    const allPoints = modules.flatMap((module) => module.points.map((point) => ({ module: module.title, point })));
-    const prompts = [
-      (module) => `Which statement is most accurate for ${module}?`,
-      (module) => `During a ${module} implementation, which approach should be selected?`,
-      (module) => `Which option demonstrates correct understanding of ${module}?`
+  function examDistractors() {
+    if (courseName === "Apex Development") return [
+      "Process each record separately and place SOQL or DML inside loops.",
+      "Run all logic without sharing or CRUD/FLS checks because Apex executes on the server.",
+      "Deploy after reaching code coverage without asserting business behavior.",
+      "Catch every exception silently so users never see an error.",
+      "Put all trigger logic directly in one trigger without handler classes.",
+      "Ignore governor limits until a production transaction fails.",
+      "Hard-code record IDs and endpoints to finish the implementation faster.",
+      "Use synchronous processing for every workload regardless of volume."
     ];
-    const candidates = allPoints.flatMap((item, pointIndex) => prompts.map((prompt, promptIndex) => {
-      const distractors = seededShuffle(allPoints.filter((other) => other.point !== item.point).map((other) => other.point), pointIndex * 19 + promptIndex * 31 + modules.length).slice(0, 3);
+    if (courseName === "Salesforce Flow") return [
+      "Perform Get Records and Update Records operations inside every loop iteration.",
+      "Run in system context without reviewing user access or sensitive data exposure.",
+      "Activate the Flow directly in production without tests or rollback planning.",
+      "Build one large Flow with duplicated logic instead of reusable subflows.",
+      "Omit fault paths and rely on users to report failures.",
+      "Use Flow for every requirement even when Apex is the safer scalable choice.",
+      "Allow record-triggered automation to update the same record without recursion controls.",
+      "Test only the successful path as an administrator."
+    ];
+    if (courseName === "Lightning Web Components") return [
+      "Manipulate the DOM directly and insert untrusted content with innerHTML.",
+      "Call Apex repeatedly for data already available through Lightning Data Service.",
+      "Keep all interface behavior in one large component with no clear responsibilities.",
+      "Assume server-side Apex automatically enforces sharing, CRUD, and field access.",
+      "Deploy the component without Jest tests, accessibility checks, or error states.",
+      "Hard-code record IDs and navigation URLs in the component.",
+      "Mutate component state during rendering and ignore lifecycle behavior.",
+      "Hide server errors and leave users without loading or failure feedback."
+    ];
+    return [
+      "Configure directly in production before confirming requirements or acceptance criteria.",
+      "Grant broad administrator access instead of applying least privilege.",
+      "Test only as a system administrator and assume every user has the same experience.",
+      "Deploy without documentation, rollback planning, or post-release verification.",
+      "Create custom configuration before evaluating standard Salesforce capabilities.",
+      "Ignore data quality, reporting, and adoption impacts during design.",
+      "Allow one urgent request to bypass governance and change review.",
+      "Use manual workarounds instead of investigating the underlying process requirement."
+    ];
+  }
+
+  function buildFinalExamQuestions() {
+    const wrongApproaches = examDistractors();
+    const prompts = [
+      (item) => `A team is completing this task: ${item.practice} Which approach best supports a reliable solution?`,
+      (item) => `During a ${item.module} implementation, which action follows recommended Salesforce practice?`,
+      (item) => `Which option best demonstrates this ${item.module} objective: ${topicTitle(item.point)}?`
+    ];
+    const topics = modules.flatMap((module) => module.points.map((point, index) => ({ module: module.title, point, practice: module.practice[index] || module.practice[0] })));
+    const candidates = topics.flatMap((item, pointIndex) => prompts.map((prompt, promptIndex) => {
+      const distractors = seededShuffle(wrongApproaches, pointIndex * 19 + promptIndex * 31 + modules.length).slice(0, 3);
       const options = seededShuffle([item.point, ...distractors], pointIndex * 41 + promptIndex * 17 + courseName.length);
-      return { prompt: prompt(item.module), module: item.module, options, correctIndex: options.indexOf(item.point) };
+      return { prompt: prompt(item), module: item.module, options, correctIndex: options.indexOf(item.point) };
     }));
     return seededShuffle(candidates, courseName.length * 97 + modules.length).slice(0, FINAL_EXAM_QUESTION_COUNT);
   }
