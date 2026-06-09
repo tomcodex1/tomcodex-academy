@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 176" role="img" aria-labelledby="title desc">
+  <title id="title">Continuous Salesforce career growth</title>
+  <desc id="desc">A rising career path connecting project delivery, certification, platform releases, and architecture.</desc>
+  <defs>
+    <linearGradient id="bg" x1="24" y1="16" x2="296" y2="160" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#334155"/>
+      <stop offset="1" stop-color="#056B8D"/>
+    </linearGradient>
+    <linearGradient id="path" x1="48" y1="127" x2="270" y2="45" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8BE4FF"/>
+      <stop offset="1" stop-color="#D8FF5F"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="320" height="176" rx="18" fill="url(#bg)"/>
+  <circle cx="277" cy="25" r="62" fill="#0EA5C6" opacity=".18"/>
+  <circle cx="38" cy="165" r="68" fill="#172B4D" opacity=".22"/>
+
+  <path d="M48 128C82 128 86 99 119 99C154 99 155 119 187 96C215 76 228 55 270 45"
+        fill="none" stroke="url(#path)" stroke-width="5" stroke-linecap="round" filter="url(#glow)"/>
+  <path d="M251 42L272 44L264 64" fill="none" stroke="#D8FF5F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g fill="#fff">
+    <circle cx="49" cy="128" r="12"/>
+    <circle cx="119" cy="99" r="12"/>
+    <circle cx="187" cy="96" r="12"/>
+    <circle cx="270" cy="45" r="12"/>
+  </g>
+  <g fill="#075875">
+    <path d="M43 127h12v7H43zM45 123h8v4h-8z"/>
+    <path d="M113 94h12v11h-12zM116 91h6v3h-6z"/>
+    <path d="M181 91h12v10h-12zM184 88h6v3h-6z"/>
+    <path d="M266 51V39h8v12zM263 43h14v4h-14z"/>
+  </g>
+
+  <g fill="#fff" font-family="Inter, Arial, sans-serif" font-size="9" font-weight="700" text-anchor="middle">
+    <text x="49" y="151">DELIVER</text>
+    <text x="119" y="76">CERTIFY</text>
+    <text x="187" y="120">EVOLVE</text>
+    <text x="270" y="23">LEAD</text>
+  </g>
+</svg>

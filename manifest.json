@@ -1,0 +1,100 @@
+{
+  "name": "TomCodex AI Academy",
+  "short_name": "TomCodex Academy",
+  "description": "AI-powered Salesforce learning platform with personalized tutoring and structured curriculum",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#062c3a",
+  "theme_color": "#087ea4",
+  "orientation": "portrait-primary",
+  "categories": ["education", "business"],
+  "lang": "en",
+  "icons": [
+    {
+      "src": "assets/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/screenshots/home-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "assets/screenshots/home-mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View learning dashboard",
+      "url": "/dashboard.html",
+      "icons": [{ "src": "assets/icons/dashboard.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Analytics",
+      "short_name": "Analytics",
+      "description": "View learning analytics",
+      "url": "/analytics-enhanced.html",
+      "icons": [{ "src": "assets/icons/analytics.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Gamification",
+      "short_name": "Gamify",
+      "description": "View badges and leaderboards",
+      "url": "/gamification-dashboard.html",
+      "icons": [{ "src": "assets/icons/gamification.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": []
+}

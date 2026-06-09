@@ -1,4 +1,5 @@
 const STORAGE_KEY = "salesforceMasterDashboard.v1";
+const ENROLLMENTS_KEY = "tomcodex.courseEnrollments.v1";
 const defaultState = {
   selectedDay: 1,
   activeTab: "dashboard",
@@ -545,7 +546,83 @@ function setupTabs() {
   showTab(state.activeTab);
 }
 
+function renderLearningTracks() {
+  const definitions = [
+    ["admin", "course-admin.html", 14],
+    ["apex", "course-apex.html", 12],
+    ["flow", "course-flow.html", 12],
+    ["lwc", "course-lwc.html", 12]
+  ];
+  let enrollments = {};
+  try { enrollments = JSON.parse(localStorage.getItem(ENROLLMENTS_KEY)) || {}; } catch {}
+
+  const enrollAndOpen = async (track, href) => {
+    const now = new Date().toISOString();
+    const isNewEnrollment = !enrollments[track]?.enrolledAt;
+    enrollments[track] = {
+      enrolledAt: enrollments[track]?.enrolledAt || now,
+      lastOpenedAt: now
+    };
+    localStorage.setItem(ENROLLMENTS_KEY, JSON.stringify(enrollments));
+    window.TomCodexLearning?.record(isNewEnrollment ? "course-enrollment" : "course-continue", 1, track);
+    await window.TomCodexLearnerSync?.flush?.();
+    window.location.href = href;
+  };
+
+  const cards = [...document.querySelectorAll("#programs .course-card")].slice(0, definitions.length);
+  const tracks = cards.map((card, index) => {
+    const [track, href, total] = definitions[index];
+    let scores = {};
+    try { scores = JSON.parse(localStorage.getItem(`tomcodex.${track}MasteryScores.v1`)) || {}; } catch {}
+    const completed = Object.values(scores).filter((entry) => Number(entry?.score) >= 80).length;
+    if (completed > 0 && !enrollments[track]) {
+      enrollments[track] = { enrolledAt: new Date().toISOString(), lastOpenedAt: null };
+      localStorage.setItem(ENROLLMENTS_KEY, JSON.stringify(enrollments));
+    }
+    const enrolled = Boolean(enrollments[track]);
+    const percent = Math.round(completed / total * 100);
+    const status = percent === 100 ? "Track completed" : completed ? `${completed} of ${total} modules mastered` : enrolled ? "Enrolled and ready to begin" : "Enrollment required";
+    const action = percent === 100 ? "Review track →" : enrolled ? "Continue track →" : "Enroll now →";
+    const title = card.querySelector("h3").textContent;
+    const remaining = Math.max(0, total - completed);
+
+    card.classList.add("learning-track-card");
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `${action.replace(" →", "")}: ${title}`);
+    card.addEventListener("click", () => enrollAndOpen(track, href));
+    card.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        enrollAndOpen(track, href);
+      }
+    });
+    card.innerHTML = `<div class="track-summary">
+      <div class="track-summary-heading"><span class="track-course-icon">${track === "admin" ? "SF" : track === "apex" ? "&lt;/&gt;" : track === "flow" ? "FL" : "UI"}</span><div><span class="course-tag">${percent === 100 ? "Completed" : completed ? "In progress" : enrolled ? "Enrolled" : "Available"}</span><h3>${title}</h3></div><strong>${percent}%</strong></div>
+      <div class="track-progress-bar"><span style="width:${percent}%"></span></div>
+      <div class="track-metrics"><div><strong>${completed}</strong><span>Mastered</span></div><div><strong>${remaining}</strong><span>Remaining</span></div><div><strong>${total}</strong><span>Total modules</span></div></div>
+      <div class="track-next-action"><div><span>Current status</span><strong>${status}</strong></div><b>${action}</b></div>
+    </div>`;
+    return { track, href, title, completed, percent, enrolled };
+  });
+
+  const recommendation = tracks.find((track) => track.percent > 0 && track.percent < 100)
+    || tracks.find((track) => track.enrolled && track.percent === 0)
+    || tracks.find((track) => !track.enrolled)
+    || tracks[0];
+  const message = recommendation.percent > 0
+    ? `Continue from ${recommendation.completed} mastered modules and keep your momentum.`
+    : recommendation.enrolled
+      ? "Open your enrolled track and begin the first module."
+      : "Enroll in this track to begin tracking modules, mastery, and reminders.";
+  const recommendationAction = recommendation.percent === 100 ? "Review track" : recommendation.enrolled ? "Continue track" : "Enroll now";
+  const recommendationElement = document.getElementById("trackRecommendation");
+  recommendationElement.innerHTML = `<div><strong>Recommended next: ${recommendation.title}</strong><span>${message}</span></div><button type="button">${recommendationAction} →</button>`;
+  recommendationElement.querySelector("button").addEventListener("click", () => enrollAndOpen(recommendation.track, recommendation.href));
+}
+
 function init() {
+  renderLearningTracks();
   renderSkillMeters();
   renderSimpleList("dailyChecklist", dailyChecklist);
   renderSimpleList("studyBlocks", studyBlocks);

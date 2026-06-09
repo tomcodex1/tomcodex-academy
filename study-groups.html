@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Join study groups to collaborate with other Salesforce learners and share knowledge." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://tomcodex-academy.vercel.app/study-groups.html" />
+  <title>Study Groups | TomCodex AI Academy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { brand: { 50: "#eef8ff", 100: "#d9f0ff", 500: "#087ea4", 600: "#056b8d", 700: "#075875", 950: "#062c3a" }, ink: "#172b4d", lime: "#d8ff5f" }, fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"] } } } };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/study-groups.css" />
+  <link rel="stylesheet" href="css/mobile-optimized.css" />
+  <link rel="stylesheet" href="css/offline-indicator.css" />
+  <script src="js/academy-guard.js"></script>
+</head>
+<body class="bg-slate-50 font-sans text-ink antialiased">
+  <header class="border-b border-slate-200 bg-white">
+    <div class="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 lg:px-8">
+      <a href="index.html" class="flex items-center gap-2">
+        <img src="assets/tomcodex-logo.svg" alt="Tom Codex" class="h-12 w-auto sm:h-14">
+        <span class="hidden border-l border-slate-300 pl-3 text-sm font-bold sm:inline">Study Groups</span>
+      </a>
+      <nav class="ml-auto flex items-center gap-4 text-sm font-bold">
+        <a href="dashboard.html" class="text-slate-500 hover:text-brand-600">Dashboard</a>
+        <a href="analytics-enhanced.html" class="text-slate-500 hover:text-brand-600">Analytics</a>
+        <a href="gamification-dashboard.html" class="text-slate-500 hover:text-brand-600">Gamification</a>
+        <a href="study-groups.html" class="rounded-lg border border-brand-600 px-4 py-2 text-brand-700 hover:bg-brand-50">Study Groups</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="studyGroupsContainer" class="groups-container">
+    <div class="groups-header">
+      <h1 class="groups-title">Study Groups</h1>
+      <button id="createGroupBtn" class="create-group-btn">Create New Group</button>
+    </div>
+
+    <section class="available-groups-section">
+      <h2 class="section-title text-xl font-bold mb-4">Available Groups</h2>
+      <div id="availableGroups" class="groups-grid">
+        <!-- Groups will be dynamically loaded here -->
+      </div>
+    </section>
+
+    <section class="user-groups-section">
+      <h2 class="user-groups-title text-xl font-bold mb-4">Your Groups</h2>
+      <div id="userGroups" class="user-groups-grid">
+        <!-- User groups will be dynamically loaded here -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Create Group Modal -->
+  <div id="createGroupModal" class="create-group-modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h2 class="modal-title">Create New Study Group</h2>
+      <form id="createGroupForm">
+        <div class="form-group">
+          <label class="form-label" for="groupName">Group Name</label>
+          <input type="text" id="groupName" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="groupDescription">Description</label>
+          <textarea id="groupDescription" class="form-textarea" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Topics</label>
+          <div class="form-topics">
+            <div class="topic-chip" data-topic="administration">Administration</div>
+            <div class="topic-chip" data-topic="apex">Apex</div>
+            <div class="topic-chip" data-topic="flow">Flow</div>
+            <div class="topic-chip" data-topic="integration">Integration</div>
+            <div class="topic-chip" data-topic="lwc">Lightning Web Components</div>
+            <div class="topic-chip" data-topic="security">Security</div>
+            <div class="topic-chip" data-topic="devops">DevOps</div>
+            <div class="topic-chip" data-topic="certification">Certification</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="form-checkbox">
+            <input type="checkbox" id="isPrivate">
+            <label for="isPrivate">Make this a private group</label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="cancelCreateGroup" class="btn-secondary">Cancel</button>
+          <button type="submit" class="btn-primary">Create Group</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/learning-records.js"></script>
+  <script src="js/study-groups.js"></script>
+  <script src="js/mobile-features.js"></script>
+  <script src="js/offline-indicator.js"></script>
+  <script src="js/site-nav.js"></script>
+</body>
+</html>

@@ -80,7 +80,7 @@
   function injectFinalExam() {
     if (el("finalExamSection")) return;
     el("moduleContent").insertAdjacentHTML("beforeend", `
-      <section id="finalExamSection" class="final-exam-section">
+      <section id="finalExamSection" class="final-exam-section hidden">
         <div class="final-exam-intro">
           <div><span class="course-tag">Course certification test</span><h3>${courseName} final exam</h3><p>Complete a Salesforce certification-style exam after finishing the full course.</p></div>
           <div class="final-exam-facts"><span><strong>60</strong>MCQs</span><span><strong>60</strong>Minutes</span><span><strong>${FINAL_EXAM_PASS_SCORE}%</strong>Pass</span></div>
@@ -98,6 +98,17 @@
     el("startFinalExamBtn").addEventListener("click", startFinalExam);
     el("submitFinalExamBtn").addEventListener("click", () => submitFinalExam(false));
     renderFinalExamStatus();
+  }
+
+  function renderFinalExamVisibility() {
+    const section = el("finalExamSection");
+    if (!section) return;
+    const isFinalModule = currentModule === modules.length - 1;
+    section.classList.toggle("hidden", !isFinalModule);
+    if (!isFinalModule) {
+      clearInterval(finalExamTimer);
+      el("finalExamPanel")?.classList.add("hidden");
+    }
   }
 
   function renderFinalExamStatus() {
@@ -313,6 +324,7 @@
     el("masteryResult").className = "mastery-result hidden";
     renderNav();
     renderProgress();
+    renderFinalExamVisibility();
     renderFinalExamStatus();
   }
 

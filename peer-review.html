@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Peer review system for Salesforce learners to get feedback on their code and configurations." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://tomcodex-academy.vercel.app/peer-review.html" />
+  <title>Peer Review | TomCodex AI Academy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { brand: { 50: "#eef8ff", 100: "#d9f0ff", 500: "#087ea4", 600: "#056b8d", 700: "#075875", 950: "#062c3a" }, ink: "#172b4d", lime: "#d8ff5f" }, fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"] } } } };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/peer-review.css" />
+  <link rel="stylesheet" href="css/mobile-optimized.css" />
+  <link rel="stylesheet" href="css/offline-indicator.css" />
+  <script src="js/academy-guard.js"></script>
+</head>
+<body class="bg-slate-50 font-sans text-ink antialiased">
+  <header class="border-b border-slate-200 bg-white">
+    <div class="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 lg:px-8">
+      <a href="index.html" class="flex items-center gap-2">
+        <img src="assets/tomcodex-logo.svg" alt="Tom Codex" class="h-12 w-auto sm:h-14">
+        <span class="hidden border-l border-slate-300 pl-3 text-sm font-bold sm:inline">Peer Review</span>
+      </a>
+      <nav class="ml-auto flex items-center gap-4 text-sm font-bold">
+        <a href="dashboard.html" class="text-slate-500 hover:text-brand-600">Dashboard</a>
+        <a href="analytics-enhanced.html" class="text-slate-500 hover:text-brand-600">Analytics</a>
+        <a href="gamification-dashboard.html" class="text-slate-500 hover:text-brand-600">Gamification</a>
+        <a href="study-groups.html" class="text-slate-500 hover:text-brand-600">Study Groups</a>
+        <a href="discussion-forums.html" class="text-slate-500 hover:text-brand-600">Forums</a>
+        <a href="peer-review.html" class="rounded-lg border border-brand-600 px-4 py-2 text-brand-700 hover:bg-brand-50">Peer Review</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="peerReviewContainer" class="reviews-container">
+    <div class="reviews-header">
+      <h1 class="reviews-title">Peer Review System</h1>
+      <div class="review-header-actions"><a href="code-review-ai.html" class="btn-outline">Run AI Review</a><button id="createReviewBtn" class="create-review-btn">Request Review</button></div>
+    </div>
+
+    <section class="reviews-section">
+      <h2 class="section-title text-xl font-bold mb-4">Available Reviews</h2>
+      <div id="availableReviews" class="reviews-grid">
+        <!-- Reviews will be dynamically loaded here -->
+      </div>
+    </section>
+
+    <section class="user-reviews-section">
+      <h2 class="user-reviews-title text-xl font-bold mb-4">Your Reviews</h2>
+      <div id="userReviews" class="user-reviews-grid">
+        <!-- User reviews will be dynamically loaded here -->
+      </div>
+    </section>
+
+    <section class="review-requests-section">
+      <h2 class="review-requests-title text-xl font-bold mb-4">Review Requests</h2>
+      <div id="reviewRequests" class="requests-grid">
+        <!-- Review requests will be dynamically loaded here -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Review Submission Modal -->
+  <div id="reviewSubmissionModal" class="review-modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h2 class="modal-title">Review Submission</h2>
+      <div class="review-details">
+        <h3 id="reviewTitle" class="text-lg font-semibold mb-2"></h3>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="reviewContent" class="form-textarea" readonly></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Code/Configuration</label>
+          <pre id="reviewCode" class="code-display"></pre>
+        </div>
+      </div>
+      <div class="feedback-section">
+        <h3 class="feedback-title">Your Feedback</h3>
+        <form id="reviewFeedbackForm">
+          <div class="form-group">
+            <label class="form-label" for="feedbackComment">Comment</label>
+            <textarea id="feedbackComment" class="form-textarea" required></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="feedbackRating">Rating</label>
+            <select id="feedbackRating" class="form-select" required>
+              <option value="">Select a rating</option>
+              <option value="5">5 - Excellent</option>
+              <option value="4">4 - Good</option>
+              <option value="3">3 - Average</option>
+              <option value="2">2 - Below Average</option>
+              <option value="1">1 - Poor</option>
+            </select>
+          </div>
+          <input type="hidden" id="reviewId">
+          <div class="form-actions">
+            <button type="button" id="cancelReview" class="btn-secondary">Cancel</button>
+            <button type="submit" class="btn-primary">Submit Feedback</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Review Modal -->
+  <div id="createReviewModal" class="review-modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h2 class="modal-title">Request a Review</h2>
+      <form id="createReviewForm">
+        <div class="form-group">
+          <label class="form-label" for="reviewType">Review Type</label>
+          <select id="reviewType" class="form-select" required>
+            <option value="">Select a type</option>
+            <option value="code">Code Review</option>
+            <option value="configuration">Configuration Review</option>
+            <option value="automation">Automation Review</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="newReviewTitle">Title</label>
+          <input type="text" id="newReviewTitle" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="newReviewDescription">Description</label>
+          <textarea id="newReviewDescription" class="form-textarea" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="newReviewContent">Content</label>
+          <textarea id="newReviewContent" class="form-textarea" required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="newReviewCode">Code/Configuration</label>
+          <textarea id="newReviewCode" class="form-textarea" required></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="cancelCreateReview" class="btn-secondary">Cancel</button>
+          <button type="submit" class="btn-primary">Submit Review Request</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Provide Feedback Modal -->
+  <div id="provideFeedbackModal" class="review-modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h2 class="modal-title">Provide Feedback</h2>
+      <form id="provideFeedbackForm">
+        <div class="form-group">
+          <label class="form-label" for="feedbackComment">Comment</label>
+          <textarea id="feedbackComment" class="form-textarea" required></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="feedbackRating">Rating</label>
+          <select id="feedbackRating" class="form-select" required>
+            <option value="">Select a rating</option>
+            <option value="5">5 - Excellent</option>
+            <option value="4">4 - Good</option>
+            <option value="3">3 - Average</option>
+            <option value="2">2 - Below Average</option>
+            <option value="1">1 - Poor</option>
+          </select>
+        </div>
+        <input type="hidden" id="feedbackReviewId">
+        <div class="form-actions">
+          <button type="button" id="cancelFeedback" class="btn-secondary">Cancel</button>
+          <button type="submit" class="btn-primary">Submit Feedback</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Feedback Modal -->
+  <div id="viewFeedbackModal" class="review-modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h2 class="modal-title">View Feedback</h2>
+      <div id="feedbackList" class="feedback-list">
+        <!-- Feedback items will be dynamically loaded here -->
+      </div>
+      <div class="form-actions">
+        <button type="button" id="closeFeedback" class="btn-secondary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/learning-records.js"></script>
+  <script src="js/peer-review.js"></script>
+  <script src="js/mobile-features.js"></script>
+  <script src="js/offline-indicator.js"></script>
+  <script src="js/site-nav.js"></script>
+</body>
+</html>

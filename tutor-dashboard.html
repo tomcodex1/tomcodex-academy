@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Protected TomCodex tutor curriculum workspace.">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Tutor Dashboard | TomCodex AI Academy</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/tutor-dashboard.css">
+</head>
+<body>
+  <main class="tutor-shell">
+    <section class="tutor-hero">
+      <div>
+        <span class="tutor-kicker">Tutor workspace</span>
+        <h1>Curriculum dashboard</h1>
+        <p>Review academy programs, inspect course coverage, and use teaching-focused review tools.</p>
+      </div>
+      <div class="tutor-identity">
+        <span>Signed in as tutor</span>
+        <strong id="tutorIdentity">Academy Tutor</strong>
+        <small id="tutorEmail">Verified curriculum access</small>
+      </div>
+    </section>
+
+    <section class="tutor-stats" aria-label="Student overview">
+      <article><strong id="registeredStudentCount">0</strong><span>Registered students</span></article>
+      <article><strong id="activeStudentCount">0</strong><span>Active learners</span></article>
+      <article><strong id="completedStudentCount">0</strong><span>Completed pathways</span></article>
+      <article><strong id="studentActivityCount">0</strong><span>Recorded activities</span></article>
+    </section>
+
+    <section class="tutor-section">
+      <div class="tutor-section-heading">
+        <div><span class="tutor-kicker">Student records</span><h2>Registered learner tracking</h2></div>
+        <div class="student-record-actions">
+          <label for="studentRecordSearch">Find student</label>
+          <input id="studentRecordSearch" type="search" placeholder="Search name, email, phase, or course">
+        </div>
+      </div>
+      <div id="studentRecordsStatus" class="student-record-status">Loading registered student records...</div>
+      <div id="studentRecordsTable" class="student-record-table-wrap" hidden>
+        <table class="student-record-table">
+          <thead><tr><th>Student</th><th>Current phase</th><th>Course progress</th><th>Activity</th><th>Joined</th></tr></thead>
+          <tbody id="studentRecordsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="tutor-section">
+      <div class="tutor-section-heading">
+        <div><span class="tutor-kicker">Curriculum</span><h2>Programs to review</h2></div>
+        <p>Review the academy curriculum while registered learner activity remains summarized in the tracking section above.</p>
+      </div>
+      <div class="tutor-course-grid">
+        <a href="course-admin.html"><span>14 modules</span><h3>Salesforce Admin</h3><p>Administration, security, data modeling, automation, and reporting.</p><b>Review curriculum</b></a>
+        <a href="course-apex.html"><span>12 modules</span><h3>Apex Development</h3><p>Apex fundamentals, triggers, testing, integrations, and delivery.</p><b>Review curriculum</b></a>
+        <a href="course-flow.html"><span>12 modules</span><h3>Salesforce Flow</h3><p>Low-code automation, flow design, debugging, and governance.</p><b>Review curriculum</b></a>
+        <a href="course-lwc.html"><span>12 modules</span><h3>Lightning Web Components</h3><p>Modern Salesforce UI development, data access, and testing.</p><b>Review curriculum</b></a>
+      </div>
+    </section>
+
+    <section class="tutor-section">
+      <div class="tutor-section-heading"><div><span class="tutor-kicker">Tutor tools</span><h2>Review and support</h2></div></div>
+      <div class="tutor-tool-grid">
+        <a href="code-review-ai.html"><h3>AI Code Review</h3><p>Evaluate Salesforce implementations and surface improvement guidance.</p><b>Open review tool</b></a>
+        <a href="peer-review.html"><h3>Peer Review</h3><p>Review submissions and provide structured technical feedback.</p><b>Open peer review</b></a>
+        <a href="discussion-forums.html"><h3>Discussion Forums</h3><p>Support curriculum questions and guide academy discussions.</p><b>Open forums</b></a>
+      </div>
+    </section>
+  </main>
+  <footer class="legal-footer">Copyright 2026 TomCodeX Inc. All rights reserved.</footer>
+  <script src="js/tutor-dashboard.js"></script>
+  <script src="js/site-nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="TomCodex is a fully AI-powered Salesforce academy using official documentation, free videos, and Trailhead practice." />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Academy Home | TomCodex AI Academy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { brand: { 50: "#eef8ff", 100: "#d9f0ff", 500: "#087ea4", 600: "#056b8d", 700: "#075875", 950: "#062c3a" }, ink: "#172b4d", mist: "#f5f8fa", lime: "#d8ff5f" },
+        fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"] }
+      }}
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/floating-guide.css" />
+  <link rel="stylesheet" href="css/floating-guide-auto.css" />
+  <link rel="stylesheet" href="css/analytics-enhanced.css" />
+  <link rel="stylesheet" href="css/gamification.css" />
+  <link rel="stylesheet" href="css/mobile-optimized.css" />
+  <link rel="stylesheet" href="css/offline-indicator.css" />
+  <script src="js/academy-guard.js"></script>
+</head>
+<body class="bg-white font-sans text-ink antialiased">
+  <header class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <div class="mx-auto flex max-w-7xl items-center gap-5 px-5 py-3 lg:px-8">
+      <a href="academy-home.html" class="flex shrink-0 items-center gap-2" aria-label="TomCodex Academy home">
+        <img src="assets/tomcodex-logo.svg" alt="Tom Codex" class="h-12 w-auto sm:h-14">
+        <span class="hidden border-l border-slate-300 pl-3 text-sm font-bold text-ink sm:inline">AI Academy</span>
+      </a>
+      <nav class="ml-auto hidden items-center gap-7 text-sm font-semibold text-slate-600 md:flex">
+        <a href="#how-it-works" class="hover:text-brand-600">How it works</a>
+        <a href="#resources" class="hover:text-brand-600">Resources</a>
+        <a href="#programs" class="hover:text-brand-600">Programs</a>
+        <a href="analytics-enhanced.html" class="hover:text-brand-600">Analytics</a>
+        <a href="gamification-dashboard.html" class="hover:text-brand-600">Gamification</a>
+        <a href="personalized-paths.html" class="hover:text-brand-600">My Path</a>
+        <a href="study-groups.html" class="hover:text-brand-600">Study Groups</a>
+        <a href="discussion-forums.html" class="hover:text-brand-600">Forums</a>
+        <a href="peer-review.html" class="hover:text-brand-600">Peer Review</a>
+        <a href="code-review-ai.html" class="hover:text-brand-600">AI Review</a>
+      </nav>
+      <a href="access.html" class="rounded-lg border border-brand-600 px-4 py-2.5 text-sm font-bold text-brand-700 hover:bg-brand-50">Open academy</a>
+      <a href="access.html" class="hidden rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-700 sm:block">Start learning</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="relative overflow-hidden bg-brand-950">
+      <div class="absolute inset-0 opacity-25" style="background-image:radial-gradient(circle at 78% 18%,#24b5ff 0,transparent 25%),radial-gradient(circle at 90% 90%,#d8ff5f 0,transparent 18%)"></div>
+      <div class="relative mx-auto grid max-w-7xl items-center gap-14 px-5 py-20 lg:grid-cols-[1.1fr_.9fr] lg:px-8 lg:py-28">
+        <div>
+          <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-bold text-cyan-100"><span class="h-2 w-2 rounded-full bg-lime"></span>AI-powered learning · Tutor-managed curriculum</div>
+          <h1 class="mt-7 max-w-3xl text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-6xl">Master Salesforce with your personal AI tutor.</h1>
+          <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-300">TomCodex AI explains official Salesforce documentation, creates your learning plan, answers every doubt, and guides you through Trailhead challenges before and after placement.</p>
+          <div class="mt-9 flex flex-col gap-3 sm:flex-row">
+            <a href="access.html" class="rounded-lg bg-lime px-6 py-3.5 text-center font-extrabold text-brand-950 transition hover:bg-white">Start learning with AI</a>
+            <a href="#how-it-works" class="rounded-lg border border-white/40 bg-white/5 px-6 py-3.5 text-center font-bold text-white hover:bg-white/10">See how it works</a>
+          </div>
+          <div class="mt-8 flex flex-wrap gap-x-7 gap-y-3 text-sm font-medium text-slate-300"><span>24/7 AI tutor</span><span>No learning deadline</span><span>Trailhead practice</span><span>Career-long growth</span></div>
+        </div>
+        <div class="rounded-3xl border border-white/15 bg-white/10 p-4 shadow-2xl backdrop-blur">
+          <div class="rounded-2xl bg-white p-6">
+            <div class="flex items-center gap-3"><img src="assets/zentom-ai-logo.svg" alt="Zentom AI" class="h-14 w-14"><div><span class="text-xs font-bold uppercase tracking-widest text-brand-600">Zentom AI Tutor</span><h2 class="font-extrabold">Your lesson is ready</h2></div></div>
+            <div class="mt-6 rounded-xl bg-slate-50 p-4"><span class="course-tag">Today's AI lesson</span><h3 class="mt-3 font-extrabold">Salesforce Objects and Relationships</h3><p class="mt-2 text-sm leading-6 text-slate-500">Learn the concept, review official docs, watch a free video, then complete a Trailhead challenge.</p></div>
+            <div class="mt-4 grid grid-cols-3 gap-3 text-center"><div class="rounded-xl bg-brand-50 p-3"><strong class="block text-xl">01</strong><span class="text-xs text-slate-500">AI lesson</span></div><div class="rounded-xl bg-brand-50 p-3"><strong class="block text-xl">02</strong><span class="text-xs text-slate-500">Resources</span></div><div class="rounded-xl bg-brand-50 p-3"><strong class="block text-xl">03</strong><span class="text-xs text-slate-500">Practice</span></div></div>
+            <a href="dashboard.html" class="mt-5 block rounded-xl bg-brand-600 px-4 py-3 text-center font-bold text-white hover:bg-brand-700">Open AI lesson</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="border-b border-slate-200 bg-mist">
+      <div class="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-5 py-7 text-center md:grid-cols-4 lg:px-8">
+        <div><strong class="block text-2xl font-extrabold">24/7</strong><span class="text-sm text-slate-500">AI tutor access</span></div>
+        <div><strong class="block text-2xl font-extrabold">Unlimited</strong><span class="text-sm text-slate-500">Continuous learning</span></div>
+        <div><strong class="block text-2xl font-extrabold">Official</strong><span class="text-sm text-slate-500">Salesforce sources</span></div>
+        <div><strong class="block text-2xl font-extrabold">Hands-on</strong><span class="text-sm text-slate-500">Trailhead practice</span></div>
+      </div>
+    </section>
+
+    <section id="how-it-works" class="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+      <div class="mx-auto max-w-3xl text-center"><p class="text-sm font-bold uppercase tracking-widest text-brand-600">How TomCodex works</p><h2 class="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">One AI-guided path from concept to confidence.</h2><p class="mt-4 text-slate-500">Every topic follows the same practical learning cycle so you understand it, build it, and remember it.</p></div>
+      <div class="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+        <article class="academy-card"><div class="resource-step">01</div><span class="course-tag">Understand</span><h3 class="mt-4 text-lg font-extrabold">AI explains the topic</h3><p class="mt-2 text-sm leading-6 text-slate-500">Simple personalized explanations based on your current knowledge.</p></article>
+        <article class="academy-card"><div class="resource-step">02</div><span class="course-tag">Explore</span><h3 class="mt-4 text-lg font-extrabold">Study trusted sources</h3><p class="mt-2 text-sm leading-6 text-slate-500">Use official Salesforce docs and free videos selected for the lesson.</p></article>
+        <article class="academy-card"><div class="resource-step">03</div><span class="course-tag">Build</span><h3 class="mt-4 text-lg font-extrabold">Practice on Trailhead</h3><p class="mt-2 text-sm leading-6 text-slate-500">Complete modules, projects, badges, and Playground challenges.</p></article>
+        <article class="academy-card"><div class="resource-step">04</div><span class="course-tag">Improve</span><h3 class="mt-4 text-lg font-extrabold">Get instant AI review</h3><p class="mt-2 text-sm leading-6 text-slate-500">Fix mistakes, answer recall questions, and prepare for interviews.</p></article>
+      </div>
+    </section>
+
+    <section id="resources" class="bg-brand-950 py-20 text-white">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div class="grid items-end gap-6 lg:grid-cols-2"><div><p class="text-sm font-bold uppercase tracking-widest text-cyan-300">Trusted learning sources</p><h2 class="mt-3 text-3xl font-extrabold sm:text-4xl">AI guidance backed by official Salesforce resources.</h2></div><p class="text-slate-300">TomCodex does not replace trusted material. It organizes, explains, and connects it to practical work.</p></div>
+        <div class="mt-10 grid gap-5 lg:grid-cols-3">
+          <article class="rounded-2xl border border-white/15 bg-white/10 p-6"><span class="text-xs font-bold uppercase tracking-widest text-cyan-300">Main content source</span><h3 class="mt-3 text-xl font-extrabold">Salesforce Documentation</h3><p class="mt-3 text-sm leading-6 text-slate-300">Platform guides, developer documentation, APIs, Apex, LWC, and product references.</p><a class="mt-5 inline-block font-bold text-lime" href="https://developer.salesforce.com/docs/?language=en" target="_blank" rel="noopener noreferrer">Browse official docs ↗</a></article>
+          <article class="rounded-2xl border border-white/15 bg-white/10 p-6"><span class="text-xs font-bold uppercase tracking-widest text-cyan-300">Free visual learning</span><h3 class="mt-3 text-xl font-extrabold">Salesforce Videos</h3><p class="mt-3 text-sm leading-6 text-slate-300">Free feature walkthroughs, tutorials, Salesforce+ sessions, and expert demonstrations.</p><a class="mt-5 inline-block font-bold text-lime" href="https://help.salesforce.com/s/articleView?id=000390369&language=en_US&type=1" target="_blank" rel="noopener noreferrer">Watch free videos ↗</a></article>
+          <article class="rounded-2xl border border-lime/50 bg-white/10 p-6"><span class="text-xs font-bold uppercase tracking-widest text-lime">Hands-on experience</span><h3 class="mt-3 text-xl font-extrabold">Trailhead Practice</h3><p class="mt-3 text-sm leading-6 text-slate-300">Modules, projects, badges, and practical challenges completed in a Trailhead Playground.</p><a class="mt-5 inline-block font-bold text-lime" href="https://trailhead.salesforce.com/" target="_blank" rel="noopener noreferrer">Open Trailhead ↗</a></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="programs" class="mx-auto max-w-7xl px-5 py-20 lg:px-8">
+      <div class="flex flex-col justify-between gap-4 md:flex-row md:items-end"><div><p class="text-sm font-bold uppercase tracking-widest text-brand-600">AI learning programs</p><h2 class="mt-3 text-3xl font-extrabold">Grow through every stage of your Salesforce career.</h2><p class="mt-3 text-slate-500">Start with foundations, prepare for placement, then continue learning for real projects, promotions, and new Salesforce releases.</p></div><a href="dashboard.html" class="w-fit rounded-lg border border-brand-600 px-5 py-3 text-sm font-bold text-brand-700 hover:bg-brand-50">Explore continuous roadmap</a></div>
+      <div class="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+        <article class="course-card"><a href="course-admin.html" class="block"><div class="course-cover course-cover-illustration"><img src="assets/course-admin.svg" alt="Connected Salesforce administration tools"></div><div class="p-5"><span class="course-tag">40+ hours</span><h3>Salesforce Admin</h3><p>14 modules covering objects, data, security, reports, automation, governance, and hands-on projects.</p><div class="course-meta font-bold text-brand-700">Beginner to advanced · Open program →</div></div></a></article>
+        <article class="course-card"><a href="course-apex.html" class="block"><div class="course-cover course-cover-illustration"><img src="assets/course-apex.svg" alt="Apex code editor and development tools"></div><div class="p-5"><span class="course-tag">36+ hours</span><h3>Apex Development</h3><p>12 modules covering SOQL, Apex classes, triggers, testing, async processing, integrations, security, and deployment.</p><div class="course-meta font-bold text-brand-700">Developer pathway · Open program →</div></div></a></article>
+        <article class="course-card"><a href="course-flow.html" class="block"><div class="course-cover course-cover-illustration"><img src="assets/course-flow.svg" alt="Connected Salesforce automation flow"></div><div class="p-5"><span class="course-tag">36+ hours</span><h3>Salesforce Flow</h3><p>12 modules covering record-triggered and screen flows, reusable automation, testing, security, integrations, and deployment.</p><div class="course-meta font-bold text-brand-700">Automation pathway · Open program →</div></div></a></article>
+        <article class="course-card"><a href="course-lwc.html" class="block"><div class="course-cover course-cover-illustration"><img src="assets/course-lwc.svg" alt="Reusable Lightning Web Component interface"></div><div class="p-5"><span class="course-tag">36+ hours</span><h3>Lightning Web Components</h3><p>12 modules covering components, Salesforce data, Apex, communication, security, Jest testing, performance, and deployment.</p><div class="course-meta font-bold text-brand-700">Frontend pathway · Open program →</div></div></a></article>
+        <article class="course-card"><a href="dashboard.html" class="block"><div class="course-cover course-cover-illustration from-slate-700 to-brand-600"><img src="assets/continuous-growth.svg" alt="Career path from project delivery to Salesforce leadership"></div><div class="p-5"><span class="course-tag">After placement</span><h3>Continuous Professional Growth</h3><p>Turn real project challenges into stronger delivery skills, targeted certifications, release expertise, and a clear path toward Salesforce architecture and leadership.</p><div class="course-meta font-bold text-brand-700">Build my continuous growth roadmap →</div></div></a></article>
+        <article class="course-card"><div class="course-cover course-cover-illustration"><img src="assets/course-interview.svg" alt="AI interview conversation and feedback"></div><div class="p-5"><span class="course-tag">Adaptive career practice</span><h3>AI Interviewer</h3><p>Practice targeted technical and behavioral Salesforce interviews with STAR coaching and adaptive follow-ups.</p><div class="course-meta"><a href="interview.html" class="font-bold text-brand-700">Start unlimited mock interviews →</a></div></div></article>
+        <article class="course-card"><div class="course-cover course-cover-illustration"><img src="assets/course-analytics.svg" alt="Learning progress charts and skill trends"></div><div class="p-5"><span class="course-tag">Learning analytics</span><h3>Activity Heatmap and Growth Curves</h3><p>Track learning consistency, records, interview improvement, and progress trends.</p><div class="course-meta"><a href="analytics.html" class="font-bold text-brand-700">View my learning analytics →</a></div></div></article>
+      </div>
+    </section>
+
+    <section class="bg-brand-50 py-16"><div class="mx-auto max-w-4xl px-5 text-center"><h2 class="text-3xl font-extrabold">Learning does not stop after placement.</h2><p class="mx-auto mt-4 max-w-2xl text-slate-500">TomCodex AI stays with you from your first Salesforce concept through workplace projects, certifications, promotions, and future platform updates.</p><a href="dashboard.html" class="mt-7 inline-block rounded-lg bg-brand-600 px-7 py-3.5 font-bold text-white hover:bg-brand-700">Enter AI Academy</a></div></section>
+  </main>
+
+  <footer class="bg-brand-950 py-10 text-slate-300"><div class="mx-auto flex max-w-7xl flex-col justify-between gap-5 px-5 md:flex-row md:items-center lg:px-8"><div><div class="flex items-center gap-3"><img src="assets/tomcodex-logo-light.svg" alt="Tom Codex" class="h-14 w-auto"><strong class="border-l border-white/20 pl-3 text-sm text-white">AI Academy</strong></div><p class="mt-2 text-sm">AI-powered Salesforce learning with verified curriculum oversight.</p><p class="mt-3 text-xs text-slate-400">Copyright 2026 TomCodeX Inc. All rights reserved.</p></div><a href="dashboard.html" class="font-bold text-lime">Open student dashboard →</a></div></footer>
+  <script src="js/learning-records.js"></script>
+  <script src="js/ai-client.js"></script>
+  <script src="js/floating-guide.js"></script>
+  <script src="js/voice-input.js"></script>
+  <script src="js/analytics-enhanced.js"></script>
+  <script src="js/gamification.js"></script>
+  <script src="js/mobile-features.js"></script>
+  <script src="js/offline-indicator.js"></script>
+  <script src="js/site-nav.js"></script>
+</body>
+</html>

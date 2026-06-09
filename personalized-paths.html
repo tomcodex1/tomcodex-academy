@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Build an adaptive Salesforce learning path from your goals, available study time, and current TomCodex progress." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://tomcodex-academy.vercel.app/personalized-paths.html" />
+  <title>Personalized Learning Paths | TomCodex AI Academy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { brand: { 50: "#eef8ff", 100: "#d9f0ff", 500: "#087ea4", 600: "#056b8d", 700: "#075875", 950: "#062c3a" }, ink: "#172b4d", lime: "#d8ff5f" }, fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"] } } } };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/personalized-paths.css" />
+  <link rel="stylesheet" href="css/mobile-optimized.css" />
+  <link rel="stylesheet" href="css/offline-indicator.css" />
+  <script src="js/academy-guard.js"></script>
+</head>
+<body class="bg-slate-50 font-sans text-ink antialiased">
+  <header class="border-b border-slate-200 bg-white">
+    <div class="path-header-inner mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 lg:px-8">
+      <a href="index.html" class="flex shrink-0 items-center gap-2">
+        <img src="assets/tomcodex-logo.svg" alt="Tom Codex" class="h-12 w-auto sm:h-14">
+        <span class="hidden border-l border-slate-300 pl-3 text-sm font-bold sm:inline">Personalized Paths</span>
+      </a>
+      <nav class="path-main-nav ml-auto flex items-center gap-4 text-sm font-bold" aria-label="Academy navigation">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="analytics-enhanced.html">Analytics</a>
+        <a href="study-groups.html">Study Groups</a>
+        <a href="personalized-paths.html" class="active" aria-current="page">My Path</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="path-hero">
+      <div class="path-hero-glow" aria-hidden="true"></div>
+      <div class="relative mx-auto grid max-w-7xl items-center gap-10 px-5 py-16 lg:grid-cols-[1.1fr_.9fr] lg:px-8 lg:py-20">
+        <div>
+          <span class="path-kicker">Phase 3 · Adaptive AI learning</span>
+          <h1>Your next Salesforce milestone, chosen from your real progress.</h1>
+          <p>Tell TomCodex where you want to go. Your path uses completed mastery tests, learning activity, interview practice, and available study time to prioritize the work that matters now.</p>
+          <div class="path-hero-actions">
+            <a href="#pathBuilder" class="path-primary light">Build my path</a>
+            <a href="#recommendedPath" class="path-secondary light">View recommendation</a>
+          </div>
+        </div>
+        <div class="path-signal-card">
+          <div class="path-signal-heading"><div><span>Progress signals</span><h2>What your path reads</h2></div><strong id="signalCount">0</strong></div>
+          <div id="signalList" class="path-signal-list" aria-live="polite"></div>
+          <p class="path-privacy-note">Your learning data stays in this browser and is used only to tailor this path.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="path-stat-strip">
+      <div class="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-5 py-6 md:grid-cols-4 lg:px-8">
+        <div><strong id="pathProgressStat">0%</strong><span>Path complete</span></div>
+        <div><strong id="weeklyPaceStat">5 hrs</strong><span>Weekly pace</span></div>
+        <div><strong id="milestoneStat">0</strong><span>Milestones ready</span></div>
+        <div><strong id="finishStat">--</strong><span>Estimated finish</span></div>
+      </div>
+    </section>
+
+    <section class="mx-auto grid max-w-7xl gap-8 px-5 py-12 lg:grid-cols-[.72fr_1.28fr] lg:px-8">
+      <aside id="pathBuilder" class="path-builder-card">
+        <span class="path-section-label">Path builder</span>
+        <h2>Shape your recommendation</h2>
+        <p>Change a goal or pace at any time. TomCodex will rebuild the milestone order without losing completed work.</p>
+        <form id="pathPreferencesForm">
+          <label for="pathGoal">Primary goal</label>
+          <select id="pathGoal">
+            <option value="admin">Become a Salesforce Admin</option>
+            <option value="developer">Become a Salesforce Developer</option>
+            <option value="automation">Master Salesforce Automation</option>
+            <option value="architect">Grow toward Solution Architect</option>
+            <option value="career">Prepare for interviews and delivery</option>
+          </select>
+          <label for="experienceLevel">Current experience</label>
+          <select id="experienceLevel">
+            <option value="beginner">Starting from fundamentals</option>
+            <option value="intermediate">Comfortable with the basics</option>
+            <option value="advanced">Working on advanced delivery</option>
+          </select>
+          <label for="weeklyHours">Study hours per week <strong id="weeklyHoursValue">5 hours</strong></label>
+          <input id="weeklyHours" type="range" min="2" max="20" step="1" value="5" />
+          <fieldset>
+            <legend>Learning preference</legend>
+            <div class="path-choice-grid">
+              <label><input type="radio" name="learningStyle" value="balanced" checked><span><strong>Balanced</strong><small>Concepts and projects</small></span></label>
+              <label><input type="radio" name="learningStyle" value="project"><span><strong>Project first</strong><small>Build while learning</small></span></label>
+              <label><input type="radio" name="learningStyle" value="interview"><span><strong>Career ready</strong><small>Practice and explain</small></span></label>
+            </div>
+          </fieldset>
+          <button class="path-primary" type="submit">Rebuild personalized path</button>
+        </form>
+      </aside>
+
+      <section id="recommendedPath" class="path-results">
+        <div class="path-result-header">
+          <div><span class="path-section-label">Recommended path</span><h2 id="pathTitle">Your adaptive learning path</h2><p id="pathSummary"></p></div>
+          <div class="path-score"><strong id="readinessScore">0%</strong><span>Current readiness</span></div>
+        </div>
+        <div class="path-progress-card">
+          <div><span>Milestone progress</span><strong id="pathProgressText">0 of 0 complete</strong></div>
+          <div class="path-progress-track"><div id="pathProgressBar" role="progressbar" aria-label="Personalized path progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div></div>
+          <p id="nextActionText"></p>
+        </div>
+        <div id="gapInsights" class="path-insights" aria-live="polite"></div>
+        <div id="milestoneList" class="milestone-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="bg-brand-950 py-8 text-slate-300"><div class="mx-auto flex max-w-7xl flex-col justify-between gap-4 px-5 md:flex-row md:items-center lg:px-8"><p class="text-sm">TomCodex AI Academy · Adaptive Salesforce learning</p><a href="dashboard.html" class="font-bold text-lime">Open student dashboard →</a></div></footer>
+  <script src="js/learner-sync.js"></script>
+  <script src="js/learning-records.js"></script>
+  <script src="js/personalized-paths.js"></script>
+  <script src="js/mobile-features.js"></script>
+  <script src="js/offline-indicator.js"></script>
+  <script src="js/site-nav.js"></script>
+</body>
+</html>

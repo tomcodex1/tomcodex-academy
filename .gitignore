@@ -3,6 +3,9 @@
 !.env.example
 node_modules/
 npm-debug.log*
+coverage/
+.local-server.*.log
 .vercel/
 
 .vercel
+data/learner-accounts.json

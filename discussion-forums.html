@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Discussion forums for Salesforce learners to ask questions and share knowledge." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://tomcodex-academy.vercel.app/discussion-forums.html" />
+  <title>Discussion Forums | TomCodex AI Academy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { brand: { 50: "#eef8ff", 100: "#d9f0ff", 500: "#087ea4", 600: "#056b8d", 700: "#075875", 950: "#062c3a" }, ink: "#172b4d", lime: "#d8ff5f" }, fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"] } } } };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/discussion-forums.css" />
+  <link rel="stylesheet" href="css/mobile-optimized.css" />
+  <link rel="stylesheet" href="css/offline-indicator.css" />
+  <script src="js/academy-guard.js"></script>
+</head>
+<body class="bg-slate-50 font-sans text-ink antialiased">
+  <header class="border-b border-slate-200 bg-white">
+    <div class="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 lg:px-8">
+      <a href="index.html" class="flex items-center gap-2">
+        <img src="assets/tomcodex-logo.svg" alt="Tom Codex" class="h-12 w-auto sm:h-14">
+        <span class="hidden border-l border-slate-300 pl-3 text-sm font-bold sm:inline">Discussion Forums</span>
+      </a>
+      <nav class="ml-auto flex items-center gap-4 text-sm font-bold">
+        <a href="dashboard.html" class="text-slate-500 hover:text-brand-600">Dashboard</a>
+        <a href="analytics-enhanced.html" class="text-slate-500 hover:text-brand-600">Analytics</a>
+        <a href="gamification-dashboard.html" class="text-slate-500 hover:text-brand-600">Gamification</a>
+        <a href="study-groups.html" class="text-slate-500 hover:text-brand-600">Study Groups</a>
+        <a href="discussion-forums.html" class="rounded-lg border border-brand-600 px-4 py-2 text-brand-700 hover:bg-brand-50">Forums</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="discussionForumsContainer" class="forums-container">
+    <div class="forums-header">
+      <h1 class="forums-title">Discussion Forums</h1>
+      <button id="createDiscussionBtn" class="create-discussion-btn">Start New Discussion</button>
+    </div>
+
+    <section class="forums-section">
+      <h2 class="section-title text-xl font-bold mb-4">Topic Forums</h2>
+      <div id="forumsList" class="forums-grid">
+        <!-- Forums will be dynamically loaded here -->
+      </div>
+    </section>
+
+    <section class="recent-discussions-section">
+      <h2 class="recent-discussions-title text-xl font-bold mb-4">Recent Discussions</h2>
+      <div id="recentDiscussions" class="recent-discussions-list">
+        <!-- Recent discussions will be dynamically loaded here -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Create Discussion Modal -->
+  <div id="createDiscussionModal" class="create-discussion-modal">
+    <div class="modal-content">
+      <span class="modal-close">&times;</span>
+      <h2 class="modal-title">Start New Discussion</h2>
+      <form id="createDiscussionForm">
+        <div class="form-group">
+          <label class="form-label" for="discussionForum">Select Forum</label>
+          <select id="discussionForum" class="form-select" required>
+            <option value="">Choose a forum</option>
+            <option value="general-salesforce">General Salesforce</option>
+            <option value="admin-questions">Administration Questions</option>
+            <option value="apex-development">Apex Development</option>
+            <option value="flow-automation">Flow & Automation</option>
+            <option value="lwc-development">Lightning Web Components</option>
+            <option value="certification-prep">Certification Prep</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="discussionTitle">Discussion Title</label>
+          <input type="text" id="discussionTitle" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="discussionContent">Content</label>
+          <textarea id="discussionContent" class="form-textarea" required></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="cancelCreateDiscussion" class="btn-secondary">Cancel</button>
+          <button type="submit" class="btn-primary">Post Discussion</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/learning-records.js"></script>
+  <script src="js/discussion-forums.js"></script>
+  <script src="js/mobile-features.js"></script>
+  <script src="js/offline-indicator.js"></script>
+  <script src="js/site-nav.js"></script>
+</body>
+</html>

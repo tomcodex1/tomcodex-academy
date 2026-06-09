@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Gamification features for Salesforce learning including badges, streaks, and leaderboards." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://tomcodex-academy.vercel.app/gamification-dashboard.html" />
+  <title>Gamification Dashboard | TomCodex AI Academy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { brand: { 50: "#eef8ff", 100: "#d9f0ff", 500: "#087ea4", 600: "#056b8d", 700: "#075875", 950: "#062c3a" }, ink: "#172b4d", lime: "#d8ff5f" }, fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"] } } } };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/gamification.css" />
+  <link rel="stylesheet" href="css/floating-guide.css" />
+  <script src="js/academy-guard.js"></script>
+</head>
+<body class="bg-slate-50 font-sans text-ink antialiased">
+  <header class="border-b border-slate-200 bg-white">
+    <div class="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 lg:px-8">
+      <a href="index.html" class="flex items-center gap-2">
+        <img src="assets/tomcodex-logo.svg" alt="Tom Codex" class="h-12 w-auto sm:h-14">
+        <span class="hidden border-l border-slate-300 pl-3 text-sm font-bold sm:inline">Gamification Dashboard</span>
+      </a>
+      <nav class="ml-auto flex items-center gap-4 text-sm font-bold">
+        <a href="dashboard.html" class="text-slate-500 hover:text-brand-600">Dashboard</a>
+        <a href="analytics-enhanced.html" class="text-slate-500 hover:text-brand-600">Analytics</a>
+        <a href="gamification-dashboard.html" class="rounded-lg border border-brand-600 px-4 py-2 text-brand-700 hover:bg-brand-50">Gamification</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="gamificationContainer" class="gamification-dashboard">
+    <div class="dashboard-header">
+      <h1 class="dashboard-title">Gamification Dashboard</h1>
+      <div class="user-stats">
+        <div class="stat-item">
+          <div class="stat-value" id="userPoints">0</div>
+          <div class="stat-label">Points</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="userRank">-</div>
+          <div class="stat-label">Rank</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="streaks-container" id="userStreak">
+      <div class="streak-current">
+        <div class="streak-number">0</div>
+        <div class="streak-label">Current Streak</div>
+      </div>
+      <div class="streak-longest">
+        <div class="streak-number">0</div>
+        <div class="streak-label">Longest Streak</div>
+      </div>
+    </div>
+
+    <section class="badges-section">
+      <h2 class="text-2xl font-bold mb-6">Your Badges</h2>
+      <div class="badges-container" id="userBadges"></div>
+    </section>
+
+    <section class="leaderboard-section">
+      <h2 class="text-2xl font-bold mb-6">Community Leaderboard</h2>
+      <div class="leaderboard-container">
+        <div class="leaderboard-title">Top Learners This Week</div>
+        <div id="leaderboard"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/learning-records.js"></script>
+  <script src="js/gamification.js"></script>
+  <script src="js/floating-guide.js"></script>
+  <script src="js/site-nav.js"></script>
+</body>
+</html>

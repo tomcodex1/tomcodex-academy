@@ -23,9 +23,10 @@
   <link rel="stylesheet" href="css/interview.css" />
   <link rel="stylesheet" href="css/floating-guide.css" />
   <link rel="stylesheet" href="css/floating-guide-auto.css" />
+  <script src="js/academy-guard.js"></script>
 </head>
-<body class="bg-slate-50 font-sans text-ink antialiased">
-  <header class="border-b border-slate-200 bg-white">
+<body class="interview-page bg-slate-50 font-sans text-ink antialiased">
+  <header class="interview-topbar border-b border-slate-200 bg-white">
     <div class="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 lg:px-8">
       <a href="index.html" class="flex items-center gap-2"><img src="assets/tomcodex-logo.svg" alt="Tom Codex" class="h-12 w-auto sm:h-14"><span class="hidden border-l border-slate-300 pl-3 text-sm font-bold sm:inline">AI Interviewer</span></a>
       <nav class="ml-auto flex items-center gap-3 text-sm font-bold"><a href="analytics.html" class="hidden text-slate-500 hover:text-brand-600 sm:block">Analytics</a><a href="dashboard.html" class="rounded-lg border border-brand-600 px-4 py-2 text-brand-700 hover:bg-brand-50">Dashboard</a><a href="index.html" class="hidden text-slate-500 hover:text-brand-600 sm:block">Home</a></nav>
@@ -33,56 +34,175 @@
   </header>
 
   <main>
-    <section class="bg-brand-950 text-white">
+    <section class="interview-hero bg-brand-950 text-white">
       <div class="mx-auto grid max-w-7xl items-center gap-8 px-5 py-12 lg:grid-cols-[1fr_.55fr] lg:px-8">
-        <div><span class="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-cyan-200">Unlimited mock interviews</span><h1 class="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl">Practice with your AI Interviewer.</h1><p class="mt-4 max-w-2xl text-lg leading-8 text-slate-300">Answer realistic Salesforce questions, receive instant structured feedback, and keep practicing before and after placement.</p></div>
+        <div><span class="interview-eyebrow inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-cyan-200">AI-powered Salesforce practice</span><h1 class="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl">Build interview confidence, one answer at a time.</h1><p class="mt-4 max-w-2xl text-lg leading-8 text-slate-300">Practice realistic questions, speak naturally, and receive focused feedback that shows exactly what to improve next.</p><div class="hero-proof"><span>Role-based sessions</span><span>Instant scoring</span><span>Private practice</span></div></div>
         <div class="grid grid-cols-3 gap-3 text-center"><div class="interview-hero-stat"><strong id="heroSessionCount">0</strong><span>Sessions</span></div><div class="interview-hero-stat"><strong id="heroBestScore">0%</strong><span>Best score</span></div><div class="interview-hero-stat"><strong>24/7</strong><span>Available</span></div></div>
       </div>
     </section>
 
-    <section class="mx-auto grid max-w-7xl gap-6 px-5 py-10 lg:grid-cols-[.38fr_.62fr] lg:px-8">
-      <aside class="space-y-6">
-        <div class="interview-card">
-          <span class="course-tag">Interview setup</span><h2 class="mt-3">Choose your mock interview</h2>
-          <label for="roleSelect">Target role</label><select id="roleSelect"><option>Salesforce Administrator</option><option>Salesforce Developer</option><option>Salesforce Consultant</option><option>Salesforce Architect</option></select>
-          <label for="difficultySelect">Difficulty</label><select id="difficultySelect"><option>Beginner</option><option selected>Intermediate</option><option>Advanced</option></select>
-          <label for="questionCountSelect">Questions per session</label><select id="questionCountSelect"><option value="3">3 questions</option><option value="5" selected>5 questions</option><option value="10">10 questions</option></select>
+    <section class="interview-workspace mx-auto grid max-w-7xl gap-6 px-5 py-10 lg:grid-cols-[.38fr_.62fr] lg:px-8">
+      <aside class="interview-sidebar space-y-6">
+        <div class="interview-card interview-setup-card">
+          <div class="setup-heading"><span class="course-tag">Interview setup</span><h2>Configure your session</h2><p>Choose a role, focus area, and interview style.</p></div>
+          <div class="setup-section">
+            <div class="setup-section-heading"><span>01</span><div><strong>Interview focus</strong><small>What should the interviewer assess?</small></div></div>
+            <div class="setup-field"><label for="roleSelect">Target role</label><select id="roleSelect"><option>Salesforce Administrator</option><option>Salesforce Developer</option><option>Salesforce Consultant</option><option>Salesforce Architect</option></select></div>
+            <div id="adminTopicField"><div class="setup-field"><label for="adminTopicSelect">Admin interview topic</label><select id="adminTopicSelect"><option value="all">All Admin topics</option></select></div><div class="setup-field"><label for="adminQuestionTypeSelect">Admin question bank</label><select id="adminQuestionTypeSelect"><option value="interview">Most-asked interview questions</option><option value="scenario">Scenario-based questions</option><option value="mixed" selected>Mixed interview + scenario</option></select></div></div>
+            <div class="setup-field"><label for="jobContextInput">Job description focus <span class="optional-label">optional</span></label><textarea id="jobContextInput" class="job-context-input" placeholder="Paste key skills or responsibilities from the target role."></textarea></div>
+          </div>
+          <div class="setup-section">
+            <div class="setup-section-heading"><span>02</span><div><strong>Session format</strong><small>Control depth, pacing, and question style.</small></div></div>
+            <div class="setup-field-grid"><div class="setup-field"><label for="difficultySelect">Difficulty</label><select id="difficultySelect"><option>Beginner</option><option selected>Intermediate</option><option>Advanced</option></select></div><div class="setup-field"><label for="questionCountSelect">Questions per round</label><select id="questionCountSelect"><option value="3">3 questions</option><option value="5" selected>5 questions</option><option value="8">8 questions</option></select></div></div>
+            <div class="setup-field"><label for="formatSelect">Interview format</label><select id="formatSelect"><option value="mixed" selected>Mixed technical + behavioral</option><option value="technical">Technical scenarios</option><option value="behavioral">Behavioral STAR stories</option></select></div>
+            <div class="setup-field"><label for="interviewRoundSelect">Interview round</label><select id="interviewRoundSelect"><option value="focused">Focused practice</option><option value="screening">Recruiter screening</option><option value="technical">Technical round</option><option value="scenario">Scenario round</option><option value="manager">Hiring manager round</option><option value="full" selected>Full interview process</option></select></div>
+            <div class="setup-field"><label for="roundDifficultySelect">Round progression</label><select id="roundDifficultySelect"><option value="steady">Use selected difficulty</option><option value="realistic" selected>Realistic progression</option></select></div>
+          </div>
+          <div class="setup-section setup-preferences">
+            <div class="setup-section-heading"><span>03</span><div><strong>AI preferences</strong><small>Personalize how the session responds.</small></div></div>
+          <label class="adaptive-toggle"><input id="adaptiveInterviewToggle" type="checkbox" checked><span><strong>Adaptive follow-ups</strong><small>Prioritize weak answer dimensions during this session.</small></span></label>
+          <label class="adaptive-toggle"><input id="voiceInterviewToggle" type="checkbox" checked><span><strong>Neural voice interviewer</strong><small>Azure Neural Voice first, then ElevenLabs, with automatic browser-voice fallback.</small></span></label>
+          </div>
+          <div class="score-legend" aria-label="Answer score colors"><span class="score-red">0-49% Improve</span><span class="score-yellow">50-74% Developing</span><span class="score-green">75-100% Strong</span></div>
           <button id="startInterviewBtn" class="interview-primary" type="button">Start mock interview</button>
         </div>
         <div class="interview-card"><h2>Practice history</h2><div id="historyList" class="history-list"><p class="empty-state">Complete an interview to see your history.</p></div></div>
       </aside>
 
-      <section class="interview-card interview-stage">
+      <section class="interview-card interview-stage" aria-label="AI interview workspace">
         <div id="welcomeState" class="stage-welcome">
           <div class="ai-orb">AI</div><span class="course-tag">TomCodex AI Interviewer</span><h2>Ready when you are.</h2><p>Select your role and difficulty. The AI interviewer will ask one question at a time and evaluate your answer for clarity, technical accuracy, examples, and confidence.</p>
           <div class="grid gap-3 sm:grid-cols-3"><div><strong>Realistic</strong><span>Role-based questions</span></div><div><strong>Instant</strong><span>Detailed evaluation</span></div><div><strong>Repeatable</strong><span>Unlimited practice</span></div></div>
         </div>
 
         <div id="questionState" class="hidden">
+          <div class="interviewer-presence" aria-live="polite">
+            <div class="ai-avatar-shell"><div class="ai-orb interview-ai-orb">AI</div><div class="ai-status-dot"></div></div>
+            <div class="interviewer-identity"><span>TomCodex AI Interviewer</span><strong id="interviewerActivity">Preparing your question</strong><small>Live mock interview</small></div>
+            <div class="interviewer-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
           <div class="flex flex-wrap items-center justify-between gap-3"><div><span id="questionProgress" class="course-tag">Question 1 of 5</span><p id="questionMeta" class="mt-2 text-xs font-bold text-slate-500"></p></div><div id="timer" class="timer">02:00</div></div>
-          <div class="question-box"><span>AI Interviewer asks</span><h2 id="questionText"></h2></div>
+          <div class="question-box"><div class="question-voice-heading"><span>AI Interviewer asks</span><button id="replayQuestionBtn" class="voice-button" type="button">Replay question</button></div><h2 id="questionText"></h2></div>
           <div class="flex flex-wrap items-end justify-between gap-3"><label for="answerInput">Your interview answer</label><div class="voice-controls"><select id="speechLanguage" aria-label="Speech language"><option value="en-IN">English (India)</option><option value="en-US">English (US)</option><option value="en-GB">English (UK)</option></select><button id="voiceInputBtn" class="voice-button" type="button" aria-pressed="false"><span class="mic-icon" aria-hidden="true">●</span><span id="voiceButtonText">Start voice answer</span></button></div></div>
           <textarea id="answerInput" class="answer-input" placeholder="Write your answer or use the microphone to speak..."></textarea>
-          <div id="voiceStatus" class="voice-status" role="status" aria-live="polite">Voice-to-text is ready. Your browser may request microphone permission.</div>
+          <div id="voiceStatus" class="voice-status" role="status" aria-live="polite">High-accuracy voice capture is ready. Live text is a preview and is corrected after you press Stop listening.</div>
           <div class="mt-3 flex flex-wrap items-center justify-between gap-3"><span id="wordCount" class="text-xs font-bold text-slate-500">0 words</span><button id="submitAnswerBtn" class="interview-primary interview-inline" type="button">Submit answer for AI review</button></div>
         </div>
 
         <div id="feedbackState" class="hidden">
-          <div class="feedback-heading"><div id="scoreRing" class="score-ring">0%</div><div><span class="course-tag">AI evaluation</span><h2 id="feedbackTitle" class="mt-3">Answer reviewed</h2><p id="feedbackSummary" class="mt-2 text-sm text-slate-500"></p></div></div>
+          <div class="feedback-heading"><div id="scoreRing" class="score-ring">0%</div><div><span class="course-tag">AI evaluation</span><h2 id="feedbackTitle" class="mt-3">Answer reviewed</h2><p id="feedbackSummary" class="mt-2 text-sm text-slate-500"></p><button id="replayFeedbackBtn" class="voice-button feedback-voice-button" type="button">Hear evaluation</button></div></div>
           <div id="scoreGrid" class="score-grid"></div>
           <div class="grid gap-4 md:grid-cols-2"><div class="feedback-box positive"><h3>What worked well</h3><ul id="strengthList"></ul></div><div class="feedback-box improve"><h3>How to improve</h3><ul id="improvementList"></ul></div></div>
+          <div id="starCoach" class="star-coach hidden"><div><span>Behavioral answer coach</span><h3>STAR story coverage</h3></div><div id="starScoreGrid" class="star-score-grid"></div></div>
           <div class="model-answer"><h3>Strong answer structure</h3><p id="modelAnswer"></p></div>
+          <div class="answer-comparison">
+            <div class="answer-comparison-heading"><div><span>Milestone 5</span><h3>Answer comparison</h3></div><b id="conceptCoverageScore">0% concept coverage</b></div>
+            <div class="answer-comparison-grid"><div><h4>Concepts you covered</h4><div id="matchedConcepts" class="concept-chip-list"></div></div><div><h4>Concepts to add</h4><div id="missingConcepts" class="concept-chip-list missing"></div></div></div>
+            <div class="answer-structure-grid"><div><h4>Your answer structure</h4><ul id="answerStructureChecks"></ul></div><div><h4>Improved answer framework</h4><ol id="improvedAnswerFramework"></ol></div></div>
+          </div>
+          <div class="follow-up-coach"><span>Adaptive follow-up</span><strong id="followUpPrompt"></strong></div>
           <button id="nextQuestionBtn" class="interview-primary" type="button">Next question</button>
         </div>
 
-        <div id="resultState" class="hidden stage-welcome"><div id="finalScoreRing" class="score-ring large">0%</div><span class="course-tag">Session completed</span><h2 id="resultTitle">Interview complete</h2><p id="resultSummary"></p><div id="resultBreakdown" class="result-breakdown"></div><div class="flex flex-wrap justify-center gap-3"><button id="practiceAgainBtn" class="interview-primary interview-inline" type="button">Practice again</button><a href="dashboard.html" class="interview-secondary">Return to dashboard</a></div></div>
+        <div id="resultState" class="hidden stage-welcome"><div id="finalScoreRing" class="score-ring large">0%</div><span class="course-tag">Session completed</span><h2 id="resultTitle">Interview complete</h2><p id="resultSummary"></p><div id="resultBreakdown" class="result-breakdown"></div><div id="roundReadinessReport" class="round-readiness-report"></div><div class="flex flex-wrap justify-center gap-3"><button id="practiceAgainBtn" class="interview-primary interview-inline" type="button">Practice again</button><a href="dashboard.html" class="interview-secondary">Return to dashboard</a></div></div>
       </section>
     </section>
+
+    <section class="mx-auto max-w-7xl px-5 pb-12 lg:px-8">
+      <div class="interview-card weakness-dashboard">
+        <div class="library-heading"><div><span class="course-tag">Milestone 7</span><h2 class="mt-3">Personal Weakness Dashboard</h2><p>Your private readiness view combines mock-interview scores, answer dimensions, saved-review confidence, topic performance, and Developer coding practice.</p></div><div class="library-count"><strong id="overallReadinessScore">0%</strong><span>readiness</span></div></div>
+        <div id="weaknessDashboardEmpty" class="study-empty-state">Complete an interview or rate study questions to build your personal readiness dashboard.</div>
+        <div id="weaknessDashboardContent" class="hidden">
+          <div id="readinessMetricGrid" class="readiness-metric-grid"></div>
+          <div class="weakness-dashboard-grid">
+            <section><h3>Answer dimensions</h3><div id="dimensionReadiness" class="readiness-bars"></div></section>
+            <section><h3>Role readiness</h3><div id="roleReadiness" class="readiness-bars"></div></section>
+            <section><h3>Weak topics to review</h3><div id="weakTopicList" class="weak-topic-list"></div></section>
+            <section><h3>Recent readiness trend</h3><div id="readinessTrend" class="readiness-trend"></div></section>
+          </div>
+          <div class="next-session-card"><div><span>Recommended next session</span><strong id="nextSessionRecommendation"></strong><p id="nextSessionReason"></p></div><button id="applyNextSessionBtn" type="button">Prepare recommended session</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="adminQuestionLibrary" class="mx-auto max-w-7xl px-5 pb-12 lg:px-8">
+      <div class="interview-card">
+        <div class="library-heading"><div><span class="course-tag">Source-transparent Admin preparation</span><h2 class="mt-3">Salesforce Administrator interview questions and answers</h2><p>Verified real-world answers are separated from generated practice drills and linked to official Salesforce guidance.</p><div class="guideline-links"><a href="https://help.salesforce.com/" target="_blank" rel="noopener noreferrer">Salesforce Help</a><a href="https://trailhead.salesforce.com/" target="_blank" rel="noopener noreferrer">Trailhead</a><a href="https://architect.salesforce.com/well-architected/overview" target="_blank" rel="noopener noreferrer">Well-Architected</a></div></div><div class="library-count"><strong id="adminLibraryQuestionCount">0</strong><span>total questions</span></div></div>
+        <div class="study-mode-panel">
+          <div class="study-mode-heading"><div><span>Milestone 1</span><strong>Interview Study Mode</strong></div><b id="adminStudyResultCount">0 results</b></div>
+          <div class="study-filter-grid">
+            <label>Search questions<input id="adminStudySearch" type="search" placeholder="Search CRM, security, flows..."></label>
+            <label>Topic<select id="adminStudyTopic"><option value="all">All topics</option></select></label>
+            <label>Source quality<select id="adminStudySource"><option value="all">All sources</option><option value="high-confidence">High confidence (85+)</option><option value="verified">Verified real-world</option><option value="community">Community sourced</option><option value="generated">Generated practice</option></select></label>
+            <label>Question type<select id="adminStudyType"><option value="all">All question types</option><option value="interview">Interview</option><option value="scenario">Scenario</option></select></label>
+            <button id="adminStudyClear" class="study-clear-button" type="button">Clear filters</button>
+          </div>
+          <div class="review-queue-bar">
+            <div><strong id="adminReviewDue">0</strong><span>due now</span></div>
+            <div><strong id="adminReviewSaved">0</strong><span>saved</span></div>
+            <div><strong id="adminReviewMastered">0</strong><span>mastered</span></div>
+            <button id="adminReviewToggle" type="button">Study due questions</button>
+          </div>
+          <p id="adminReviewTopicProgress" class="review-topic-progress">Rate questions to begin topic mastery tracking.</p>
+          <div id="adminSourceQualitySummary" class="source-quality-summary"></div>
+        </div>
+        <div id="adminQuestionTopics" class="admin-question-topics"></div>
+      </div>
+    </section>
+    <section id="developerCodingWorkspace" class="mx-auto hidden max-w-7xl px-5 pb-12 lg:px-8">
+      <div class="interview-card">
+        <div class="library-heading"><div><span class="course-tag">Milestone 4</span><h2 class="mt-3">Salesforce Developer Coding Workspace</h2><p>Practice interview-style Apex, SOQL, LWC, and debugging tasks. Solutions are checked locally for expected concepts, governor-limit safety, security, and testing evidence.</p></div><div class="library-count"><strong id="codingCompletedCount">0</strong><span>completed</span></div></div>
+        <div class="coding-workspace-grid">
+          <aside class="coding-exercise-panel">
+            <label for="codingCategorySelect">Exercise category</label><select id="codingCategorySelect"><option value="all">All categories</option><option value="apex">Apex</option><option value="soql">SOQL</option><option value="lwc">LWC</option><option value="debugging">Debugging</option></select>
+            <label for="codingExerciseSelect">Challenge</label><select id="codingExerciseSelect"></select>
+            <div class="coding-prompt"><span id="codingExerciseMeta"></span><h3 id="codingExerciseTitle"></h3><p id="codingExercisePrompt"></p><div id="codingRequirements" class="coding-requirements"></div></div>
+            <button id="loadCodingStarterBtn" class="study-clear-button" type="button">Reset starter code</button>
+          </aside>
+          <section class="coding-editor-panel">
+            <textarea id="codingAnswerInput" class="coding-answer-input" spellcheck="false" aria-label="Coding solution"></textarea>
+            <div class="coding-action-row"><span>Your code stays in this browser.</span><button id="validateCodingAnswerBtn" class="interview-primary interview-inline" type="button">Validate solution</button></div>
+            <div id="codingValidationResult" class="coding-validation-result"><p>Choose a challenge and validate your solution to receive interview-focused feedback.</p></div>
+          </section>
+        </div>
+      </div>
+    </section>
+    <section id="developerQuestionLibrary" class="mx-auto hidden max-w-7xl px-5 pb-12 lg:px-8">
+      <div class="interview-card">
+        <div class="library-heading"><div><span class="course-tag">800+ Developer preparation</span><h2 class="mt-3">Salesforce Developer interview questions and answers</h2><p>Community-sourced core Q&A is shown first, with clearly separated generated practice drills for broad interview preparation.</p><div class="guideline-links"><a href="https://developer.salesforce.com/docs/" target="_blank" rel="noopener noreferrer">Salesforce Developers</a><a href="https://trailhead.salesforce.com/" target="_blank" rel="noopener noreferrer">Trailhead</a></div></div><div class="library-count"><strong id="developerLibraryQuestionCount">0</strong><span>total questions</span></div></div>
+        <div class="study-mode-panel">
+          <div class="study-mode-heading"><div><span>Milestone 1</span><strong>Interview Study Mode</strong></div><b id="developerStudyResultCount">0 results</b></div>
+          <div class="study-filter-grid">
+            <label>Search questions<input id="developerStudySearch" type="search" placeholder="Search Apex, LWC, integrations..."></label>
+            <label>Topic<select id="developerStudyTopic"><option value="all">All topics</option></select></label>
+            <label>Source quality<select id="developerStudySource"><option value="all">All sources</option><option value="high-confidence">High confidence (85+)</option><option value="community">Community sourced</option><option value="generated">Generated practice</option></select></label>
+            <label>Question type<select id="developerStudyType"><option value="all">All question types</option><option value="interview">Interview</option><option value="practice">Practice drill</option></select></label>
+            <button id="developerStudyClear" class="study-clear-button" type="button">Clear filters</button>
+          </div>
+          <div class="review-queue-bar">
+            <div><strong id="developerReviewDue">0</strong><span>due now</span></div>
+            <div><strong id="developerReviewSaved">0</strong><span>saved</span></div>
+            <div><strong id="developerReviewMastered">0</strong><span>mastered</span></div>
+            <button id="developerReviewToggle" type="button">Study due questions</button>
+          </div>
+          <p id="developerReviewTopicProgress" class="review-topic-progress">Rate questions to begin topic mastery tracking.</p>
+          <div id="developerSourceQualitySummary" class="source-quality-summary"></div>
+        </div>
+        <div id="developerQuestionTopics" class="admin-question-topics"></div>
+      </div>
+    </section>
   </main>
+  <script src="js/learner-sync.js"></script>
   <script src="js/learning-records.js"></script>
   <script src="js/ai-client.js"></script>
+  <script src="js/course-admin.js"></script>
+  <script src="js/interview-realtime.js"></script>
+  <script src="js/interview-community.js"></script>
+  <script src="js/interview-developer.js"></script>
+  <script src="js/developer-coding-workspace.js"></script>
   <script src="js/interview.js"></script>
   <script src="js/floating-guide.js"></script>
   <script src="js/voice-input.js"></script>
+  <script src="js/site-nav.js"></script>
 </body>
 </html>

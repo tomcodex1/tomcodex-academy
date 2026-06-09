@@ -2,12 +2,16 @@ import express from "express";
 import path from "node:path";
 import { registerAiTrainerRoute } from "../server/ai-trainer-route.example.js";
 import { registerAiEvaluatorRoute } from "../server/ai-evaluator-route.example.js";
+import { registerAiCodeReviewRoute } from "../server/ai-code-review-route.example.js";
+import { registerAiInterviewRoute } from "../server/ai-interview-route.example.js";
+import { registerAiTranscriptionRoute } from "../server/ai-transcription-route.js";
+import { registerElevenLabsSpeechRoute } from "../server/elevenlabs-speech-route.js";
 
 const app = express();
 
 app.use((_request, response, next) => {
   response.set({
-    "Content-Security-Policy": "default-src 'self'; script-src 'self' https://cdn.tailwindcss.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+    "Content-Security-Policy": "default-src 'self'; script-src 'self' https://cdn.tailwindcss.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' data:; media-src 'self' blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
     "Permissions-Policy": "camera=(), geolocation=(), payment=(), usb=()",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "X-Content-Type-Options": "nosniff",
@@ -15,9 +19,23 @@ app.use((_request, response, next) => {
   });
   next();
 });
-app.use(express.json({ limit: "1mb" }));
+app.use(express.json({ limit: "15mb" }));
 registerAiTrainerRoute(app);
 registerAiEvaluatorRoute(app);
+registerAiCodeReviewRoute(app);
+registerAiInterviewRoute(app);
+registerAiTranscriptionRoute(app);
+registerElevenLabsSpeechRoute(app);
+app.all([
+  "/api/student-login",
+  "/api/student-signup",
+  "/api/student-forgot-password",
+  "/api/student-reset-password",
+  "/api/tutor-login"
+], (_request, response) => response.status(503).json({
+  error: "Account authentication is unavailable on this stateless hosted preview. Run the TomCodex academy server with npm start."
+}));
+app.use("/api", (_request, response) => response.status(404).json({ error: "API route not found." }));
 app.get("/", (_request, response) => response.sendFile(path.resolve("index.html")));
 app.use(express.static(path.resolve(".")));
 
