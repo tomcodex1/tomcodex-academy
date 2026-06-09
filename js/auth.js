@@ -17,6 +17,7 @@ if (isStaticLocalPreview) {
 }
 let existingSession = {};
 try { existingSession = JSON.parse(localStorage.getItem(AUTH_SESSION_KEY)) || {}; } catch {}
+let authFormSubmitted = false;
 
 if ((accessParams.get("student") === "required" && existingSession.role === "student")
   || (accessParams.get("tutor") === "required" && existingSession.role === "tutor")) {
@@ -74,7 +75,7 @@ function showStudentTab(tabName) {
 }
 
 async function restoreExistingSession() {
-  if (!existingSession.role) return;
+  if (!existingSession.role || authFormSubmitted) return;
   try {
     const response = await fetch("/api/auth-session");
     if (!response.ok) throw new Error("Session unavailable");
@@ -87,6 +88,13 @@ async function restoreExistingSession() {
     localStorage.removeItem(AUTH_SESSION_KEY);
     localStorage.removeItem(AUTH_IDENTITY_KEY);
   }
+}
+
+function clearCachedAuthSession() {
+  authFormSubmitted = true;
+  localStorage.removeItem(AUTH_SESSION_KEY);
+  localStorage.removeItem(AUTH_IDENTITY_KEY);
+  existingSession = {};
 }
 
 async function readJsonResponse(response, fallbackMessage) {
@@ -135,6 +143,7 @@ document.querySelectorAll("[data-open-student-tab]").forEach((button) => button.
 
 document.getElementById("studentSignInForm").addEventListener("submit", async (event) => {
   event.preventDefault();
+  clearCachedAuthSession();
   showMessage("info", "Signing in securely...");
   try {
     const student = await postJson("/api/student-login", {
@@ -147,6 +156,7 @@ document.getElementById("studentSignInForm").addEventListener("submit", async (e
 
 document.getElementById("studentSignUpForm").addEventListener("submit", async (event) => {
   event.preventDefault();
+  clearCachedAuthSession();
   showMessage("info", "Creating your student account...");
   try {
     const student = await postJson("/api/student-signup", {
@@ -159,6 +169,7 @@ document.getElementById("studentSignUpForm").addEventListener("submit", async (e
 });
 
 document.getElementById("requestResetBtn").addEventListener("click", async () => {
+  clearCachedAuthSession();
   showMessage("info", "Preparing a password reset code...");
   try {
     const result = await postJson("/api/student-forgot-password", { email: document.getElementById("studentResetEmail").value.trim() });
@@ -169,6 +180,7 @@ document.getElementById("requestResetBtn").addEventListener("click", async () =>
 
 document.getElementById("studentResetForm").addEventListener("submit", async (event) => {
   event.preventDefault();
+  clearCachedAuthSession();
   showMessage("info", "Updating your password...");
   try {
     await postJson("/api/student-reset-password", {
@@ -185,6 +197,7 @@ tutorLoginBtn.addEventListener("click", () => showRole("tutor"));
 
 tutorLoginPanel.addEventListener("submit", async (event) => {
   event.preventDefault();
+  clearCachedAuthSession();
   tutorSubmitBtn.disabled = true;
   tutorSubmitBtn.textContent = "Verifying tutor access...";
   authMessage.className = "auth-message info";
