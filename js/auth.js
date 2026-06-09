@@ -102,7 +102,7 @@ async function postJson(url, body) {
   } catch {
     throw new Error("Cannot reach the academy server. Open http://localhost:3000 and try again.");
   }
-  const result = await readJsonResponse(response, "Student account login requires the TomCodex academy server. Start it with npm start.");
+  const result = await readJsonResponse(response, "The academy login service did not return a valid response.");
   if (!response.ok) throw new Error(result.error || "Request failed.");
   return result;
 }
@@ -187,7 +187,7 @@ tutorLoginPanel.addEventListener("submit", async (event) => {
         accessCode: document.getElementById("tutorAccessCode").value
       })
     });
-    const result = await readJsonResponse(response, "Tutor login requires the TomCodex academy server. Start it with npm start.");
+    const result = await readJsonResponse(response, "The tutor login service did not return a valid response.");
     if (!response.ok) throw new Error(result.error || "Tutor verification failed.");
 
     saveSession("tutor", "tutor-credentials", result.email);
@@ -200,7 +200,7 @@ tutorLoginPanel.addEventListener("submit", async (event) => {
   } catch (error) {
     authMessage.className = "auth-message error";
     authMessage.textContent = error.message === "Failed to fetch"
-      ? "Tutor login requires the TomCodex academy server. Start it with npm start."
+      ? "Cannot reach the tutor login service. Check your connection and try again."
       : error.message;
   } finally {
     tutorSubmitBtn.disabled = false;
