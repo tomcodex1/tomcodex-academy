@@ -9,3 +9,5 @@ coverage/
 
 .vercel
 data/learner-accounts.json
+
+.env*.local
