@@ -5,6 +5,7 @@ const scrypt = promisify(scryptCallback);
 const SESSION_SECONDS = 7 * 24 * 60 * 60;
 const RESET_SECONDS = 15 * 60;
 const STUDENT_SET_KEY = "tomcodex:students";
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function redisConfig() {
   const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
@@ -32,7 +33,7 @@ function secureMatch(value, expected) {
 }
 
 function sessionSecret() {
-  return process.env.AUTH_SESSION_SECRET || process.env.TUTOR_ACCESS_CODE || process.env.HOSTED_STUDENT_PASSWORD || "";
+  return process.env.AUTH_SESSION_SECRET || "";
 }
 
 function readCookie(request, name) {
@@ -91,6 +92,13 @@ async function saveStudent(student) {
   await redis(["SADD", STUDENT_SET_KEY, student.email]);
 }
 
+async function createStudent(student) {
+  const created = await redis(["SET", studentKey(student.email), JSON.stringify(student), "NX"]);
+  if (!created) return false;
+  await redis(["SADD", STUDENT_SET_KEY, student.email]);
+  return true;
+}
+
 function publicStudent(student) {
   return {
     id: student.id,
@@ -135,19 +143,46 @@ function requireTutor(request, response) {
   return session;
 }
 
+function supportedProgressKey(key) {
+  return key === "salesforceMasterDashboard.v1"
+    || key === "tomcodex.learningRecords.v1"
+    || key === "tomcodex.interviewHistory.v1"
+    || key === "tomcodex.courseEnrollments.v1"
+    || key === "tomcodex.personalizedPath.v1"
+    || key === "tomcodex.aiCodeReviews.v1"
+    || key === "tomcodex.adminCourseProgress.v1"
+    || /^tomcodex\.(admin|apex|flow|lwc)MasteryScores\.v1(\.finalExam)?$/.test(key);
+}
+
+async function sendResetEmail(email, resetCode) {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESET_FROM_EMAIL;
+  if (!apiKey || !from) throw new Error("Password reset email is not configured. Add RESEND_API_KEY and RESET_FROM_EMAIL in Vercel.");
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from,
+      to: [email],
+      subject: "Your TomCodeX Academy password reset code",
+      html: `<p>Your TomCodeX Academy password reset code is:</p><p style="font-size:24px;font-weight:700;letter-spacing:4px">${resetCode}</p><p>This code expires in 15 minutes. If you did not request it, you can ignore this email.</p>`
+    })
+  });
+  if (!response.ok) throw new Error("Password reset email could not be sent.");
+}
+
 export function registerHostedAuthRoutes(app) {
   app.post("/api/student-signup", async (request, response) => {
     try {
       const name = String(request.body?.name || "").trim();
       const email = String(request.body?.email || "").trim().toLowerCase();
       const password = String(request.body?.password || "");
-      if (name.length < 2 || !email.includes("@")) return response.status(400).json({ error: "Enter a valid name and email address." });
+      if (name.length < 2 || !EMAIL_PATTERN.test(email)) return response.status(400).json({ error: "Enter a valid name and email address." });
       if (!validStudentPassword(password)) return response.status(400).json({ error: "Password must use at least 8 characters with uppercase, lowercase, and a number." });
-      if (await loadStudent(email)) return response.status(409).json({ error: "A student account already exists for this email." });
       const passwordData = await hashPassword(password);
       const createdAt = new Date().toISOString();
       const student = { id: randomBytes(12).toString("hex"), name, email, passwordSalt: passwordData.salt, passwordHash: passwordData.hash, progress: {}, createdAt, lastLoginAt: createdAt };
-      await saveStudent(student);
+      if (!await createStudent(student)) return response.status(409).json({ error: "A student account already exists for this email." });
       createSession(response, { role: "student", email });
       return response.status(201).json(publicStudent(student));
     } catch (error) {
@@ -180,10 +215,15 @@ export function registerHostedAuthRoutes(app) {
   app.post("/api/student-forgot-password", async (request, response) => {
     try {
       const email = String(request.body?.email || "").trim().toLowerCase();
-      if (!await loadStudent(email)) return response.status(404).json({ error: "No student account was found for this email." });
+      const student = await loadStudent(email);
+      if (!student) return response.json({ message: "If an account exists for this email, a reset code has been sent." });
       const resetCode = String(randomInt(100000, 1000000));
       await redis(["SET", `tomcodex:reset:${email}`, resetCode, "EX", RESET_SECONDS]);
-      return response.json({ message: "Reset code created.", resetCode });
+      if (process.env.NODE_ENV === "test" || process.env.ALLOW_RESET_CODE_RESPONSE === "true") {
+        return response.json({ message: "Reset code created.", resetCode });
+      }
+      await sendResetEmail(email, resetCode);
+      return response.json({ message: "If an account exists for this email, a reset code has been sent." });
     } catch (error) {
       return response.status(503).json({ error: error.message });
     }
@@ -247,6 +287,7 @@ export function registerHostedAuthRoutes(app) {
       if (!student) return response.status(404).json({ error: "Student account not found." });
       const key = String(request.body?.key || "");
       const value = String(request.body?.value ?? "");
+      if (!supportedProgressKey(key)) return response.status(400).json({ error: "Unsupported progress key." });
       if (value.length > 500000) return response.status(413).json({ error: "Progress value is too large." });
       student.progress ||= {};
       student.progress[key] = value;
@@ -283,5 +324,20 @@ export function registerHostedAuthRoutes(app) {
   app.post("/api/logout", (_request, response) => {
     response.setHeader("Set-Cookie", "tomcodexHosted=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0");
     return response.json({ signedOut: true });
+  });
+
+  app.get("/api/auth-session", async (request, response) => {
+    const session = readSession(request);
+    if (!session) return response.status(401).json({ authenticated: false });
+    if (session.role === "student") {
+      try {
+        const student = redisConfig() ? await loadStudent(session.email) : configuredStudent();
+        if (!student) return response.status(401).json({ authenticated: false });
+        return response.json({ authenticated: true, role: "student", identity: publicStudent(student) });
+      } catch (error) {
+        return response.status(503).json({ error: error.message });
+      }
+    }
+    return response.json({ authenticated: true, role: "tutor", identity: { email: session.email, role: "tutor", name: "Academy Tutor" } });
   });
 }

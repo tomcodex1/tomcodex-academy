@@ -23,10 +23,6 @@ if ((accessParams.get("student") === "required" && existingSession.role === "stu
   localStorage.removeItem(AUTH_SESSION_KEY);
   localStorage.removeItem(AUTH_IDENTITY_KEY);
   existingSession = {};
-} else if (existingSession.role === "student") {
-  window.location.replace("/learner-dashboard");
-} else if (existingSession.role === "tutor") {
-  window.location.replace("tutor-dashboard.html");
 }
 
 function saveSession(role, method, identifier) {
@@ -75,6 +71,22 @@ function showStudentTab(tabName) {
   document.querySelectorAll("[data-student-panel]").forEach((panel) => {
     panel.classList.toggle("hidden", panel.dataset.studentPanel !== tabName);
   });
+}
+
+async function restoreExistingSession() {
+  if (!existingSession.role) return;
+  try {
+    const response = await fetch("/api/auth-session");
+    if (!response.ok) throw new Error("Session unavailable");
+    const result = await response.json();
+    if (!result.authenticated) throw new Error("Session unavailable");
+    saveSession(result.role, "server-session", result.identity?.email || existingSession.identifier);
+    saveIdentity(result.identity || {});
+    window.location.replace(result.role === "tutor" ? "tutor-dashboard.html" : "/learner-dashboard");
+  } catch {
+    localStorage.removeItem(AUTH_SESSION_KEY);
+    localStorage.removeItem(AUTH_IDENTITY_KEY);
+  }
 }
 
 async function readJsonResponse(response, fallbackMessage) {
@@ -207,3 +219,5 @@ tutorLoginPanel.addEventListener("submit", async (event) => {
     tutorSubmitBtn.textContent = "Verify and open curriculum";
   }
 });
+
+restoreExistingSession();

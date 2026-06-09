@@ -30,6 +30,7 @@ registerElevenLabsSpeechRoute(app);
 registerHostedAuthRoutes(app);
 app.use("/api", (_request, response) => response.status(404).json({ error: "API route not found." }));
 app.get("/", (_request, response) => response.sendFile(path.resolve("index.html")));
+app.get("/learner-dashboard", (_request, response) => response.sendFile(path.resolve("dashboard.html")));
 app.use(express.static(path.resolve(".")));
 
 export default app;

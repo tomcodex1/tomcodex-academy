@@ -167,3 +167,15 @@ The AI Interviewer sends question-generation requests to `POST /api/ai/interview
 The static academy pages deploy from the project root. Requests under `/api/*` are routed to the Vercel serverless Express handler in `api/index.js`.
 
 Configure `AI_PROVIDER`, `GEMINI_MODEL`, `GEMINI_API_KEY`, and `AI_SPEED_MODE` in the Vercel project environment variables before deploying to production.
+
+### Production account system
+
+For persistent student registration, secure sign-in, password reset, progress synchronization, and tutor student tracking:
+
+1. Connect an Upstash Redis database from the Vercel Marketplace.
+2. Add `AUTH_SESSION_SECRET` with a long random value.
+3. Add `TUTOR_EMAIL` and `TUTOR_ACCESS_CODE` for restricted tutor access.
+4. Add `RESEND_API_KEY` and `RESET_FROM_EMAIL` from a verified Resend domain for password-reset email delivery.
+5. Redeploy Production after the variables are available.
+
+The Upstash integration provides `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`. Passwords are stored only as salted scrypt hashes, and authenticated access uses signed HTTP-only cookies.

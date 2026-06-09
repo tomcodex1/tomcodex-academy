@@ -14,6 +14,8 @@ Our testing strategy follows a multi-layered approach to ensure comprehensive te
 
 ## Test Structure
 
+`tests/hosted-auth.test.js` covers hosted student signup, duplicate prevention, login, signed sessions, password reset, progress persistence, tutor login, and tutor student tracking.
+
 ```
 tests/
 ├── learning-service.test.js      # Unit tests for business logic

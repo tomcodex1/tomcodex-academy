@@ -366,6 +366,18 @@ app.post("/api/logout", (request, response) => {
   return response.json({ signedOut: true });
 });
 
+app.get("/api/auth-session", async (request, response) => {
+  const studentSession = authenticatedStudent(request);
+  if (studentSession) {
+    const students = await loadStudents();
+    const student = students.find((candidate) => candidate.id === studentSession.studentId);
+    if (student) return response.json({ authenticated: true, role: "student", identity: publicStudent(student) });
+  }
+  const tutorSession = authenticatedTutor(request);
+  if (tutorSession) return response.json({ authenticated: true, role: "tutor", identity: { name: "Academy Tutor", email: tutorSession.email, role: "tutor" } });
+  return response.status(401).json({ authenticated: false });
+});
+
 app.get(["/tutor-dashboard", "/tutor-dashboard.html", "/tutor-catalog"], (request, response) => {
   if (!authenticatedTutor(request)) return response.redirect("/index.html?tutor=required");
   return response.sendFile(resolve("tutor-dashboard.html"));
