@@ -908,23 +908,153 @@ const modules = [
   },
   {
     title: "Approval Processes and Advanced Automation",
-    description: "Design systematic record approval processes and explore complex declarative automation configurations.",
+    description: "Design systematic record approval processes to control how critical data gets reviewed, approved, or rejected in Salesforce — without writing a single line of code.",
     points: [
-      "Configure single-step and multi-step Approval Processes.",
-      "Understand approval steps, entry criteria, and automated actions.",
-      "Compare validation rules, flows, and approval capabilities."
+      "Configure single-step and multi-step Approval Processes for Student records.",
+      "Understand approval steps, entry criteria, initial submission actions, and final actions.",
+      "Compare approval processes vs flows vs validation rules — and choose the right tool."
     ],
     resources: [
-      ["Approvals Help Docs", "https://help.salesforce.com/s/articleView?id=sf.approvals.htm&type=5"]
+      ["Approval Processes Help Docs", "https://help.salesforce.com/s/articleView?id=sf.approvals.htm&type=5"],
+      ["Trailhead: Build an Approval Process", "https://trailhead.salesforce.com/content/learn/modules/business_process_automation/approvals"],
+      ["Approval Process Best Practices", "https://developer.salesforce.com/blogs/2019/04/approval-processes-best-practices"]
     ],
     practice: [
-      "Create an approval process for Student Course graduation approvals.",
-      "Design final approval and rejection actions."
+      "Create a Student Graduation Approval Process on the Student__c object.",
+      "Add an approval step requiring your manager profile to approve.",
+      "Configure final approval actions: update Student Status to Graduated.",
+      "Configure rejection actions: send an email alert to the student.",
+      "Test the approval by submitting a Student record for approval."
     ],
     questions: [
-      "When should you use an approval process instead of record-triggered flows?",
-      "What actions can be triggered during approval steps?"
-    ]
+      "When should you use an Approval Process instead of a Record-Triggered Flow?",
+      "What is the difference between an Approval Step and an Approval Action?",
+      "How does the Approval History related list help track approval status?"
+    ],
+    richContent: {
+      moduleGoal: "Add executive-level governance to your Student Success CRM: build a formal approval workflow that requires manager sign-off before a student can be marked as Graduated.",
+      learningOutcomes: [
+        "Explain what an Approval Process is and how it differs from Flow automation.",
+        "Configure entry criteria, approval steps, approver assignments, and approval/rejection actions.",
+        "Test an approval process by submitting a student record and approving/rejecting it.",
+        "Choose the right automation tool (Flow vs Approval vs Validation Rule) for a given requirement."
+      ],
+      simpleExplanation: `
+        <h4 class="font-bold text-slate-800 text-sm">What is an Approval Process?</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          An <strong>Approval Process</strong> is a Salesforce automation that sends a record to a designated person for review before a status change is committed. Unlike Flow (which runs automatically), approvals require a <strong>human decision</strong> — approve or reject.
+        </p>
+        <h4 class="font-bold text-slate-800 text-sm mt-3">Why Approvals Beat Manual Processes</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          Without an approval process, anyone with edit access can set a student's status to <em>Graduated</em>. With an approval process, the record is <strong>locked</strong> after submission and can only change state once a qualified reviewer acts. This creates an auditable, consistent process.
+        </p>
+        <h4 class="font-bold text-slate-800 text-sm mt-3">Approval Process vs Flow</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          Use <strong>Flow</strong> when: an action should happen automatically without human review (e.g., auto-create a task).<br/>
+          Use <strong>Approval Process</strong> when: a human must consciously approve or reject a business decision.
+        </p>
+      `,
+      realBusinessExample: `
+        <p class="text-slate-600 text-xs leading-relaxed">
+          At <strong>TomCodeX Academy</strong>, before a student is marked <em>Graduated</em>, the Head Tutor must review their lab completion score and interview performance.
+        </p>
+        <ul class="list-disc pl-5 mt-2 space-y-1 text-slate-600 text-xs">
+          <li><strong>Submission Trigger:</strong> Student clicks "Submit for Graduation Approval".</li>
+          <li><strong>Record Lock:</strong> Student record is locked so no one can edit it during review.</li>
+          <li><strong>Approver Notified:</strong> Head Tutor receives an email with Approve / Reject buttons.</li>
+          <li><strong>On Approval:</strong> Student__c.Status__c automatically set to <em>Graduated</em>.</li>
+          <li><strong>On Rejection:</strong> An email alert is sent to the student with feedback notes.</li>
+        </ul>
+      `,
+      whereUsed: `
+        <div class="space-y-3">
+          <div>
+            <strong class="text-brand-700 text-xs block">Setup → Process Automation → Approval Processes</strong>
+            <span class="text-slate-500 text-xs">Where you create and manage all approval process configurations.</span>
+          </div>
+          <div>
+            <strong class="text-brand-700 text-xs block">Record Detail Page → Submit for Approval button</strong>
+            <span class="text-slate-500 text-xs">The button that appears when a record meets the entry criteria for an active approval process.</span>
+          </div>
+          <div>
+            <strong class="text-brand-700 text-xs block">Approval History Related List</strong>
+            <span class="text-slate-500 text-xs">Tracks every approval step, approver decision, and timestamp on the record.</span>
+          </div>
+          <div>
+            <strong class="text-brand-700 text-xs block">Home → Items to Approve</strong>
+            <span class="text-slate-500 text-xs">The approver's inbox where pending approval requests are listed for action.</span>
+          </div>
+        </div>
+      `,
+      stepByStepImplementation: [
+        "Navigate to Setup → Process Automation → Approval Processes.",
+        "Click <strong>Create New Approval Process</strong> → Use Standard Setup Wizard.",
+        "Select <strong>Student__c</strong> as the Object. Name it <strong>Student Graduation Approval</strong> (API name: <code>Student_Graduation_Approval</code>).",
+        "Set Entry Criteria: <code>Student__c.Status__c EQUALS Pending Graduation</code> (only records in this status can be submitted).",
+        "Approval Assignment: select your Manager or Queue (for now, use your own user as approver).",
+        "Enable <strong>Record Lock</strong> during the approval process.",
+        "Add Final Approval Action: Field Update → <code>Status__c = Graduated</code>.",
+        "Add Rejection Action: Email Alert → notify the student with rejection reason.",
+        "Click <strong>Activate</strong>. Then open a Student record, set Status to Pending Graduation, and click Submit for Approval."
+      ],
+      bestPractices: [
+        "Always lock the record during approval to prevent concurrent edits that could conflict with the approval outcome.",
+        "Use approval process <strong>entry criteria</strong> to limit which records trigger the process — don't rely only on the Submit button.",
+        "For multi-step approvals (e.g., Manager → Director → VP), define clear step order and escalation timeouts.",
+        "Use email templates for approval/rejection notifications so communications are branded and consistent."
+      ],
+      labTask: {
+        title: "Admin Module 9 Lab — Student Graduation Approval Process",
+        description: "Build a complete Approval Process to govern student graduation in your Student Success CRM.",
+        steps: [
+          "In Setup, go to Process Automation → Approval Processes → select Student__c.",
+          "Create a new process named: <strong>Student Graduation Approval</strong>.",
+          "Set entry criteria: Status__c = Pending Graduation.",
+          "Add one approval step — assign to your manager or yourself.",
+          "Add final approval action: Field Update Status__c → Graduated.",
+          "Add rejection action: Email Alert to the student.",
+          "Activate the process. Submit a student record and approve it yourself.",
+          "Take a screenshot of the Approval History related list showing the completed approval."
+        ],
+        labQuestions: [
+          {
+            id: "q1",
+            question: "What is the API name of the Approval Process you created?",
+            type: "text",
+            placeholder: "Enter API name (e.g. Student_Graduation_Approval)",
+            hint: "Check Setup → Approval Processes → the API Name column."
+          },
+          {
+            id: "q2",
+            question: "What object is the Approval Process built on?",
+            type: "text",
+            placeholder: "Enter object API name (e.g. Student__c)",
+            hint: "The custom object for students in your CRM."
+          },
+          {
+            id: "q3",
+            question: "What field and value did you set as Entry Criteria?",
+            type: "text",
+            placeholder: "Describe field and value (e.g. Status__c = Pending Graduation)",
+            hint: "Only records matching this criteria can be submitted for approval."
+          },
+          {
+            id: "q4",
+            question: "What Final Approval Action did you configure?",
+            type: "text",
+            placeholder: "Describe the action (e.g. Field Update Status__c to Graduated)",
+            hint: "The action that runs automatically when the approver clicks Approve."
+          },
+          {
+            id: "q5",
+            question: "What is the key difference between an Approval Process and a Record-Triggered Flow?",
+            type: "text",
+            placeholder: "Explain the difference",
+            hint: "Think about human decision vs. automatic execution."
+          }
+        ]
+      }
+    }
   }
 ];
 

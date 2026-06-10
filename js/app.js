@@ -587,7 +587,7 @@ function setupTabs() {
 
 function renderLearningTracks() {
   const definitions = [
-    ["admin", "course-admin.html", 8],
+    ["admin", "course-admin.html", 9],
     ["apex", "course-apex.html", 12],
     ["flow", "course-flow.html", 12],
     ["lwc", "course-lwc.html", 12]
@@ -739,9 +739,12 @@ function renderLearningTracks() {
   } else if (adminVerifiedCount === 7) {
     nextActionText = "Continue Admin Module 8 - Flow Automation Intermediate";
     nextActionLink = "course-admin.html?module=7";
+  } else if (adminVerifiedCount === 8) {
+    nextActionText = "Continue Admin Module 9 - Approval Processes and Advanced Automation";
+    nextActionLink = "course-admin.html?module=8";
   } else {
-    nextActionText = "All modules verified! Go to final exam.";
-    nextActionLink = "course-admin.html";
+    nextActionText = "All 9 modules verified! View your certificate eligibility.";
+    nextActionLink = "dashboard.html?tab=passport";
   }
 
   const recommendationElement = document.getElementById("trackRecommendation");
