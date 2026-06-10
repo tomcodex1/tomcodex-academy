@@ -6,9 +6,10 @@ import { registerAiCodeReviewRoute } from "../server/ai-code-review-route.exampl
 import { registerAiInterviewRoute } from "../server/ai-interview-route.example.js";
 import { registerAiTranscriptionRoute } from "../server/ai-transcription-route.js";
 import { registerElevenLabsSpeechRoute } from "../server/elevenlabs-speech-route.js";
-import { registerHostedAuthRoutes, checkAiQuota } from "../server/hosted-auth.js";
+import { registerHostedAcademyAiCoreRoute, registerHostedAuthRoutes, checkAiQuota } from "../server/hosted-auth.js";
 
 const app = express();
+app.set("trust proxy", true); // Trust Vercel's edge proxy so request.protocol = https
 
 app.use((_request, response, next) => {
   response.set({
@@ -23,6 +24,7 @@ app.use((_request, response, next) => {
 app.use(express.json({ limit: "15mb" }));
 
 app.use(/\/api\/ai\/.*/, checkAiQuota);
+registerHostedAcademyAiCoreRoute(app);
 registerAiTrainerRoute(app);
 registerAiEvaluatorRoute(app);
 registerAiCodeReviewRoute(app);

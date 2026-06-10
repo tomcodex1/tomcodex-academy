@@ -1,0 +1,19 @@
+[
+  {
+    "id": "ffe529dc736770f59da1b12c",
+    "name": "Test Student UI",
+    "email": "test-ui@tomcodex.com",
+    "passwordSalt": "2dda8e2f30de0789162831b34d19d7a0",
+    "passwordHash": "8f8fb111b5544761d957f564e66343cdc5ced363ddd004fc117a666ed206a8f8a4004383828a476f1eb781da7016f2704b30190fcd9e3d6151af349afd72f10f",
+    "progress": {
+      "tomcodex.adminLabAttempts.v1": "{\"admin-1\":[{\"attempt\":1,\"score\":100,\"status\":\"Verified\",\"feedback\":\"Lab verified. Progress can be updated.\",\"createdAt\":\"2026-06-10T19:29:57.766Z\"},{\"attempt\":2,\"score\":100,\"status\":\"Verified\",\"feedback\":\"Lab verified. Progress can be updated.\",\"createdAt\":\"2026-06-10T19:29:57.791Z\"}],\"admin-1:summary\":{\"bestScore\":100,\"status\":\"Verified\",\"attempts\":2,\"updatedAt\":\"2026-06-10T19:29:57.791Z\"}}",
+      "tomcodex.skillPassport.v1": "{\"salesforce-platform-foundations\":{\"module\":\"Salesforce Platform Foundations\",\"skill\":\"Salesforce Platform Foundations\",\"score\":100,\"status\":\"Verified\",\"pocStage\":\"Foundation Started\",\"updatedAt\":\"2026-06-10T19:29:57.791Z\"}}",
+      "tomcodex.moduleUnlocks.v1": "{\"admin-1\":{\"labVerified\":true,\"modulePracticeCompleted\":true,\"skillPassportUpdated\":true,\"nextModuleUnlockCandidate\":true,\"nextModuleAccess\":\"unlocked\",\"updatedAt\":\"2026-06-10T19:29:57.791Z\"}}"
+    },
+    "createdAt": "2026-06-10T19:29:57.744Z",
+    "lastLoginAt": "2026-06-10T19:29:57.744Z",
+    "tier": "founder",
+    "personalApiKey": "",
+    "progressUpdatedAt": "2026-06-10T19:29:57.792Z"
+  }
+]

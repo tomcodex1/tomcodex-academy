@@ -309,8 +309,36 @@ function renderTodayMission() {
 
 function renderSkillMeters() {
   const list = document.getElementById("skillMeters");
+  if (!list) return;
+  
+  let passport = {};
+  try { passport = JSON.parse(localStorage.getItem("tomcodex.skillPassport.v1")) || {}; } catch {}
+  
+  let adminFoundationScore = 12;
+  if (passport["salesforce-platform-foundations"]?.status === "Verified") {
+    adminFoundationScore = passport["salesforce-platform-foundations"]?.score || 100;
+  }
+  if (passport["salesforce-object-modeling"]?.status === "Verified") {
+    adminFoundationScore = Math.max(adminFoundationScore, passport["salesforce-object-modeling"]?.score || 100);
+  }
+  
+  let securityScore = 8;
+  if (passport["salesforce-security-foundations"]?.status === "Verified") {
+    securityScore = passport["salesforce-security-foundations"]?.score || 100;
+  }
+  
+  const dynamicSkillMeters = [
+    ["Admin Foundation", adminFoundationScore],
+    ["Security", securityScore],
+    ["Flow Automation", 5],
+    ["Apex", 3],
+    ["LWC", 2],
+    ["Integration", 1],
+    ["DevOps", 1]
+  ];
+  
   list.innerHTML = "";
-  skillMeters.forEach(([skill, value]) => {
+  dynamicSkillMeters.forEach(([skill, value]) => {
     list.innerHTML += `
       <div>
         <div class="meter-label"><span>${skill}</span><strong>${value}%</strong></div>
@@ -559,7 +587,7 @@ function setupTabs() {
 
 function renderLearningTracks() {
   const definitions = [
-    ["admin", "course-admin.html", 14],
+    ["admin", "course-admin.html", 9],
     ["apex", "course-apex.html", 12],
     ["flow", "course-flow.html", 12],
     ["lwc", "course-lwc.html", 12]
@@ -585,14 +613,31 @@ function renderLearningTracks() {
     const [track, href, total] = definitions[index];
     let scores = {};
     try { scores = JSON.parse(localStorage.getItem(`tomcodex.${track}MasteryScores.v1`)) || {}; } catch {}
-    const completed = Object.values(scores).filter((entry) => Number(entry?.score) >= 80).length;
+    
+    let completed = 0;
+    if (track === "admin") {
+      let attempts = {};
+      try { attempts = JSON.parse(localStorage.getItem("tomcodex.adminLabAttempts.v1")) || {}; } catch {}
+      let adminScores = {};
+      try { adminScores = JSON.parse(localStorage.getItem("tomcodex.adminMasteryScores.v1")) || {}; } catch {}
+      for (let i = 1; i <= total; i++) {
+        const bestScore = attempts[`admin-${i}:summary`]?.bestScore || attempts[`admin-module-${i}:summary`]?.bestScore || 0;
+        const quizScore = adminScores[i - 1]?.score || 0;
+        if (bestScore >= 80 || quizScore >= 80) {
+          completed++;
+        }
+      }
+    } else {
+      completed = Object.values(scores).filter((entry) => Number(entry?.score) >= 80).length;
+    }
+
     if (completed > 0 && !enrollments[track]) {
       enrollments[track] = { enrolledAt: new Date().toISOString(), lastOpenedAt: null };
       localStorage.setItem(ENROLLMENTS_KEY, JSON.stringify(enrollments));
     }
     const enrolled = Boolean(enrollments[track]);
     const percent = Math.round(completed / total * 100);
-    const status = percent === 100 ? "Track completed" : completed ? `${completed} of ${total} modules mastered` : enrolled ? "Enrolled and ready to begin" : "Enrollment required";
+    const status = percent === 100 ? "Track completed" : completed ? `${completed} of ${total} modules ${track === 'admin' ? 'verified' : 'mastered'}` : enrolled ? "Enrolled and ready to begin" : "Enrollment required";
     const action = percent === 100 ? "Review track →" : enrolled ? "Continue track →" : "Enroll now →";
     const title = card.querySelector("h3").textContent;
     const remaining = Math.max(0, total - completed);
@@ -611,25 +656,131 @@ function renderLearningTracks() {
     card.innerHTML = `<div class="track-summary">
       <div class="track-summary-heading"><span class="track-course-icon">${track === "admin" ? "SF" : track === "apex" ? "&lt;/&gt;" : track === "flow" ? "FL" : "UI"}</span><div><span class="course-tag">${percent === 100 ? "Completed" : completed ? "In progress" : enrolled ? "Enrolled" : "Available"}</span><h3>${title}</h3></div><strong>${percent}%</strong></div>
       <div class="track-progress-bar"><span style="width:${percent}%"></span></div>
-      <div class="track-metrics"><div><strong>${completed}</strong><span>Mastered</span></div><div><strong>${remaining}</strong><span>Remaining</span></div><div><strong>${total}</strong><span>Total modules</span></div></div>
+      <div class="track-metrics"><div><strong>${completed}</strong><span>${track === 'admin' ? 'Verified' : 'Mastered'}</span></div><div><strong>${remaining}</strong><span>Remaining</span></div><div><strong>${total}</strong><span>Total modules</span></div></div>
       <div class="track-next-action"><div><span>Current status</span><strong>${status}</strong></div><b>${action}</b></div>
     </div>`;
     return { track, href, title, completed, percent, enrolled };
   });
 
-  const recommendation = tracks.find((track) => track.percent > 0 && track.percent < 100)
-    || tracks.find((track) => track.enrolled && track.percent === 0)
-    || tracks.find((track) => !track.enrolled)
-    || tracks[0];
-  const message = recommendation.percent > 0
-    ? `Continue from ${recommendation.completed} mastered modules and keep your momentum.`
-    : recommendation.enrolled
-      ? "Open your enrolled track and begin the first module."
-      : "Enroll in this track to begin tracking modules, mastery, and reminders.";
-  const recommendationAction = recommendation.percent === 100 ? "Review track" : recommendation.enrolled ? "Continue track" : "Enroll now";
+  // Dynamic progress summary cards on dashboard
+  const TOTAL_ADMIN_MODULES = definitions[0][2];
+  let adminVerifiedCount = 0;
+  let adminAttempts = {};
+  try { adminAttempts = JSON.parse(localStorage.getItem("tomcodex.adminLabAttempts.v1")) || {}; } catch {}
+  let adminScores = {};
+  try { adminScores = JSON.parse(localStorage.getItem("tomcodex.adminMasteryScores.v1")) || {}; } catch {}
+  for (let i = 1; i <= TOTAL_ADMIN_MODULES; i++) {
+    const bestScore = adminAttempts[`admin-${i}:summary`]?.bestScore || adminAttempts[`admin-module-${i}:summary`]?.bestScore || 0;
+    const quizScore = adminScores[i - 1]?.score || 0;
+    if (bestScore >= 80 || quizScore >= 80) {
+      adminVerifiedCount++;
+    }
+  }
+
+  let verifiedSkillsCount = 0;
+  try {
+    const passport = JSON.parse(localStorage.getItem("tomcodex.skillPassport.v1") || "{}");
+    verifiedSkillsCount = Object.values(passport).filter(s => s.status === "Verified").length;
+  } catch {}
+
+  let maxBestScore = 0;
+  try {
+    Object.keys(adminAttempts).forEach(key => {
+      if (key.endsWith(":summary")) {
+        const score = Number(adminAttempts[key]?.bestScore) || 0;
+        if (score > maxBestScore) {
+          maxBestScore = score;
+        }
+      }
+    });
+    Object.values(adminScores).forEach(entry => {
+      const score = Number(entry?.score) || 0;
+      if (score > maxBestScore) {
+        maxBestScore = score;
+      }
+    });
+  } catch {}
+
+  let authUser = {};
+  try {
+    authUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {};
+  } catch {}
+  const currentTier = authUser.tier || "free";
+
+  let nextActionText = "";
+  let nextActionLink = "course-admin.html";
+  
+  if (adminVerifiedCount === 0) {
+    nextActionText = "Continue Admin Module 1 - Salesforce Platform Foundations";
+    nextActionLink = "course-admin.html?module=0";
+  } else if (adminVerifiedCount === 1) {
+    if (currentTier !== "founder") {
+      nextActionText = "Upgrade to Founder Access to continue Admin Module 2";
+      nextActionLink = "pricing.html";
+    } else {
+      nextActionText = "Continue Admin Module 2 - Student Success CRM Object Model";
+      nextActionLink = "course-admin.html?module=1";
+    }
+  } else if (adminVerifiedCount === 2) {
+    nextActionText = "Continue Admin Module 3 - Security and Access Control";
+    nextActionLink = "course-admin.html?module=2";
+  } else if (adminVerifiedCount === 3) {
+    nextActionText = "Continue Admin Module 4 - Page Layouts, Lightning App, and User Experience";
+    nextActionLink = "course-admin.html?module=3";
+  } else if (adminVerifiedCount === 4) {
+    nextActionText = "Continue Admin Module 5 - Validation Rules and Data Quality";
+    nextActionLink = "course-admin.html?module=4";
+  } else if (adminVerifiedCount === 5) {
+    nextActionText = "Continue Admin Module 6 - Reports and Dashboards";
+    nextActionLink = "course-admin.html?module=5";
+  } else if (adminVerifiedCount === 6) {
+    nextActionText = "Continue Admin Module 7 - Flow Automation Foundations";
+    nextActionLink = "course-admin.html?module=6";
+  } else if (adminVerifiedCount === 7) {
+    nextActionText = "Continue Admin Module 8 - Flow Automation Intermediate";
+    nextActionLink = "course-admin.html?module=7";
+  } else if (adminVerifiedCount === 8) {
+    nextActionText = "Continue Admin Module 9 - Approval Processes and Advanced Automation";
+    nextActionLink = "course-admin.html?module=8";
+  } else {
+    nextActionText = "All 9 modules verified! View your certificate eligibility.";
+    nextActionLink = "dashboard.html?tab=passport";
+  }
+
   const recommendationElement = document.getElementById("trackRecommendation");
-  recommendationElement.innerHTML = `<div><strong>Recommended next: ${recommendation.title}</strong><span>${message}</span></div><button type="button">${recommendationAction} →</button>`;
-  recommendationElement.querySelector("button").addEventListener("click", () => enrollAndOpen(recommendation.track, recommendation.href));
+  if (recommendationElement) {
+    recommendationElement.innerHTML = `
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50 border border-slate-200 rounded-3xl p-6 shadow-sm">
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs bg-brand-50 text-brand-700 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Active Track</span>
+            <span class="text-slate-500 text-xs font-semibold">Salesforce Admin Track</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+            <div>
+              <span class="text-[11px] text-slate-400 block uppercase font-bold tracking-wider">Admin Track Progress</span>
+              <strong class="text-sm text-slate-800 font-extrabold">Admin Track Progress: ${adminVerifiedCount} / ${TOTAL_ADMIN_MODULES} modules verified</strong>
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-400 block uppercase font-bold tracking-wider">Verified Skills</span>
+              <strong class="text-sm text-slate-800 font-extrabold">Verified Skills: ${verifiedSkillsCount}</strong>
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-400 block uppercase font-bold tracking-wider">Best Score</span>
+              <strong class="text-sm text-slate-800 font-extrabold">Best Score: ${maxBestScore > 0 ? maxBestScore + '%' : '0%'}</strong>
+            </div>
+          </div>
+          <div class="pt-2">
+            <span class="text-[11px] text-slate-400 block uppercase font-bold tracking-wider font-semibold">Next Action</span>
+            <span class="text-xs font-bold text-brand-650" style="color: #056b8d;">Next Action: ${nextActionText.replace("Next Action: ", "").replace("Upgrade to Founder Access to continue Admin Module 2", "Upgrade to Founder Access to continue Admin Module 2").replace("Continue Admin Module 2 - Student Success CRM Object Model", "Continue Admin Module 2 - Student Success CRM Object Model")}</span>
+          </div>
+        </div>
+        <a href="${nextActionLink}" class="shrink-0 rounded-xl bg-brand-600 px-5 py-3 font-bold text-white hover:bg-brand-700 transition text-sm inline-block text-center whitespace-nowrap">
+          ${nextActionText.includes("Upgrade") ? "Upgrade to Founder" : "Continue Path"} &rarr;
+        </a>
+      </div>
+    `;
+  }
 }
 
 const crmStages = [
@@ -706,29 +857,49 @@ function renderPocTracker() {
   let foundInProgress = false;
   let completedCount = 0;
 
-  let identity = {};
-  try { identity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
-  const isFree = (identity.tier || "free") === "free";
+  let authUser = {};
+  try {
+    authUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {};
+  } catch {}
+  const isFree = (authUser.tier || "free") === "free";
 
   crmStages.forEach((stage) => {
     let isCompleted = false;
     let score = 0;
 
-    try {
-      const scores = JSON.parse(localStorage.getItem(`tomcodex.${stage.course}MasteryScores.v1`)) || {};
-      if (scores[stage.moduleIndex]?.score >= 80) {
+    if (stage.course === "admin") {
+      let attempts = {};
+      try { attempts = JSON.parse(localStorage.getItem("tomcodex.adminLabAttempts.v1")) || {}; } catch {}
+      const moduleId = `admin-${stage.moduleIndex + 1}`;
+      const legacyId = `admin-module-${stage.moduleIndex + 1}`;
+      const bestScore = attempts[`${moduleId}:summary`]?.bestScore || attempts[`${legacyId}:summary`]?.bestScore || 0;
+      
+      let adminScores = {};
+      try { adminScores = JSON.parse(localStorage.getItem("tomcodex.adminMasteryScores.v1")) || {}; } catch {}
+      const quizScore = adminScores[stage.moduleIndex]?.score || 0;
+      
+      const maxScore = Math.max(bestScore, quizScore);
+      if (maxScore >= 80) {
         isCompleted = true;
-        score = Math.max(score, scores[stage.moduleIndex].score);
+        score = maxScore;
       }
-    } catch {}
+    } else {
+      try {
+        const scores = JSON.parse(localStorage.getItem(`tomcodex.${stage.course}MasteryScores.v1`)) || {};
+        if (scores[stage.moduleIndex]?.score >= 80) {
+          isCompleted = true;
+          score = Math.max(score, scores[stage.moduleIndex].score);
+        }
+      } catch {}
 
-    try {
-      const screenshots = JSON.parse(localStorage.getItem(`tomcodex.${stage.course}MasteryScores.v1.screenshots`)) || {};
-      if (screenshots[stage.moduleIndex]?.score >= 80) {
-        isCompleted = true;
-        score = Math.max(score, screenshots[stage.moduleIndex].score);
-      }
-    } catch {}
+      try {
+        const screenshots = JSON.parse(localStorage.getItem(`tomcodex.${stage.course}MasteryScores.v1.screenshots`)) || {};
+        if (screenshots[stage.moduleIndex]?.score >= 80) {
+          isCompleted = true;
+          score = Math.max(score, screenshots[stage.moduleIndex].score);
+        }
+      } catch {}
+    }
 
     let status = "locked";
     if (isCompleted) {
@@ -787,10 +958,12 @@ function renderPocTracker() {
   if (progressText) progressText.textContent = `${progressPercent}%`;
 }
 
-function renderSkillPassport() {
-  let identity = {};
-  try { identity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
-  const isFounder = identity.tier === "founder";
+async function renderSkillPassport() {
+  let authUser = {};
+  try {
+    authUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {};
+  } catch {}
+  const isFounder = authUser.tier === "founder";
   const tierName = isFounder ? "★ Founder Access" : "Free Starter";
 
   let totalLabs = 0;
@@ -836,6 +1009,42 @@ function renderSkillPassport() {
     });
   });
 
+  // Load dynamic skill passport and attempts history
+  let dynamicAttempts = {};
+  try { dynamicAttempts = JSON.parse(localStorage.getItem("tomcodex.adminLabAttempts.v1")) || {}; } catch {}
+
+  // Process dynamic attempts history
+  Object.entries(dynamicAttempts).forEach(([key, val]) => {
+    if (Array.isArray(val) && (key.startsWith("admin-") || key.startsWith("admin-module-"))) {
+      if (key.startsWith("admin-module-")) return; // Avoid processing both formats to prevent duplicates
+
+      val.forEach((attempt) => {
+        const scoreVal = Number(attempt.score) || 0;
+        totalLabs++;
+        totalLabScoreSum += scoreVal;
+        
+        let modTitle = `Admin Module`;
+        if (key === "admin-1") modTitle = "Salesforce Platform Foundations";
+        else if (key === "admin-2") modTitle = "Student Success CRM Object Model";
+        else if (key === "admin-3") modTitle = "Security and Access Control";
+        else {
+          const modNum = key.split("-")[1];
+          modTitle = `Admin Module ${modNum}`;
+        }
+
+        evaluationHistory.push({
+          course: "admin",
+          moduleIndex: key,
+          title: modTitle,
+          score: scoreVal,
+          passed: attempt.status === "Verified",
+          feedback: attempt.feedback || "Lab verification complete.",
+          timestamp: attempt.createdAt || new Date().toISOString()
+        });
+      });
+    }
+  });
+
   const avgLabScore = totalLabs > 0 ? Math.round(totalLabScoreSum / totalLabs) : 0;
 
   const labsCompletedEl = document.getElementById("passportLabsCompleted");
@@ -853,26 +1062,40 @@ function renderSkillPassport() {
     tierStatusEl.className = `block text-lg font-bold ${isFounder ? "text-brand-600" : "text-slate-600"}`;
   }
 
+  // --- Cert status (existing hero card) ---
   let adminScores = {};
   try { adminScores = JSON.parse(localStorage.getItem("tomcodex.adminMasteryScores.v1")) || {}; } catch {}
-  const adminCompleted = Object.values(adminScores).filter((entry) => Number(entry?.score) >= 80).length;
+
+  // Count verified admin modules from lab attempts (primary) and quiz scores (secondary)
+  const TOTAL_CERT_MODULES = 8;
+  let adminAttemptsCert = {};
+  try { adminAttemptsCert = JSON.parse(localStorage.getItem("tomcodex.adminLabAttempts.v1")) || {}; } catch {}
+  let adminVerifiedForCert = 0;
+  for (let i = 1; i <= TOTAL_CERT_MODULES; i++) {
+    const bestLab = adminAttemptsCert[`admin-${i}:summary`]?.bestScore || adminAttemptsCert[`admin-module-${i}:summary`]?.bestScore || 0;
+    const quizScore = adminScores[i - 1]?.score || 0;
+    if (bestLab >= 80 || quizScore >= 80) adminVerifiedForCert++;
+  }
 
   const certTitleEl = document.getElementById("passportCertTitle");
   const certStatusEl = document.getElementById("passportCertStatus");
   
-  if (adminCompleted >= 14) {
-    if (certTitleEl) certTitleEl.textContent = "Verified Salesforce Platform Graduate";
+  if (adminVerifiedForCert >= TOTAL_CERT_MODULES && isFounder) {
+    if (certTitleEl) certTitleEl.textContent = "✓ Verified Salesforce Admin Foundation Graduate";
     if (certStatusEl) {
       certStatusEl.className = "mt-6 w-full p-4 rounded-2xl bg-lime/20 border border-lime text-lime text-xs font-bold text-center";
-      certStatusEl.innerHTML = `★ Graduate Verified! Certificate Code: TCX-ADM-${identity.id ? identity.id.slice(0, 8).toUpperCase() : "GRAD"}`;
+      certStatusEl.innerHTML = `★ Certificate Eligible! ${adminVerifiedForCert}/${TOTAL_CERT_MODULES} modules verified`;
     }
   } else {
-    if (certTitleEl) certTitleEl.textContent = "Salesforce Platform Graduate";
+    if (certTitleEl) certTitleEl.textContent = "Salesforce Admin Foundation Graduate";
     if (certStatusEl) {
-      certStatusEl.className = "mt-6 w-full p-4 rounded-2xl bg-white/5 border border-white/10 text-slate-350 text-xs font-semibold text-center";
-      certStatusEl.textContent = `Status: Locked (${adminCompleted} of 14 Admin Modules Complete)`;
+      certStatusEl.className = "mt-6 w-full p-4 rounded-2xl bg-white/5 border border-white/10 text-slate-300 text-xs font-semibold text-center";
+      certStatusEl.textContent = `Status: Locked (${adminVerifiedForCert} of ${TOTAL_CERT_MODULES} modules verified)`;
     }
   }
+
+  // --- Certificate Eligibility Engine Card ---
+  await renderCertificateEligibilityCard();
 
   const historyList = document.getElementById("passportHistoryList");
   if (historyList) {
@@ -915,9 +1138,157 @@ function renderSkillPassport() {
   }
 }
 
+async function renderCertificateEligibilityCard() {
+  const verifiedModulesEl = document.getElementById("certVerifiedModules");
+  const progressBarEl = document.getElementById("certProgressBar");
+  const founderStatusEl = document.getElementById("certFounderStatus");
+  const eligibilityStatusEl = document.getElementById("certEligibilityStatus");
+  const missingListEl = document.getElementById("certMissingList");
+
+  if (!eligibilityStatusEl) return;
+
+  // Set loading state
+  eligibilityStatusEl.textContent = "Checking eligibility…";
+  eligibilityStatusEl.className = "mt-2 w-full p-3 rounded-2xl text-center text-[11px] font-bold bg-slate-100 text-slate-400";
+  if (missingListEl) missingListEl.classList.add("hidden");
+
+  let result = null;
+
+  // Try backend engine first
+  try {
+    const resp = await fetch("/api/academy/certificate-eligibility", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({})
+    });
+    if (resp.ok) {
+      result = await resp.json();
+    }
+  } catch {
+    // Backend offline — fall through to local calculation
+  }
+
+  // Local fallback calculation
+  if (!result) {
+    let authUser = {};
+    try { authUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
+    const tier = authUser.tier || "free";
+    const TOTAL = 8;
+    const MIN_SCORE = 80;
+
+    let adminAttempts = {};
+    try { adminAttempts = JSON.parse(localStorage.getItem("tomcodex.adminLabAttempts.v1")) || {}; } catch {}
+    let adminScores = {};
+    try { adminScores = JSON.parse(localStorage.getItem("tomcodex.adminMasteryScores.v1")) || {}; } catch {}
+    let passport = {};
+    try { passport = JSON.parse(localStorage.getItem("tomcodex.skillPassport.v1")) || {}; } catch {}
+
+    const missingRequirements = [];
+    const verifiedSkills = [];
+    let verifiedModules = 0;
+
+    if (tier !== "founder") missingRequirements.push("Upgrade to Founder tier required.");
+
+    const skillNames = [
+      "Salesforce Platform Foundations", "Salesforce Object Modeling",
+      "Salesforce Security Foundations", "Page Layouts & App UX",
+      "Validation Rules & Data Quality", "Reports & Dashboards",
+      "Flow Automation Foundations", "Flow Automation Intermediate"
+    ];
+    const skillIds = [
+      "salesforce-platform-foundations", "salesforce-object-modeling",
+      "salesforce-security-foundations", "salesforce-app-user-experience",
+      "salesforce-data-quality-rules", "salesforce-reporting-dashboards",
+      "salesforce-flow-automation-foundations", "salesforce-flow-automation-intermediate"
+    ];
+
+    for (let i = 1; i <= TOTAL; i++) {
+      const bestLab = adminAttempts[`admin-${i}:summary`]?.bestScore || adminAttempts[`admin-module-${i}:summary`]?.bestScore || 0;
+      const quizScore = adminScores[i - 1]?.score || 0;
+      const passportSkill = passport[skillIds[i - 1]];
+      const isVerified = passportSkill?.status === "Verified";
+      const finalScore = passportSkill?.score || bestLab || 0;
+
+      if ((finalScore >= MIN_SCORE || bestLab >= MIN_SCORE || quizScore >= MIN_SCORE) && isVerified) {
+        verifiedModules++;
+        verifiedSkills.push(skillNames[i - 1]);
+      } else {
+        missingRequirements.push(`Complete Admin Module ${i} (${skillNames[i - 1]}) with ≥${MIN_SCORE}%.`);
+      }
+    }
+
+    result = {
+      eligible: missingRequirements.length === 0,
+      verifiedModules,
+      requiredModules: TOTAL,
+      minimumScore: MIN_SCORE,
+      verifiedSkills,
+      missingRequirements,
+      certificateName: "TomCodeX Academy Course Completion Certificate"
+    };
+  }
+
+  const { eligible, verifiedModules, requiredModules, missingRequirements } = result;
+  const percent = Math.round((verifiedModules / requiredModules) * 100);
+
+  // Get tier info
+  let authUser = {};
+  try { authUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
+  const isFounder = authUser.tier === "founder";
+
+  // Update verified modules counter
+  if (verifiedModulesEl) verifiedModulesEl.textContent = `${verifiedModules} / ${requiredModules}`;
+
+  // Update progress bar
+  if (progressBarEl) {
+    progressBarEl.style.width = `${percent}%`;
+    progressBarEl.className = `h-full rounded-full transition-all duration-700 ${eligible ? "bg-emerald-500" : percent >= 50 ? "bg-amber-400" : "bg-brand-500"}`;
+  }
+
+  // Update founder status
+  if (founderStatusEl) {
+    if (isFounder) {
+      founderStatusEl.textContent = "✓ Active";
+      founderStatusEl.className = "text-xs text-emerald-600";
+    } else {
+      founderStatusEl.textContent = "✗ Required";
+      founderStatusEl.className = "text-xs text-rose-500";
+    }
+  }
+
+  // Update main status badge
+  if (eligibilityStatusEl) {
+    if (eligible) {
+      eligibilityStatusEl.className = "mt-2 w-full p-3 rounded-2xl text-center text-[11px] font-bold bg-emerald-50 border border-emerald-200 text-emerald-700";
+      eligibilityStatusEl.innerHTML = `🏆 Certificate Eligible! All ${requiredModules} modules verified.`;
+    } else {
+      eligibilityStatusEl.className = "mt-2 w-full p-3 rounded-2xl text-center text-[11px] font-bold bg-amber-50 border border-amber-200 text-amber-700";
+      eligibilityStatusEl.innerHTML = `${verifiedModules}/${requiredModules} modules verified — ${requiredModules - verifiedModules} remaining`;
+    }
+  }
+
+  // Render missing requirements
+  if (missingListEl) {
+    if (!eligible && missingRequirements.length > 0) {
+      missingListEl.classList.remove("hidden");
+      missingListEl.innerHTML = `
+        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-2 mb-1">Remaining Requirements</p>
+        ${missingRequirements.slice(0, 5).map(r =>
+          `<div class="flex items-start gap-1.5 text-[11px] text-rose-600 font-medium"><span class="mt-px shrink-0">✗</span><span>${r}</span></div>`
+        ).join("")}
+        ${missingRequirements.length > 5 ? `<p class="text-[10px] text-slate-400">+ ${missingRequirements.length - 5} more requirements</p>` : ""}
+      `;
+    } else {
+      missingListEl.classList.add("hidden");
+    }
+  }
+}
+
 function renderSettingsForm() {
   let identity = {};
-  try { identity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
+  try {
+    identity = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {};
+  } catch {}
 
   const settingsName = document.getElementById("settingsName");
   const settingsEmail = document.getElementById("settingsEmail");
@@ -1015,6 +1386,17 @@ function setupSettingsForm() {
         usage: result.student.usage
       };
       localStorage.setItem("tomcodex.authIdentity.v1", JSON.stringify(updatedIdentity));
+
+      let cachedUser = {};
+      try { cachedUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || {}; } catch {}
+      const updatedUser = {
+        ...cachedUser,
+        name: result.student.name,
+        userId: result.student.id,
+        tier: result.student.tier || "free",
+        upgradedAt: result.student.upgradedAt || null
+      };
+      localStorage.setItem("tomcodex.auth.user.v1", JSON.stringify(updatedUser));
 
       const welcomeEl = document.getElementById("learnerWelcome");
       if (welcomeEl) welcomeEl.textContent = `Welcome back, ${result.student.name}`;

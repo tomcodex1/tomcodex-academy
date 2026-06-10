@@ -1,11 +1,17 @@
 import { createHmac, randomBytes, randomInt, scrypt as scryptCallback, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
+import { createAcademyAiHandler } from "zentom-ai-core";
 
 const scrypt = promisify(scryptCallback);
 const SESSION_SECONDS = 7 * 24 * 60 * 60;
 const RESET_SECONDS = 15 * 60;
 const STUDENT_SET_KEY = "tomcodex:students";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const ADMIN_LAB_ATTEMPTS_KEY = "tomcodex.adminLabAttempts.v1";
+const SKILL_PASSPORT_KEY = "tomcodex.skillPassport.v1";
+const MODULE_UNLOCKS_KEY = "tomcodex.moduleUnlocks.v1";
+process.env.FREE_DAILY_AI_LIMIT ||= "50";
+process.env.FOUNDER_DAILY_AI_LIMIT ||= "1000";
 
 function redisConfig() {
   const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
@@ -162,7 +168,95 @@ function supportedProgressKey(key) {
     || key === "tomcodex.personalizedPath.v1"
     || key === "tomcodex.aiCodeReviews.v1"
     || key === "tomcodex.adminCourseProgress.v1"
+    || key === ADMIN_LAB_ATTEMPTS_KEY
+    || key === SKILL_PASSPORT_KEY
+    || key === MODULE_UNLOCKS_KEY
     || /^tomcodex\.(admin|apex|flow|lwc)MasteryScores\.v1(\.finalExam)?$/.test(key);
+}
+
+function parseStudentProgress(student, key, fallback) {
+  try {
+    return JSON.parse(student.progress?.[key] || JSON.stringify(fallback));
+  } catch {
+    return fallback;
+  }
+}
+
+function saveStudentProgressObject(student, key, value) {
+  student.progress ||= {};
+  student.progress[key] = JSON.stringify(value);
+  student.progressUpdatedAt = new Date().toISOString();
+}
+
+async function persistAdminModuleOneSkillPassport({ userId, skillPassportUpdate, result }) {
+  if (!redisConfig()) {
+    return {
+      browserOnly: true,
+      bestScore: Number(skillPassportUpdate?.score || result?.data?.score || 0)
+    };
+  }
+
+  const emails = await redis(["SMEMBERS", STUDENT_SET_KEY]) || [];
+  const students = (await Promise.all(emails.map(loadStudent))).filter(Boolean);
+  const student = students.find((candidate) => candidate.id === userId);
+  if (!student) throw new Error("Student account not found.");
+
+  const moduleId = skillPassportUpdate?.moduleId || "admin-module-1";
+  const skillId = skillPassportUpdate?.skillId || "salesforce-platform-foundations";
+  const score = Number(skillPassportUpdate?.score || result?.data?.score || 0);
+  const passed = score >= 80;
+  const attemptStatus = passed ? "Verified" : "Try Again";
+  const timestamp = new Date().toISOString();
+
+  const attemptHistory = parseStudentProgress(student, ADMIN_LAB_ATTEMPTS_KEY, {});
+  const moduleAttempts = Array.isArray(attemptHistory[moduleId]) ? attemptHistory[moduleId] : [];
+  const attempts = moduleAttempts.concat({
+    attempt: moduleAttempts.length + 1,
+    score,
+    status: attemptStatus,
+    feedback: skillPassportUpdate?.feedback || result?.data?.feedback || "",
+    createdAt: timestamp
+  });
+  const bestScore = attempts.reduce((best, attempt) => Math.max(best, Number(attempt.score) || 0), 0);
+  attemptHistory[moduleId] = attempts;
+  attemptHistory[`${moduleId}:summary`] = {
+    bestScore,
+    status: bestScore >= 80 ? "Verified" : "Try Again",
+    attempts: attempts.length,
+    updatedAt: timestamp
+  };
+
+  const skillPassport = parseStudentProgress(student, SKILL_PASSPORT_KEY, {});
+  skillPassport[skillId] = {
+    module: "Admin Module 1",
+    skill: "Salesforce Platform Foundations",
+    score: bestScore,
+    status: bestScore >= 80 ? "Verified" : "Try Again",
+    pocStage: bestScore >= 80 ? "Foundation Started" : "Foundation In Progress",
+    updatedAt: timestamp
+  };
+
+  const unlocks = parseStudentProgress(student, MODULE_UNLOCKS_KEY, {});
+  unlocks[moduleId] = {
+    labVerified: passed,
+    modulePracticeCompleted: passed,
+    skillPassportUpdated: true,
+    nextModuleUnlockCandidate: passed,
+    nextModuleAccess: student.tier === "founder" && passed ? "unlocked" : "upgrade_required",
+    updatedAt: timestamp
+  };
+
+  saveStudentProgressObject(student, ADMIN_LAB_ATTEMPTS_KEY, attemptHistory);
+  saveStudentProgressObject(student, SKILL_PASSPORT_KEY, skillPassport);
+  saveStudentProgressObject(student, MODULE_UNLOCKS_KEY, unlocks);
+  await saveStudent(student);
+
+  return {
+    attemptHistory: attemptHistory[moduleId],
+    bestScore,
+    skillPassportUpdate: skillPassport[skillId],
+    unlock: unlocks[moduleId]
+  };
 }
 
 async function sendResetEmail(email, resetCode) {
@@ -188,7 +282,10 @@ export function registerHostedAuthRoutes(app) {
     const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
     
     if (clientID && clientSecret) {
-      const redirectUri = encodeURIComponent(`${request.protocol}://${request.get('host')}/api/auth/google/callback`);
+      // Use x-forwarded headers from Vercel's edge proxy for correct https:// protocol
+      const protocol = request.headers["x-forwarded-proto"] || request.protocol;
+      const host = request.headers["x-forwarded-host"] || request.get("host");
+      const redirectUri = encodeURIComponent(`${protocol}://${host}/api/auth/google/callback`);
       const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientID}&redirect_uri=${redirectUri}&response_type=code&scope=email%20profile`;
       return response.redirect(googleAuthUrl);
     } else {
@@ -208,7 +305,7 @@ export function registerHostedAuthRoutes(app) {
       const code = request.query.code;
       const clientID = process.env.GOOGLE_CLIENT_ID;
       const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-      const redirectUri = `${request.protocol}://${request.get('host')}/api/auth/google/callback`;
+      const redirectUri = `${request.headers["x-forwarded-proto"] || request.protocol}://${request.headers["x-forwarded-host"] || request.get("host")}/api/auth/google/callback`;
       
       if (!code || !clientID || !clientSecret) {
         return response.redirect("/access.html?error=Google authentication failed");
@@ -492,6 +589,39 @@ export function registerHostedAuthRoutes(app) {
       }
     }
     return response.json({ authenticated: true, role: "tutor", identity: { email: session.email, role: "tutor", name: "Academy Tutor" } });
+  });
+}
+
+export function registerHostedAcademyAiCoreRoute(app) {
+  app.post("/api/ai/run", async (request, response, next) => {
+    const session = readSession(request);
+    if (session?.role !== "student") {
+      return response.status(401).json({ error: "Student sign-in is required." });
+    }
+
+    try {
+      const student = redisConfig() ? await loadStudent(session.email) : configuredStudent();
+      if (!student) return response.status(404).json({ error: "Student account not found." });
+
+      request.session = {
+        user: {
+          id: student.id,
+          tier: student.tier || "free"
+        }
+      };
+
+      return createAcademyAiHandler({
+        async updateSkillPassport({ userId, update, aiResult }) {
+          return persistAdminModuleOneSkillPassport({
+            userId,
+            skillPassportUpdate: update,
+            result: aiResult
+          });
+        }
+      })(request, response);
+    } catch (error) {
+      next(error);
+    }
   });
 }
 

@@ -10,6 +10,7 @@ import { registerAiCodeReviewRoute } from "./server/ai-code-review-route.example
 import { registerAiInterviewRoute } from "./server/ai-interview-route.example.js";
 import { registerAiTranscriptionRoute } from "./server/ai-transcription-route.js";
 import { registerElevenLabsSpeechRoute } from "./server/elevenlabs-speech-route.js";
+import { createAcademyAiHandler, aiEngine, buildSkillPassportUpdate, moduleProgression, evaluateCertificateEligibility } from "zentom-ai-core";
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
@@ -21,6 +22,11 @@ const STUDENT_SESSION_TTL = 7 * 24 * 60 * 60 * 1000;
 const RESET_CODE_TTL = 15 * 60 * 1000;
 const studentStorePath = resolve(process.env.STUDENT_STORE_PATH || "data/learner-accounts.json");
 const scrypt = promisify(scryptCallback);
+const ADMIN_LAB_ATTEMPTS_KEY = "tomcodex.adminLabAttempts.v1";
+const SKILL_PASSPORT_KEY = "tomcodex.skillPassport.v1";
+const MODULE_UNLOCKS_KEY = "tomcodex.moduleUnlocks.v1";
+process.env.FREE_DAILY_AI_LIMIT ||= "50";
+process.env.FOUNDER_DAILY_AI_LIMIT ||= "1000";
 
 app.use((_request, response, next) => {
   response.set({
@@ -116,6 +122,9 @@ function supportedProgressKey(key) {
     || key === "tomcodex.personalizedPath.v1"
     || key === "tomcodex.aiCodeReviews.v1"
     || key === "tomcodex.adminCourseProgress.v1"
+    || key === ADMIN_LAB_ATTEMPTS_KEY
+    || key === SKILL_PASSPORT_KEY
+    || key === MODULE_UNLOCKS_KEY
     || /^tomcodex\.(admin|apex|flow|lwc)MasteryScores\.v1(\.finalExam)?$/.test(key);
 }
 
@@ -163,6 +172,203 @@ function parseStudentProgress(student, key, fallback) {
     return fallback;
   }
 }
+
+function saveStudentProgressObject(student, key, value) {
+  student.progress ||= {};
+  student.progress[key] = JSON.stringify(value);
+  student.progressUpdatedAt = new Date().toISOString();
+}
+
+async function persistAdminModuleOneSkillPassport({ userId, skillPassportUpdate, result }) {
+  const students = await loadStudents();
+  const student = students.find((candidate) => candidate.id === userId);
+  if (!student) throw new Error("Student account not found.");
+
+  const moduleId = skillPassportUpdate?.moduleId || "admin-module-1";
+  const skillId = skillPassportUpdate?.skillId || "salesforce-platform-foundations";
+  const score = Number(skillPassportUpdate?.score || result?.data?.score || 0);
+  const passed = score >= 80;
+  const attemptStatus = passed ? "Verified" : "Try Again";
+  const timestamp = new Date().toISOString();
+
+  const attemptHistory = parseStudentProgress(student, ADMIN_LAB_ATTEMPTS_KEY, {});
+  const moduleAttempts = Array.isArray(attemptHistory[moduleId]) ? attemptHistory[moduleId] : [];
+  const attempts = moduleAttempts.concat({
+    attempt: moduleAttempts.length + 1,
+    score,
+    status: attemptStatus,
+    feedback: skillPassportUpdate?.feedback || result?.data?.feedback || "",
+    createdAt: timestamp
+  });
+  const bestScore = attempts.reduce((best, attempt) => Math.max(best, Number(attempt.score) || 0), 0);
+  attemptHistory[moduleId] = attempts;
+  attemptHistory[`${moduleId}:summary`] = {
+    bestScore,
+    status: bestScore >= 80 ? "Verified" : "Try Again",
+    attempts: attempts.length,
+    updatedAt: timestamp
+  };
+
+  const skillPassport = parseStudentProgress(student, SKILL_PASSPORT_KEY, {});
+  skillPassport[skillId] = {
+    module: "Admin Module 1",
+    skill: "Salesforce Platform Foundations",
+    score: bestScore,
+    status: bestScore >= 80 ? "Verified" : "Try Again",
+    pocStage: bestScore >= 80 ? "Foundation Started" : "Foundation In Progress",
+    updatedAt: timestamp
+  };
+
+  const unlocks = parseStudentProgress(student, MODULE_UNLOCKS_KEY, {});
+  unlocks[moduleId] = {
+    labVerified: passed,
+    modulePracticeCompleted: passed,
+    skillPassportUpdated: true,
+    nextModuleUnlockCandidate: passed,
+    nextModuleAccess: student.tier === "founder" && passed ? "unlocked" : "upgrade_required",
+    updatedAt: timestamp
+  };
+
+  saveStudentProgressObject(student, ADMIN_LAB_ATTEMPTS_KEY, attemptHistory);
+  saveStudentProgressObject(student, SKILL_PASSPORT_KEY, skillPassport);
+  saveStudentProgressObject(student, MODULE_UNLOCKS_KEY, unlocks);
+  await saveStudents(students);
+
+  return {
+    attemptHistory: attemptHistory[moduleId],
+    bestScore,
+    skillPassportUpdate: skillPassport[skillId],
+    unlock: unlocks[moduleId]
+  };
+}
+
+async function persistDynamicSkillPassport({ student, moduleId, labId, skillId, score, passed, feedback, students }) {
+  const attemptStatus = passed ? "Verified" : "Try Again";
+  const timestamp = new Date().toISOString();
+
+  const attemptHistory = parseStudentProgress(student, ADMIN_LAB_ATTEMPTS_KEY, {});
+  const moduleAttempts = Array.isArray(attemptHistory[moduleId]) ? attemptHistory[moduleId] : [];
+  const attempts = moduleAttempts.concat({
+    attempt: moduleAttempts.length + 1,
+    score,
+    status: attemptStatus,
+    feedback: feedback || "",
+    createdAt: timestamp
+  });
+  const bestScore = attempts.reduce((best, attempt) => Math.max(best, Number(attempt.score) || 0), 0);
+  attemptHistory[moduleId] = attempts;
+  attemptHistory[`${moduleId}:summary`] = {
+    bestScore,
+    status: bestScore >= 80 ? "Verified" : "Try Again",
+    attempts: attempts.length,
+    updatedAt: timestamp
+  };
+
+  const moduleConfig = moduleProgression.find(m => m.moduleId === moduleId) || {};
+  const moduleName = moduleConfig.moduleName || "Salesforce Module";
+  const skillName = skillId
+    .split("-")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+
+  const skillPassport = parseStudentProgress(student, SKILL_PASSPORT_KEY, {});
+  skillPassport[skillId] = {
+    module: moduleName,
+    skill: skillName,
+    score: bestScore,
+    status: bestScore >= 80 ? "Verified" : "Try Again",
+    pocStage: bestScore >= 80 ? "Foundation Started" : "Foundation In Progress",
+    updatedAt: timestamp
+  };
+
+  const unlocks = parseStudentProgress(student, MODULE_UNLOCKS_KEY, {});
+  unlocks[moduleId] = {
+    labVerified: passed,
+    modulePracticeCompleted: passed,
+    skillPassportUpdated: true,
+    nextModuleUnlockCandidate: passed,
+    nextModuleAccess: student.tier === "founder" && passed ? "unlocked" : "upgrade_required",
+    updatedAt: timestamp
+  };
+
+  saveStudentProgressObject(student, ADMIN_LAB_ATTEMPTS_KEY, attemptHistory);
+  saveStudentProgressObject(student, SKILL_PASSPORT_KEY, skillPassport);
+  saveStudentProgressObject(student, MODULE_UNLOCKS_KEY, unlocks);
+  await saveStudents(students);
+
+  return {
+    attemptHistory: attemptHistory[moduleId],
+    bestScore,
+    skillPassportUpdate: skillPassport[skillId],
+    unlock: unlocks[moduleId]
+  };
+}
+
+function getDynamicUnlockDecision({ student, moduleId, tier }) {
+  const currentConfig = moduleProgression.find(m => m.moduleId === moduleId);
+  if (!currentConfig) {
+    return {
+      currentModuleId: moduleId,
+      nextModuleId: "unknown",
+      eligibleToUnlock: false,
+      reason: `Module configuration not found for ${moduleId}.`
+    };
+  }
+
+  const nextModuleId = currentConfig.nextModuleId;
+  if (!nextModuleId) {
+    return {
+      currentModuleId: moduleId,
+      nextModuleId: null,
+      eligibleToUnlock: false,
+      reason: `No subsequent module after ${moduleId}.`
+    };
+  }
+
+  const nextConfig = moduleProgression.find(m => m.moduleId === nextModuleId);
+  if (!nextConfig) {
+    return {
+      currentModuleId: moduleId,
+      nextModuleId,
+      eligibleToUnlock: false,
+      reason: `Configuration not found for next module ${nextModuleId}.`
+    };
+  }
+
+  const prerequisites = currentConfig.prerequisites || [];
+  const attemptHistory = parseStudentProgress(student, ADMIN_LAB_ATTEMPTS_KEY, {});
+  const summaryKey = `${moduleId}:summary`;
+  const bestScore = attemptHistory[summaryKey]?.bestScore || 0;
+
+  for (const prereq of prerequisites) {
+    if (bestScore < prereq.minPassingScore) {
+      return {
+        currentModuleId: moduleId,
+        nextModuleId,
+        eligibleToUnlock: false,
+        reason: `Lab score of ${bestScore}% is below the passing score of ${prereq.minPassingScore}%.`
+      };
+    }
+  }
+
+  if (nextConfig.requiredTier === "founder" && tier !== "founder") {
+    return {
+      currentModuleId: moduleId,
+      nextModuleId,
+      eligibleToUnlock: false,
+      reason: `Module 2 requires Founder Access.`
+    };
+  }
+
+  const mainPrereq = prerequisites[0] || {};
+  return {
+    currentModuleId: moduleId,
+    nextModuleId,
+    eligibleToUnlock: true,
+    reason: `Lab score is ${bestScore}% and passing score is ${mainPrereq.minPassingScore || 80}%.`
+  };
+}
+
 
 function tutorStudentSummary(student) {
   const tracks = trackCompletion(student);
@@ -285,8 +491,9 @@ app.post("/api/student-upgrade", async (request, response) => {
   const student = students.find((candidate) => candidate.id === session.studentId);
   if (!student) return response.status(404).json({ error: "Student account not found." });
   student.tier = "founder";
+  student.upgradedAt = new Date().toISOString();
   await saveStudents(students);
-  return response.json({ success: true, tier: "founder" });
+  return response.json({ success: true, tier: "founder", upgradedAt: student.upgradedAt });
 });
 
 app.put("/api/student-settings", async (request, response) => {
@@ -701,6 +908,187 @@ app.get(["/learner-dashboard", "/dashboard.html"], (request, response) => {
 });
 
 app.use(/\/api\/ai\/.*/, checkAiQuota);
+
+app.post("/api/academy/verify-lab", async (request, response, next) => {
+  let userId = request.body?.userId;
+  let tier = request.body?.tier;
+
+  const session = authenticatedStudent(request);
+  if (session && !userId) {
+    userId = session.studentId;
+  }
+
+  if (!userId) {
+    return response.status(401).json({ error: "Student sign-in or userId is required." });
+  }
+
+  try {
+    const students = await loadStudents();
+    const student = students.find((candidate) => candidate.id === userId);
+    if (!student) {
+      return response.status(404).json({ error: "Student account not found." });
+    }
+
+    if (!tier) {
+      tier = student.tier || "free";
+    }
+
+    const task = request.body?.task || "verify-lab";
+    const params = request.body?.params || {};
+
+    const result = await aiEngine.run(task, params, {
+      userId,
+      tier,
+      personalApiKey: student.personalApiKey
+    });
+
+    let skillPassportUpdate = null;
+
+    if (result.ok) {
+      const resolvedModuleId = params.moduleId || result.data.moduleId || "admin-1";
+      const resolvedLabId = params.labId || result.data.labId || "admin-1-lab-1";
+      const resolvedSkillId = params.skillId || result.data.skillId || "salesforce-platform-foundations";
+
+      skillPassportUpdate = buildSkillPassportUpdate({
+        labResult: result.data,
+        moduleId: resolvedModuleId,
+        skillId: resolvedSkillId
+      });
+
+      await persistDynamicSkillPassport({
+        student,
+        moduleId: resolvedModuleId,
+        labId: resolvedLabId,
+        skillId: resolvedSkillId,
+        score: result.data.score,
+        passed: result.data.passed,
+        feedback: result.data.feedback,
+        students
+      });
+    }
+
+    const resolvedModuleId = params.moduleId || (result.ok ? result.data.moduleId : "admin-1");
+    const resolvedLabId = params.labId || (result.ok ? result.data.labId : "admin-1-lab-1");
+
+    const unlockDecision = getDynamicUnlockDecision({
+      student,
+      moduleId: resolvedModuleId,
+      tier
+    });
+
+    const attemptHistory = parseStudentProgress(student, ADMIN_LAB_ATTEMPTS_KEY, {});
+    const skillPassport = parseStudentProgress(student, SKILL_PASSPORT_KEY, {});
+    
+    const currentAttempts = attemptHistory[resolvedModuleId] || [];
+    const failedCount = currentAttempts.filter(a => a.status === "Try Again").length;
+    const bestScore = currentAttempts.reduce((best, attempt) => Math.max(best, Number(attempt.score) || 0), 0);
+    
+    const verifiedAt = (attemptHistory[`${resolvedModuleId}:summary`]?.bestScore >= 80)
+      ? (attemptHistory[`${resolvedModuleId}:summary`]?.updatedAt || new Date().toISOString())
+      : null;
+
+    return response.json({
+      ok: result.ok,
+      task: "verify-lab",
+      data: {
+        passed: result.ok ? result.data.passed : false,
+        score: result.ok ? result.data.score : 0,
+        feedback: result.ok ? result.data.feedback : (result.error?.message || "Lab verification failed."),
+        criteriaResults: result.ok ? result.data.criteriaResults : []
+      },
+      skillPassportUpdate: skillPassportUpdate ? {
+        moduleId: skillPassportUpdate.moduleId,
+        skillId: skillPassportUpdate.skillId,
+        labId: skillPassportUpdate.labId,
+        status: skillPassportUpdate.status,
+        score: skillPassportUpdate.score
+      } : null,
+      passportSummary: {
+        attemptsCount: currentAttempts.length,
+        failedAttemptsCount: failedCount,
+        bestScore: bestScore,
+        verifiedAt: verifiedAt
+      },
+      unlockDecision: {
+        currentModuleId: resolvedModuleId,
+        nextModuleId: unlockDecision.nextModuleId,
+        eligibleToUnlock: unlockDecision.eligibleToUnlock,
+        reason: unlockDecision.reason
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/academy/certificate-eligibility", async (request, response, next) => {
+  let userId = request.body?.userId;
+  let tier = request.body?.tier;
+
+  const session = authenticatedStudent(request);
+  if (session && !userId) {
+    userId = session.studentId;
+  }
+
+  if (!userId) {
+    return response.status(401).json({ error: "Student sign-in or userId is required." });
+  }
+
+  try {
+    const students = await loadStudents();
+    const student = students.find((candidate) => candidate.id === userId);
+    if (!student) {
+      return response.status(404).json({ error: "Student account not found." });
+    }
+
+    if (!tier) {
+      tier = student.tier || "free";
+    }
+
+    const studentAttempts = parseStudentProgress(student, ADMIN_LAB_ATTEMPTS_KEY, {});
+    const skillPassport = parseStudentProgress(student, SKILL_PASSPORT_KEY, {});
+
+    const result = evaluateCertificateEligibility({
+      studentAttempts,
+      skillPassport,
+      tier
+    });
+
+    return response.json(result);
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/ai/run", async (request, response, next) => {
+  const session = authenticatedStudent(request);
+  if (!session) return response.status(401).json({ error: "Student sign-in is required." });
+
+  try {
+    const students = await loadStudents();
+    const student = students.find((candidate) => candidate.id === session.studentId);
+    if (!student) return response.status(404).json({ error: "Student account not found." });
+
+    request.session = {
+      user: {
+        id: student.id,
+        tier: student.tier || "free"
+      }
+    };
+
+    return createAcademyAiHandler({
+      async updateSkillPassport({ userId, update, aiResult }) {
+        return persistAdminModuleOneSkillPassport({
+          userId,
+          skillPassportUpdate: update,
+          result: aiResult
+        });
+      }
+    })(request, response);
+  } catch (error) {
+    next(error);
+  }
+});
 
 registerAiTrainerRoute(app);
 registerAiEvaluatorRoute(app);
