@@ -491,8 +491,9 @@ app.post("/api/student-upgrade", async (request, response) => {
   const student = students.find((candidate) => candidate.id === session.studentId);
   if (!student) return response.status(404).json({ error: "Student account not found." });
   student.tier = "founder";
+  student.upgradedAt = new Date().toISOString();
   await saveStudents(students);
-  return response.json({ success: true, tier: "founder" });
+  return response.json({ success: true, tier: "founder", upgradedAt: student.upgradedAt });
 });
 
 app.put("/api/student-settings", async (request, response) => {

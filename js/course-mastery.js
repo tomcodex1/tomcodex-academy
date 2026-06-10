@@ -79,9 +79,11 @@
     }
 
     // Check tier eligibility
-    let authIdentity = {};
-    try { authIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
-    const currentTier = authIdentity.tier || "free";
+    let authUser = {};
+    try {
+      authUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {};
+    } catch {}
+    const currentTier = authUser.tier || "free";
     const requiredTier = index === 0 ? "free" : "founder";
 
     if (requiredTier === "founder" && currentTier !== "founder") {
@@ -163,9 +165,14 @@
         const res = await fetch("/api/student-upgrade", { method: "POST" });
         const data = await res.json();
         if (res.ok && data.success) {
-          const cached = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1") || "{}");
-          cached.tier = "founder";
-          localStorage.setItem("tomcodex.authIdentity.v1", JSON.stringify(cached));
+          const cachedUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1") || "{}");
+          cachedUser.tier = "founder";
+          cachedUser.upgradedAt = data.upgradedAt || new Date().toISOString();
+          localStorage.setItem("tomcodex.auth.user.v1", JSON.stringify(cachedUser));
+
+          const cachedIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1") || "{}");
+          cachedIdentity.tier = "founder";
+          localStorage.setItem("tomcodex.authIdentity.v1", JSON.stringify(cachedIdentity));
           
           currentModule = index;
           render();
@@ -513,10 +520,12 @@
     const key = "tomcodex.moduleUnlocks.v1";
     const all = loadJson(key, {});
     const formats = [`admin-module-${index + 1}`, `admin-${index + 1}`];
-    let authIdentity = {};
-    try { authIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
+    let authUser = {};
+    try {
+      authUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {};
+    } catch {}
     
-    const isUnlocked = result.unlockDecision ? result.unlockDecision.eligibleToUnlock : (authIdentity.tier === "founder" && result.passed);
+    const isUnlocked = result.unlockDecision ? result.unlockDecision.eligibleToUnlock : (authUser.tier === "founder" && result.passed);
 
     formats.forEach(moduleId => {
       all[moduleId] = {
@@ -577,9 +586,9 @@
     btn.disabled = true;
     btn.innerHTML = `<svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Verifying with AI...`;
 
-    let authIdentity = {};
+    let authUser = {};
     try {
-      authIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {};
+      authUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {};
     } catch {}
 
     const module = modules[currentModule];
@@ -592,8 +601,8 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           task: "verify-lab",
-          userId: authIdentity.id || "student-demo-001",
-          tier: authIdentity.tier || "free",
+          userId: authUser.userId || authUser.id || "student-demo-001",
+          tier: authUser.tier || "free",
           params: {
             moduleId,
             labId,

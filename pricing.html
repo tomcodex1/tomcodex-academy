@@ -193,6 +193,15 @@
             const result = await response.json();
             if (result.authenticated && result.role === "student") {
               currentUser = result.identity;
+              
+              localStorage.setItem("tomcodex.authIdentity.v1", JSON.stringify(currentUser));
+              localStorage.setItem("tomcodex.auth.user.v1", JSON.stringify({
+                userId: currentUser.id,
+                name: currentUser.name,
+                tier: currentUser.tier || "free",
+                upgradedAt: currentUser.upgradedAt || null
+              }));
+
               document.getElementById("navAuthGroup").innerHTML = `
                 <span class="text-sm font-semibold text-slate-600 mr-2">Hello, ${currentUser.name}</span>
                 <a href="dashboard.html" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-700">Open Dashboard</a>
@@ -248,6 +257,11 @@
             showAlert("success", "Congratulations! Your account has been upgraded to Founder Access.");
             
             // Sync local storage identity if cached
+            const cachedUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1") || "{}");
+            cachedUser.tier = "founder";
+            cachedUser.upgradedAt = result.upgradedAt || new Date().toISOString();
+            localStorage.setItem("tomcodex.auth.user.v1", JSON.stringify(cachedUser));
+
             const cachedIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1") || "{}");
             cachedIdentity.tier = "founder";
             localStorage.setItem("tomcodex.authIdentity.v1", JSON.stringify(cachedIdentity));

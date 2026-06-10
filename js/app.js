@@ -700,9 +700,11 @@ function renderLearningTracks() {
     });
   } catch {}
 
-  let authIdentity = {};
-  try { authIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
-  const currentTier = authIdentity.tier || "free";
+  let authUser = {};
+  try {
+    authUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {};
+  } catch {}
+  const currentTier = authUser.tier || "free";
 
   let nextActionText = "";
   let nextActionLink = "course-admin.html";
@@ -839,9 +841,11 @@ function renderPocTracker() {
   let foundInProgress = false;
   let completedCount = 0;
 
-  let identity = {};
-  try { identity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
-  const isFree = (identity.tier || "free") === "free";
+  let authUser = {};
+  try {
+    authUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {};
+  } catch {}
+  const isFree = (authUser.tier || "free") === "free";
 
   crmStages.forEach((stage) => {
     let isCompleted = false;
@@ -939,9 +943,11 @@ function renderPocTracker() {
 }
 
 function renderSkillPassport() {
-  let identity = {};
-  try { identity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
-  const isFounder = identity.tier === "founder";
+  let authUser = {};
+  try {
+    authUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {};
+  } catch {}
+  const isFounder = authUser.tier === "founder";
   const tierName = isFounder ? "★ Founder Access" : "Free Starter";
 
   let totalLabs = 0;
@@ -1104,7 +1110,9 @@ function renderSkillPassport() {
 
 function renderSettingsForm() {
   let identity = {};
-  try { identity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
+  try {
+    identity = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {};
+  } catch {}
 
   const settingsName = document.getElementById("settingsName");
   const settingsEmail = document.getElementById("settingsEmail");
@@ -1202,6 +1210,17 @@ function setupSettingsForm() {
         usage: result.student.usage
       };
       localStorage.setItem("tomcodex.authIdentity.v1", JSON.stringify(updatedIdentity));
+
+      let cachedUser = {};
+      try { cachedUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || {}; } catch {}
+      const updatedUser = {
+        ...cachedUser,
+        name: result.student.name,
+        userId: result.student.id,
+        tier: result.student.tier || "free",
+        upgradedAt: result.student.upgradedAt || null
+      };
+      localStorage.setItem("tomcodex.auth.user.v1", JSON.stringify(updatedUser));
 
       const welcomeEl = document.getElementById("learnerWelcome");
       if (welcomeEl) welcomeEl.textContent = `Welcome back, ${result.student.name}`;
