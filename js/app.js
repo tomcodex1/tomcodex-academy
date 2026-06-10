@@ -836,6 +836,42 @@ function renderSkillPassport() {
     });
   });
 
+  // Load dynamic skill passport and attempts history
+  let dynamicAttempts = {};
+  try { dynamicAttempts = JSON.parse(localStorage.getItem("tomcodex.adminLabAttempts.v1")) || {}; } catch {}
+
+  // Process dynamic attempts history
+  Object.entries(dynamicAttempts).forEach(([key, val]) => {
+    if (Array.isArray(val) && (key.startsWith("admin-") || key.startsWith("admin-module-"))) {
+      if (key.startsWith("admin-module-")) return; // Avoid processing both formats to prevent duplicates
+
+      val.forEach((attempt) => {
+        const scoreVal = Number(attempt.score) || 0;
+        totalLabs++;
+        totalLabScoreSum += scoreVal;
+        
+        let modTitle = `Admin Module`;
+        if (key === "admin-1") modTitle = "Salesforce Platform Foundations";
+        else if (key === "admin-2") modTitle = "Student Success CRM Object Model";
+        else if (key === "admin-3") modTitle = "Security and Access Control";
+        else {
+          const modNum = key.split("-")[1];
+          modTitle = `Admin Module ${modNum}`;
+        }
+
+        evaluationHistory.push({
+          course: "admin",
+          moduleIndex: key,
+          title: modTitle,
+          score: scoreVal,
+          passed: attempt.status === "Verified",
+          feedback: attempt.feedback || "Lab verification complete.",
+          timestamp: attempt.createdAt || new Date().toISOString()
+        });
+      });
+    }
+  });
+
   const avgLabScore = totalLabs > 0 ? Math.round(totalLabScoreSum / totalLabs) : 0;
 
   const labsCompletedEl = document.getElementById("passportLabsCompleted");

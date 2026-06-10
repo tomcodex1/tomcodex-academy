@@ -445,38 +445,45 @@
   function saveLabAttempt(index, result) {
     const key = "tomcodex.adminLabAttempts.v1";
     const all = loadJson(key, {});
-    const moduleId = `admin-module-${index + 1}`;
-    const attempts = Array.isArray(all[moduleId]) ? all[moduleId] : [];
-    const attempt = {
-      attempt: attempts.length + 1,
-      score: result.score,
-      status: result.passed ? "Verified" : "Try Again",
-      feedback: result.summary,
-      createdAt: new Date().toISOString()
-    };
-    all[moduleId] = attempts.concat(attempt);
-    all[`${moduleId}:summary`] = {
-      bestScore: all[moduleId].reduce((best, item) => Math.max(best, Number(item.score) || 0), 0),
-      status: result.passed ? "Verified" : "Try Again",
-      attempts: all[moduleId].length,
-      updatedAt: attempt.createdAt
-    };
+    const formats = [`admin-module-${index + 1}`, `admin-${index + 1}`];
+    formats.forEach(moduleId => {
+      const attempts = Array.isArray(all[moduleId]) ? all[moduleId] : [];
+      const attempt = {
+        attempt: attempts.length + 1,
+        score: result.score,
+        status: result.passed ? "Verified" : "Try Again",
+        feedback: result.summary,
+        createdAt: new Date().toISOString()
+      };
+      all[moduleId] = attempts.concat(attempt);
+      all[`${moduleId}:summary`] = {
+        bestScore: all[moduleId].reduce((best, item) => Math.max(best, Number(item.score) || 0), 0),
+        status: result.passed ? "Verified" : "Try Again",
+        attempts: all[moduleId].length,
+        updatedAt: attempt.createdAt
+      };
+    });
     saveJson(key, all);
   }
   function saveModuleUnlock(index, result) {
     const key = "tomcodex.moduleUnlocks.v1";
     const all = loadJson(key, {});
-    const moduleId = `admin-module-${index + 1}`;
+    const formats = [`admin-module-${index + 1}`, `admin-${index + 1}`];
     let authIdentity = {};
     try { authIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
-    all[moduleId] = {
-      labVerified: Boolean(result.passed),
-      modulePracticeCompleted: Boolean(result.passed),
-      skillPassportUpdated: Boolean(result.skillPassportUpdate),
-      nextModuleUnlockCandidate: Boolean(result.passed),
-      nextModuleAccess: authIdentity.tier === "founder" && result.passed ? "unlocked" : "upgrade_required",
-      updatedAt: new Date().toISOString()
-    };
+    
+    const isUnlocked = result.unlockDecision ? result.unlockDecision.eligibleToUnlock : (authIdentity.tier === "founder" && result.passed);
+
+    formats.forEach(moduleId => {
+      all[moduleId] = {
+        labVerified: Boolean(result.passed),
+        modulePracticeCompleted: Boolean(result.passed),
+        skillPassportUpdated: Boolean(result.skillPassportUpdate),
+        nextModuleUnlockCandidate: Boolean(result.passed),
+        nextModuleAccess: isUnlocked ? "unlocked" : "upgrade_required",
+        updatedAt: new Date().toISOString()
+      };
+    });
     saveJson(key, all);
   }
 
@@ -493,7 +500,7 @@
           id="labAnswer_${c.id}"
           data-lab-criterion="${c.id}"
           type="${c.type === 'number' ? 'number' : 'text'}"
-          placeholder="Your answer..."
+          placeholder="${c.placeholder || 'Your answer...'}"
           class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none"
         />
       </div>
@@ -526,28 +533,26 @@
     btn.disabled = true;
     btn.innerHTML = `<svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Verifying with AI...`;
 
-    // Get criteria definition (from server or inline)
+    let authIdentity = {};
+    try {
+      authIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {};
+    } catch {}
+
     const module = modules[currentModule];
-    const labCriteria = module.labCriteria || window.TomCodexLabCriteria?.[criteriaKey]?.criteria || [];
+    const moduleId = `admin-${currentModule + 1}`;
+    const labId = `admin-${currentModule + 1}-lab-1`;
 
     try {
-      const res = await fetch("/api/ai/run", {
+      const res = await fetch("/api/academy/verify-lab", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           task: "verify-lab",
-          moduleId: "admin-module-1",
-          skillId: "salesforce-platform-foundations",
-          module: module.title,
+          userId: authIdentity.id || "student-demo-001",
+          tier: authIdentity.tier || "free",
           params: {
-            moduleId: "admin-module-1",
-            skillId: "salesforce-platform-foundations",
-            lab: {
-              labId: "admin-module-1-lab",
-              labTitle: module.richContent?.handsOnLab?.title || module.title,
-              passingScore: 80,
-              criteria: labCriteria
-            },
+            moduleId,
+            labId,
             studentAnswers
           }
         })
@@ -564,18 +569,18 @@
         // Update Skill Passport
         try {
           const passport = JSON.parse(localStorage.getItem("tomcodex.skillPassport.v1") || "{}");
-          passport["salesforce-platform-foundations"] = {
-            module: "Admin Module 1",
-            skill: "Salesforce Platform Foundations",
+          const skillId = result.skillPassportUpdate?.skillId || "salesforce-platform-foundations";
+          const skillName = skillId.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+          passport[skillId] = {
+            module: module.title,
+            skill: skillName,
             status: "Verified",
             pocStage: "Foundation Started",
-            score: result.score,
-            verifiedAt: new Date().toISOString(),
+            score: result.bestScore,
+            verifiedAt: result.passportSummary?.verifiedAt || new Date().toISOString(),
             moduleName: module.title,
             ...(result.skillPassportUpdate || {})
           };
-          passport["salesforce-platform-foundations"].status = "Verified";
-          passport["salesforce-platform-foundations"].pocStage = "Foundation Started";
           localStorage.setItem("tomcodex.skillPassport.v1", JSON.stringify(passport));
         } catch {}
       }
@@ -596,24 +601,58 @@
     return {
       passed: Boolean(data.passed),
       score: Number(data.score) || 0,
-      passedCount: Number(data.passedCount) || 0,
-      totalCount: Number(data.total) || criteriaResults.length,
+      passedCount: criteriaResults.filter(r => r.passed).length,
+      totalCount: criteriaResults.length,
       criteriaResults,
       summary: data.feedback || (data.passed ? "Lab verified." : "Review the hints and try again."),
       skillPassportUpdate: payload?.skillPassportUpdate || null,
-      unlock: payload?.unlock || null
+      unlockDecision: payload?.unlockDecision || null,
+      passportSummary: payload?.passportSummary || null,
+      bestScore: payload?.passportSummary?.bestScore || Number(data.score) || 0
     };
   }
 
   function renderLabVerifyResult(result) {
     const box = el("labVerifyResult");
+    if (!box) return;
     box.classList.remove("hidden");
     box.className = `mt-5 rounded-2xl border-2 p-5 ${ result.passed ? "border-emerald-300 bg-emerald-50" : "border-rose-200 bg-rose-50" }`;
+    
     const badge = el("labScoreBadge");
     badge.textContent = `${result.score}%`;
     badge.style.background = result.passed ? "#10b981" : "#ef4444";
-    el("labVerifySummary").textContent = result.summary;
-    el("labVerifySubtitle").textContent = result.passed ? "Your lab is verified. Proceed to the mastery test!" : "Fix the incorrect answers and try again.";
+    
+    el("labVerifySummary").textContent = result.passed ? "Status: Verified" : "Status: Try Again";
+    
+    let nextModuleText = "";
+    if (result.unlockDecision) {
+      if (result.unlockDecision.eligibleToUnlock) {
+        nextModuleText = "Admin Module 2 unlocked";
+      } else {
+        if (result.unlockDecision.reason && result.unlockDecision.reason.includes("Founder")) {
+          nextModuleText = "Locked - Founder Access required";
+        } else {
+          nextModuleText = `Locked - ${result.unlockDecision.reason}`;
+        }
+      }
+    } else {
+      nextModuleText = result.passed ? "Admin Module 2 unlocked" : "Locked";
+    }
+
+    const skillId = result.skillPassportUpdate?.skillId || "salesforce-platform-foundations";
+    const skillName = skillId.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    const attemptsCount = result.passportSummary?.attemptsCount || 1;
+    const bestScore = result.bestScore || result.score;
+
+    el("labVerifySubtitle").innerHTML = `
+      <div class="mt-2 space-y-1 text-xs text-slate-700">
+        <div><strong>Skill:</strong> ${skillName}</div>
+        <div><strong>Attempts:</strong> ${attemptsCount}</div>
+        <div><strong>Best Score:</strong> ${bestScore}%</div>
+        <div><strong>Next Module:</strong> <span class="${result.unlockDecision?.eligibleToUnlock ? 'text-emerald-700 font-bold' : 'text-rose-700 font-bold'}">${nextModuleText}</span></div>
+      </div>
+    `;
+
     el("labCriteriaResults").innerHTML = (result.criteriaResults || []).map(r => `
       <div class="flex items-start gap-3 rounded-lg p-3 ${ r.passed ? "bg-emerald-100" : "bg-rose-100" }">
         <span class="text-base shrink-0">${r.passed ? "✅" : "❌"}</span>
@@ -623,7 +662,12 @@
         </div>
       </div>
     `).join("");
-    if (!result.passed) el("retryCheckBtn").classList.remove("hidden");
+    
+    if (!result.passed) {
+      el("retryCheckBtn").classList.remove("hidden");
+    } else {
+      el("retryCheckBtn").classList.add("hidden");
+    }
     box.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 

@@ -112,39 +112,38 @@ const modules = [
       },
       labCriteria: [
         {
-          id: "accountName",
+          id: "q1",
           question: "What is the exact Account Name you created?",
           type: "text",
-          expectedKeywords: ["TomCodeX Training Institute"],
+          placeholder: "Enter the Account Name",
           hint: "Open the Account record you created and confirm the Account Name."
         },
         {
-          id: "contactLastName",
+          id: "q2",
           question: "What is the exact Contact Last Name you created?",
           type: "text",
-          expectedKeywords: ["Demo Student"],
+          placeholder: "Enter the Contact Last Name",
           hint: "Open the Contact record you created and confirm the Last Name."
         },
         {
-          id: "contactAccount",
+          id: "q3",
           question: "Which Account is your Contact linked to?",
           type: "text",
-          expectedKeywords: ["TomCodeX Training Institute"],
+          placeholder: "Enter the linked Account Name",
           hint: "Open the Contact record and check the linked Account Name."
         },
         {
-          id: "listViewName",
+          id: "q4",
           question: "What is the name of the Account list view you created?",
           type: "text",
-          expectedKeywords: ["My Active Accounts"],
+          placeholder: "Enter the list view name",
           hint: "Open the Accounts tab and check your list view name."
         },
         {
-          id: "listViewColumns",
+          id: "q5",
           question: "Name the two columns visible in your Account list view.",
           type: "text",
-          expectedKeywords: ["Account Name", "Phone"],
-          minimumMatches: 2,
+          placeholder: "Enter visible columns (e.g. Account Name, Phone)",
           hint: "Open your Account list view and confirm Account Name and Phone are visible."
         }
       ]
