@@ -1,6 +1,6 @@
 # Salesforce Master Dashboard
 
-Vanilla HTML, CSS, and JavaScript version of Vijay's Salesforce learning dashboard.
+Vanilla HTML, CSS, and JavaScript version of tom's Salesforce learning dashboard.
 
 ## Features
 
