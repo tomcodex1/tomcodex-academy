@@ -18,7 +18,7 @@ function createFetchMock() {
       const bodyObj = JSON.parse(options.body || "{}");
       const promptText = bodyObj.contents?.[0]?.parts?.[0]?.text || "";
       let mockResponse = {};
-      if (promptText.includes("module mastery questions")) {
+      if (promptText.includes("creating a mastery test")) {
         mockResponse = {
           candidates: [{
             content: {
@@ -130,6 +130,8 @@ describe("Google Auth and Quotas", () => {
     process.env.UPSTASH_REDIS_REST_TOKEN = "test-token";
     process.env.AUTH_SESSION_SECRET = "a-long-test-session-secret";
     process.env.AI_PROVIDER = "gemini";
+    delete process.env.GOOGLE_CLIENT_ID;
+    delete process.env.GOOGLE_CLIENT_SECRET;
     
     global.fetch = createFetchMock();
     const app = express();
@@ -157,7 +159,7 @@ describe("Google Auth and Quotas", () => {
 
   afterEach(async () => {
     await new Promise((resolve) => server.close(resolve));
-    ["UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN", "AUTH_SESSION_SECRET", "AI_PROVIDER"].forEach((key) => delete process.env[key]);
+    ["UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN", "AUTH_SESSION_SECRET", "AI_PROVIDER", "GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET"].forEach((key) => delete process.env[key]);
   });
 
   test("GET /api/auth/google redirects to mock auth page by default", async () => {

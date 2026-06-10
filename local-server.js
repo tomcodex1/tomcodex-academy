@@ -10,6 +10,7 @@ import { registerAiCodeReviewRoute } from "./server/ai-code-review-route.example
 import { registerAiInterviewRoute } from "./server/ai-interview-route.example.js";
 import { registerAiTranscriptionRoute } from "./server/ai-transcription-route.js";
 import { registerElevenLabsSpeechRoute } from "./server/elevenlabs-speech-route.js";
+import { createAcademyAiHandler } from "zentom-ai-core";
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
@@ -21,6 +22,11 @@ const STUDENT_SESSION_TTL = 7 * 24 * 60 * 60 * 1000;
 const RESET_CODE_TTL = 15 * 60 * 1000;
 const studentStorePath = resolve(process.env.STUDENT_STORE_PATH || "data/learner-accounts.json");
 const scrypt = promisify(scryptCallback);
+const ADMIN_LAB_ATTEMPTS_KEY = "tomcodex.adminLabAttempts.v1";
+const SKILL_PASSPORT_KEY = "tomcodex.skillPassport.v1";
+const MODULE_UNLOCKS_KEY = "tomcodex.moduleUnlocks.v1";
+process.env.FREE_DAILY_AI_LIMIT ||= "50";
+process.env.FOUNDER_DAILY_AI_LIMIT ||= "1000";
 
 app.use((_request, response, next) => {
   response.set({
@@ -116,6 +122,9 @@ function supportedProgressKey(key) {
     || key === "tomcodex.personalizedPath.v1"
     || key === "tomcodex.aiCodeReviews.v1"
     || key === "tomcodex.adminCourseProgress.v1"
+    || key === ADMIN_LAB_ATTEMPTS_KEY
+    || key === SKILL_PASSPORT_KEY
+    || key === MODULE_UNLOCKS_KEY
     || /^tomcodex\.(admin|apex|flow|lwc)MasteryScores\.v1(\.finalExam)?$/.test(key);
 }
 
@@ -162,6 +171,75 @@ function parseStudentProgress(student, key, fallback) {
   } catch {
     return fallback;
   }
+}
+
+function saveStudentProgressObject(student, key, value) {
+  student.progress ||= {};
+  student.progress[key] = JSON.stringify(value);
+  student.progressUpdatedAt = new Date().toISOString();
+}
+
+async function persistAdminModuleOneSkillPassport({ userId, skillPassportUpdate, result }) {
+  const students = await loadStudents();
+  const student = students.find((candidate) => candidate.id === userId);
+  if (!student) throw new Error("Student account not found.");
+
+  const moduleId = skillPassportUpdate?.moduleId || "admin-module-1";
+  const skillId = skillPassportUpdate?.skillId || "salesforce-platform-foundations";
+  const score = Number(skillPassportUpdate?.score || result?.data?.score || 0);
+  const passed = score >= 80;
+  const attemptStatus = passed ? "Verified" : "Try Again";
+  const timestamp = new Date().toISOString();
+
+  const attemptHistory = parseStudentProgress(student, ADMIN_LAB_ATTEMPTS_KEY, {});
+  const moduleAttempts = Array.isArray(attemptHistory[moduleId]) ? attemptHistory[moduleId] : [];
+  const attempts = moduleAttempts.concat({
+    attempt: moduleAttempts.length + 1,
+    score,
+    status: attemptStatus,
+    feedback: skillPassportUpdate?.feedback || result?.data?.feedback || "",
+    createdAt: timestamp
+  });
+  const bestScore = attempts.reduce((best, attempt) => Math.max(best, Number(attempt.score) || 0), 0);
+  attemptHistory[moduleId] = attempts;
+  attemptHistory[`${moduleId}:summary`] = {
+    bestScore,
+    status: bestScore >= 80 ? "Verified" : "Try Again",
+    attempts: attempts.length,
+    updatedAt: timestamp
+  };
+
+  const skillPassport = parseStudentProgress(student, SKILL_PASSPORT_KEY, {});
+  skillPassport[skillId] = {
+    module: "Admin Module 1",
+    skill: "Salesforce Platform Foundations",
+    score: bestScore,
+    status: bestScore >= 80 ? "Verified" : "Try Again",
+    pocStage: bestScore >= 80 ? "Foundation Started" : "Foundation In Progress",
+    updatedAt: timestamp
+  };
+
+  const unlocks = parseStudentProgress(student, MODULE_UNLOCKS_KEY, {});
+  unlocks[moduleId] = {
+    labVerified: passed,
+    modulePracticeCompleted: passed,
+    skillPassportUpdated: true,
+    nextModuleUnlockCandidate: passed,
+    nextModuleAccess: student.tier === "founder" && passed ? "unlocked" : "upgrade_required",
+    updatedAt: timestamp
+  };
+
+  saveStudentProgressObject(student, ADMIN_LAB_ATTEMPTS_KEY, attemptHistory);
+  saveStudentProgressObject(student, SKILL_PASSPORT_KEY, skillPassport);
+  saveStudentProgressObject(student, MODULE_UNLOCKS_KEY, unlocks);
+  await saveStudents(students);
+
+  return {
+    attemptHistory: attemptHistory[moduleId],
+    bestScore,
+    skillPassportUpdate: skillPassport[skillId],
+    unlock: unlocks[moduleId]
+  };
 }
 
 function tutorStudentSummary(student) {
@@ -701,6 +779,36 @@ app.get(["/learner-dashboard", "/dashboard.html"], (request, response) => {
 });
 
 app.use(/\/api\/ai\/.*/, checkAiQuota);
+
+app.post("/api/ai/run", async (request, response, next) => {
+  const session = authenticatedStudent(request);
+  if (!session) return response.status(401).json({ error: "Student sign-in is required." });
+
+  try {
+    const students = await loadStudents();
+    const student = students.find((candidate) => candidate.id === session.studentId);
+    if (!student) return response.status(404).json({ error: "Student account not found." });
+
+    request.session = {
+      user: {
+        id: student.id,
+        tier: student.tier || "free"
+      }
+    };
+
+    return createAcademyAiHandler({
+      async updateSkillPassport({ userId, update, aiResult }) {
+        return persistAdminModuleOneSkillPassport({
+          userId,
+          skillPassportUpdate: update,
+          result: aiResult
+        });
+      }
+    })(request, response);
+  } catch (error) {
+    next(error);
+  }
+});
 
 registerAiTrainerRoute(app);
 registerAiEvaluatorRoute(app);

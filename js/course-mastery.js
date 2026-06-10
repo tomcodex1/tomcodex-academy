@@ -408,66 +408,223 @@
     `).join("");
   }
 
-  function loadScreenshotScores() {
-    try { return JSON.parse(localStorage.getItem(MASTERY_KEY + ".screenshots")) || {}; } catch { return {}; }
+  // ── Check My Work: Lab Criteria Verification ─────────────────────────────
+
+  // Map course names to criteria keys
+  const COURSE_KEY_MAP = {
+    "Salesforce Administrator": "admin",
+    "Apex Development": "apex",
+    "Salesforce Flow": "flow",
+    "Lightning Web Components": "lwc"
+  };
+
+  function loadLabResults() {
+    try { return JSON.parse(localStorage.getItem(MASTERY_KEY + ".labResults")) || {}; } catch { return {}; }
   }
-  function saveScreenshotScore(index, result) {
-    const scores = loadScreenshotScores();
-    scores[index] = { score: result.score, passed: result.passed, feedback: result.feedback, timestamp: new Date().toISOString() };
-    localStorage.setItem(MASTERY_KEY + ".screenshots", JSON.stringify(scores));
+  function loadJson(key, fallback) {
+    try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch { return fallback; }
+  }
+  function saveJson(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+  function saveLabResult(index, result) {
+    const all = loadLabResults();
+    if (!all[index] || result.score > (all[index].score || 0)) {
+      all[index] = {
+        score: result.score,
+        passed: result.passed,
+        timestamp: new Date().toISOString(),
+        summary: result.summary,
+        criteriaResults: result.criteriaResults || [],
+        skillPassportUpdate: result.skillPassportUpdate || null,
+        unlock: result.unlock || null
+      };
+      localStorage.setItem(MASTERY_KEY + ".labResults", JSON.stringify(all));
+    }
+  }
+  function saveLabAttempt(index, result) {
+    const key = "tomcodex.adminLabAttempts.v1";
+    const all = loadJson(key, {});
+    const moduleId = `admin-module-${index + 1}`;
+    const attempts = Array.isArray(all[moduleId]) ? all[moduleId] : [];
+    const attempt = {
+      attempt: attempts.length + 1,
+      score: result.score,
+      status: result.passed ? "Verified" : "Try Again",
+      feedback: result.summary,
+      createdAt: new Date().toISOString()
+    };
+    all[moduleId] = attempts.concat(attempt);
+    all[`${moduleId}:summary`] = {
+      bestScore: all[moduleId].reduce((best, item) => Math.max(best, Number(item.score) || 0), 0),
+      status: result.passed ? "Verified" : "Try Again",
+      attempts: all[moduleId].length,
+      updatedAt: attempt.createdAt
+    };
+    saveJson(key, all);
+  }
+  function saveModuleUnlock(index, result) {
+    const key = "tomcodex.moduleUnlocks.v1";
+    const all = loadJson(key, {});
+    const moduleId = `admin-module-${index + 1}`;
+    let authIdentity = {};
+    try { authIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
+    all[moduleId] = {
+      labVerified: Boolean(result.passed),
+      modulePracticeCompleted: Boolean(result.passed),
+      skillPassportUpdated: Boolean(result.skillPassportUpdate),
+      nextModuleUnlockCandidate: Boolean(result.passed),
+      nextModuleAccess: authIdentity.tier === "founder" && result.passed ? "unlocked" : "upgrade_required",
+      updatedAt: new Date().toISOString()
+    };
+    saveJson(key, all);
   }
 
-  async function evaluateScreenshot() {
-    const input = el("screenshotInput");
-    const file = input.files?.[0];
-    if (!file) {
-      alert("Please select a screenshot image file first.");
+  function renderLabCriteriaForm(criteria) {
+    const form = el("labCriteriaForm");
+    if (!form || !criteria?.length) return;
+    form.innerHTML = criteria.map((c, i) => `
+      <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <label class="block text-xs font-bold text-slate-700 mb-2" for="labAnswer_${c.id}">
+          <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-600 text-white text-xs font-extrabold mr-2">${i + 1}</span>
+          ${c.question}
+        </label>
+        <input
+          id="labAnswer_${c.id}"
+          data-lab-criterion="${c.id}"
+          type="${c.type === 'number' ? 'number' : 'text'}"
+          placeholder="Your answer..."
+          class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500 outline-none"
+        />
+      </div>
+    `).join("");
+  }
+
+  async function runCheckMyWork() {
+    const courseKey = COURSE_KEY_MAP[courseName] || "admin";
+    const criteriaKey = `${courseKey}-${currentModule}`;
+
+    // Gather answers from the form
+    const answerInputs = document.querySelectorAll("[data-lab-criterion]");
+    if (!answerInputs.length) {
+      alert("Criteria questions not loaded yet. Please wait.");
       return;
     }
-    const btn = el("evaluateScreenshotBtn");
+    const studentAnswers = {};
+    let anyEmpty = false;
+    answerInputs.forEach(input => {
+      const val = input.value.trim();
+      studentAnswers[input.dataset.labCriterion] = val;
+      if (!val) anyEmpty = true;
+    });
+    if (anyEmpty) {
+      alert("Please answer all questions before checking your work.");
+      return;
+    }
+
+    const btn = el("checkMyWorkBtn");
     btn.disabled = true;
-    btn.textContent = "AI is evaluating...";
-    
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const base64Data = reader.result.split(",")[1];
-      const payload = {
-        image: base64Data,
-        mimeType: file.type,
-        course: courseName,
-        module: modules[currentModule].title
-      };
-      
-      try {
-        const result = await window.TomCodexAI.evaluateScreenshot(payload);
-        saveScreenshotScore(currentModule, result);
-        renderScreenshotResult(result);
-        if (result.passed) {
-          window.TomCodexLearning?.record("task", 20, `Passed ${recordLabel} screenshot lab: ${modules[currentModule].title} (${result.score}%)`);
-        }
-      } catch (err) {
-        alert(err.message || "Failed to evaluate screenshot.");
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Evaluate with AI";
+    btn.innerHTML = `<svg class="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Verifying with AI...`;
+
+    // Get criteria definition (from server or inline)
+    const module = modules[currentModule];
+    const labCriteria = module.labCriteria || window.TomCodexLabCriteria?.[criteriaKey]?.criteria || [];
+
+    try {
+      const res = await fetch("/api/ai/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          task: "verify-lab",
+          moduleId: "admin-module-1",
+          skillId: "salesforce-platform-foundations",
+          module: module.title,
+          params: {
+            moduleId: "admin-module-1",
+            skillId: "salesforce-platform-foundations",
+            lab: {
+              labId: "admin-module-1-lab",
+              labTitle: module.richContent?.handsOnLab?.title || module.title,
+              passingScore: 80,
+              criteria: labCriteria
+            },
+            studentAnswers
+          }
+        })
+      });
+      if (!res.ok) throw new Error("Verification failed");
+      const payload = await res.json();
+      const result = normalizeAiRunLabResult(payload);
+      renderLabVerifyResult(result);
+      saveLabResult(currentModule, result);
+      saveLabAttempt(currentModule, result);
+      saveModuleUnlock(currentModule, result);
+      if (result.passed) {
+        window.TomCodexLearning?.record("task", 20, `Passed ${recordLabel} lab check: ${module.title} (${result.score}%)`);
+        // Update Skill Passport
+        try {
+          const passport = JSON.parse(localStorage.getItem("tomcodex.skillPassport.v1") || "{}");
+          passport["salesforce-platform-foundations"] = {
+            module: "Admin Module 1",
+            skill: "Salesforce Platform Foundations",
+            status: "Verified",
+            pocStage: "Foundation Started",
+            score: result.score,
+            verifiedAt: new Date().toISOString(),
+            moduleName: module.title,
+            ...(result.skillPassportUpdate || {})
+          };
+          passport["salesforce-platform-foundations"].status = "Verified";
+          passport["salesforce-platform-foundations"].pocStage = "Foundation Started";
+          localStorage.setItem("tomcodex.skillPassport.v1", JSON.stringify(passport));
+        } catch {}
       }
-    };
-    reader.onerror = () => {
-      alert("Error reading file.");
+    } catch (err) {
+      alert("Could not connect to the verifier. Please try again.");
+    } finally {
       btn.disabled = false;
-      btn.textContent = "Evaluate with AI";
-    };
-    reader.readAsDataURL(file);
+      btn.innerHTML = `<svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Check My Work`;
+    }
   }
 
-  function renderScreenshotResult(result) {
-    el("screenshotReviewContainer").classList.remove("hidden");
-    const badge = el("screenshotScoreBadge");
+  function normalizeAiRunLabResult(payload) {
+    const data = payload?.data || {};
+    const criteriaResults = (data.criteriaResults || []).map((item) => ({
+      ...item,
+      feedback: item.passed ? "Correct." : item.hint || "Review the lab instructions and try again."
+    }));
+    return {
+      passed: Boolean(data.passed),
+      score: Number(data.score) || 0,
+      passedCount: Number(data.passedCount) || 0,
+      totalCount: Number(data.total) || criteriaResults.length,
+      criteriaResults,
+      summary: data.feedback || (data.passed ? "Lab verified." : "Review the hints and try again."),
+      skillPassportUpdate: payload?.skillPassportUpdate || null,
+      unlock: payload?.unlock || null
+    };
+  }
+
+  function renderLabVerifyResult(result) {
+    const box = el("labVerifyResult");
+    box.classList.remove("hidden");
+    box.className = `mt-5 rounded-2xl border-2 p-5 ${ result.passed ? "border-emerald-300 bg-emerald-50" : "border-rose-200 bg-rose-50" }`;
+    const badge = el("labScoreBadge");
     badge.textContent = `${result.score}%`;
     badge.style.background = result.passed ? "#10b981" : "#ef4444";
-    el("screenshotReviewSummary").textContent = result.passed ? "Lab configuration verified!" : "Lab review needs improvement.";
-    el("screenshotReviewFeedback").textContent = result.feedback;
-    el("screenshotReviewBox").className = `mt-3 p-4 rounded-xl border flex gap-4 items-start ${result.passed ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-rose-50 border-rose-200 text-rose-800"}`;
+    el("labVerifySummary").textContent = result.summary;
+    el("labVerifySubtitle").textContent = result.passed ? "Your lab is verified. Proceed to the mastery test!" : "Fix the incorrect answers and try again.";
+    el("labCriteriaResults").innerHTML = (result.criteriaResults || []).map(r => `
+      <div class="flex items-start gap-3 rounded-lg p-3 ${ r.passed ? "bg-emerald-100" : "bg-rose-100" }">
+        <span class="text-base shrink-0">${r.passed ? "✅" : "❌"}</span>
+        <div class="flex-1">
+          <p class="text-xs font-bold text-slate-700">${r.question}</p>
+          <p class="text-xs text-slate-600 mt-0.5">${r.feedback}</p>
+        </div>
+      </div>
+    `).join("");
+    if (!result.passed) el("retryCheckBtn").classList.remove("hidden");
+    box.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
   function render() {
@@ -498,14 +655,19 @@
       el("richWhyMatters").innerHTML = module.richContent.whyMattersInJob;
       el("richInterview").innerHTML = module.richContent.interviewQuestions.map((q) => `<li>${q}</li>`).join("");
       el("richLabDescription").innerHTML = module.richContent.handsOnLab.instructions;
-      
-      const screenshotScores = loadScreenshotScores();
-      const labScore = screenshotScores[currentModule];
-      if (labScore) {
-        renderScreenshotResult(labScore);
+
+      // Render Check My Work criteria form
+      const courseKey = COURSE_KEY_MAP[courseName] || "admin";
+      const labCriteria = module.labCriteria || window.TomCodexLabCriteria?.[`${courseKey}-${currentModule}`]?.criteria || [];
+      renderLabCriteriaForm(labCriteria);
+
+      // Restore previous result if exists
+      const labResults = loadLabResults();
+      if (labResults[currentModule]) {
+        renderLabVerifyResult(labResults[currentModule]);
       } else {
-        el("screenshotReviewContainer").classList.add("hidden");
-        el("screenshotInput").value = "";
+        const box = el("labVerifyResult");
+        if (box) box.classList.add("hidden");
       }
     } else {
       el("lessonPoints").innerHTML = module.points.map((item) => `<div>${item}</div>`).join("");
@@ -588,7 +750,13 @@
   el("completeModuleBtn").addEventListener("click", startTest);
   el("startMasteryTestBtn").addEventListener("click", startTest);
   el("startMasteryTestBtnRich")?.addEventListener("click", startTest);
-  el("evaluateScreenshotBtn")?.addEventListener("click", evaluateScreenshot);
+  el("checkMyWorkBtn")?.addEventListener("click", runCheckMyWork);
+  el("retryCheckBtn")?.addEventListener("click", () => {
+    el("labVerifyResult")?.classList.add("hidden");
+    el("retryCheckBtn").classList.add("hidden");
+    document.querySelectorAll("[data-lab-criterion]").forEach(i => i.value = "");
+    el("labCriteriaForm")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
   el("submitMasteryTestBtn").addEventListener("click", submitTest);
   el("previousModuleBtn").addEventListener("click", () => { if (currentModule > 0) { currentModule -= 1; render(); } });
   el("nextModuleBtn").addEventListener("click", () => {

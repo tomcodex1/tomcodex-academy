@@ -95,21 +95,59 @@ const modules = [
         "How do you navigate to the company settings to verify your Organization ID?"
       ],
       handsOnLab: {
-        title: "Lab 1: Provision Developer Org & Verify Database Schema",
+        title: "Lab 1: Explore Your Salesforce Developer Org",
         instructions: `
           <p class="text-slate-600 text-xs leading-relaxed mb-3">
-            Set up your environment and capture proof of your Object Manager configuration:
+            Complete these steps in your <strong>Salesforce Developer Org or Trailhead Playground</strong>, then answer the <strong>Check My Work</strong> questions below to verify your setup.
           </p>
           <ol class="list-decimal pl-5 space-y-1.5 text-slate-600 text-xs">
-            <li>Open your newly registered Developer Org.</li>
-            <li>Click the gear icon (top-right) and navigate to <strong>Setup</strong>.</li>
-            <li>Select the <strong>Object Manager</strong> tab on the left of the main Setup screen.</li>
-            <li>Verify you see Standard Objects like <strong>Account</strong>, <strong>Asset</strong>, and <strong>Contact</strong> in the list.</li>
-            <li>Take a clear screenshot showing the full browser window (including your unique Salesforce address bar URL) with the Object Manager list visible.</li>
-            <li>Save this screenshot as a PNG or JPEG to upload below for AI grading.</li>
+            <li>Log in to your org at <strong>login.salesforce.com</strong></li>
+            <li>Click the <strong>App Launcher</strong> (9-dot grid icon) and count the apps</li>
+            <li>Go to <strong>Setup → Company Information</strong> — note your org edition</li>
+            <li>Go to <strong>Setup → Object Manager</strong> — note the first standard object listed</li>
+            <li>Go to <strong>Setup → Users</strong> — find your own Profile name</li>
+            <li>Note the subdomain in your browser address bar (before .lightning.force.com)</li>
           </ol>
         `
-      }
+      },
+      labCriteria: [
+        {
+          id: "accountName",
+          question: "What is the exact Account Name you created?",
+          type: "text",
+          expectedKeywords: ["TomCodeX Training Institute"],
+          hint: "Open the Account record you created and confirm the Account Name."
+        },
+        {
+          id: "contactLastName",
+          question: "What is the exact Contact Last Name you created?",
+          type: "text",
+          expectedKeywords: ["Demo Student"],
+          hint: "Open the Contact record you created and confirm the Last Name."
+        },
+        {
+          id: "contactAccount",
+          question: "Which Account is your Contact linked to?",
+          type: "text",
+          expectedKeywords: ["TomCodeX Training Institute"],
+          hint: "Open the Contact record and check the linked Account Name."
+        },
+        {
+          id: "listViewName",
+          question: "What is the name of the Account list view you created?",
+          type: "text",
+          expectedKeywords: ["My Active Accounts"],
+          hint: "Open the Accounts tab and check your list view name."
+        },
+        {
+          id: "listViewColumns",
+          question: "Name the two columns visible in your Account list view.",
+          type: "text",
+          expectedKeywords: ["Account Name", "Phone"],
+          minimumMatches: 2,
+          hint: "Open your Account list view and confirm Account Name and Phone are visible."
+        }
+      ]
     }
   },
   {
