@@ -309,8 +309,36 @@ function renderTodayMission() {
 
 function renderSkillMeters() {
   const list = document.getElementById("skillMeters");
+  if (!list) return;
+  
+  let passport = {};
+  try { passport = JSON.parse(localStorage.getItem("tomcodex.skillPassport.v1")) || {}; } catch {}
+  
+  let adminFoundationScore = 12;
+  if (passport["salesforce-platform-foundations"]?.status === "Verified") {
+    adminFoundationScore = passport["salesforce-platform-foundations"]?.score || 100;
+  }
+  if (passport["salesforce-object-modeling"]?.status === "Verified") {
+    adminFoundationScore = Math.max(adminFoundationScore, passport["salesforce-object-modeling"]?.score || 100);
+  }
+  
+  let securityScore = 8;
+  if (passport["salesforce-security-foundations"]?.status === "Verified") {
+    securityScore = passport["salesforce-security-foundations"]?.score || 100;
+  }
+  
+  const dynamicSkillMeters = [
+    ["Admin Foundation", adminFoundationScore],
+    ["Security", securityScore],
+    ["Flow Automation", 5],
+    ["Apex", 3],
+    ["LWC", 2],
+    ["Integration", 1],
+    ["DevOps", 1]
+  ];
+  
   list.innerHTML = "";
-  skillMeters.forEach(([skill, value]) => {
+  dynamicSkillMeters.forEach(([skill, value]) => {
     list.innerHTML += `
       <div>
         <div class="meter-label"><span>${skill}</span><strong>${value}%</strong></div>
@@ -559,7 +587,7 @@ function setupTabs() {
 
 function renderLearningTracks() {
   const definitions = [
-    ["admin", "course-admin.html", 14],
+    ["admin", "course-admin.html", 4],
     ["apex", "course-apex.html", 12],
     ["flow", "course-flow.html", 12],
     ["lwc", "course-lwc.html", 12]
@@ -585,14 +613,31 @@ function renderLearningTracks() {
     const [track, href, total] = definitions[index];
     let scores = {};
     try { scores = JSON.parse(localStorage.getItem(`tomcodex.${track}MasteryScores.v1`)) || {}; } catch {}
-    const completed = Object.values(scores).filter((entry) => Number(entry?.score) >= 80).length;
+    
+    let completed = 0;
+    if (track === "admin") {
+      let attempts = {};
+      try { attempts = JSON.parse(localStorage.getItem("tomcodex.adminLabAttempts.v1")) || {}; } catch {}
+      let adminScores = {};
+      try { adminScores = JSON.parse(localStorage.getItem("tomcodex.adminMasteryScores.v1")) || {}; } catch {}
+      for (let i = 1; i <= total; i++) {
+        const bestScore = attempts[`admin-${i}:summary`]?.bestScore || attempts[`admin-module-${i}:summary`]?.bestScore || 0;
+        const quizScore = adminScores[i - 1]?.score || 0;
+        if (bestScore >= 80 || quizScore >= 80) {
+          completed++;
+        }
+      }
+    } else {
+      completed = Object.values(scores).filter((entry) => Number(entry?.score) >= 80).length;
+    }
+
     if (completed > 0 && !enrollments[track]) {
       enrollments[track] = { enrolledAt: new Date().toISOString(), lastOpenedAt: null };
       localStorage.setItem(ENROLLMENTS_KEY, JSON.stringify(enrollments));
     }
     const enrolled = Boolean(enrollments[track]);
     const percent = Math.round(completed / total * 100);
-    const status = percent === 100 ? "Track completed" : completed ? `${completed} of ${total} modules mastered` : enrolled ? "Enrolled and ready to begin" : "Enrollment required";
+    const status = percent === 100 ? "Track completed" : completed ? `${completed} of ${total} modules ${track === 'admin' ? 'verified' : 'mastered'}` : enrolled ? "Enrolled and ready to begin" : "Enrollment required";
     const action = percent === 100 ? "Review track →" : enrolled ? "Continue track →" : "Enroll now →";
     const title = card.querySelector("h3").textContent;
     const remaining = Math.max(0, total - completed);
@@ -611,25 +656,113 @@ function renderLearningTracks() {
     card.innerHTML = `<div class="track-summary">
       <div class="track-summary-heading"><span class="track-course-icon">${track === "admin" ? "SF" : track === "apex" ? "&lt;/&gt;" : track === "flow" ? "FL" : "UI"}</span><div><span class="course-tag">${percent === 100 ? "Completed" : completed ? "In progress" : enrolled ? "Enrolled" : "Available"}</span><h3>${title}</h3></div><strong>${percent}%</strong></div>
       <div class="track-progress-bar"><span style="width:${percent}%"></span></div>
-      <div class="track-metrics"><div><strong>${completed}</strong><span>Mastered</span></div><div><strong>${remaining}</strong><span>Remaining</span></div><div><strong>${total}</strong><span>Total modules</span></div></div>
+      <div class="track-metrics"><div><strong>${completed}</strong><span>${track === 'admin' ? 'Verified' : 'Mastered'}</span></div><div><strong>${remaining}</strong><span>Remaining</span></div><div><strong>${total}</strong><span>Total modules</span></div></div>
       <div class="track-next-action"><div><span>Current status</span><strong>${status}</strong></div><b>${action}</b></div>
     </div>`;
     return { track, href, title, completed, percent, enrolled };
   });
 
-  const recommendation = tracks.find((track) => track.percent > 0 && track.percent < 100)
-    || tracks.find((track) => track.enrolled && track.percent === 0)
-    || tracks.find((track) => !track.enrolled)
-    || tracks[0];
-  const message = recommendation.percent > 0
-    ? `Continue from ${recommendation.completed} mastered modules and keep your momentum.`
-    : recommendation.enrolled
-      ? "Open your enrolled track and begin the first module."
-      : "Enroll in this track to begin tracking modules, mastery, and reminders.";
-  const recommendationAction = recommendation.percent === 100 ? "Review track" : recommendation.enrolled ? "Continue track" : "Enroll now";
+  // Dynamic progress summary cards on dashboard
+  let adminVerifiedCount = 0;
+  let adminAttempts = {};
+  try { adminAttempts = JSON.parse(localStorage.getItem("tomcodex.adminLabAttempts.v1")) || {}; } catch {}
+  let adminScores = {};
+  try { adminScores = JSON.parse(localStorage.getItem("tomcodex.adminMasteryScores.v1")) || {}; } catch {}
+  for (let i = 1; i <= 4; i++) {
+    const bestScore = adminAttempts[`admin-${i}:summary`]?.bestScore || adminAttempts[`admin-module-${i}:summary`]?.bestScore || 0;
+    const quizScore = adminScores[i - 1]?.score || 0;
+    if (bestScore >= 80 || quizScore >= 80) {
+      adminVerifiedCount++;
+    }
+  }
+
+  let verifiedSkillsCount = 0;
+  try {
+    const passport = JSON.parse(localStorage.getItem("tomcodex.skillPassport.v1") || "{}");
+    verifiedSkillsCount = Object.values(passport).filter(s => s.status === "Verified").length;
+  } catch {}
+
+  let maxBestScore = 0;
+  try {
+    Object.keys(adminAttempts).forEach(key => {
+      if (key.endsWith(":summary")) {
+        const score = Number(adminAttempts[key]?.bestScore) || 0;
+        if (score > maxBestScore) {
+          maxBestScore = score;
+        }
+      }
+    });
+    Object.values(adminScores).forEach(entry => {
+      const score = Number(entry?.score) || 0;
+      if (score > maxBestScore) {
+        maxBestScore = score;
+      }
+    });
+  } catch {}
+
+  let authIdentity = {};
+  try { authIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
+  const currentTier = authIdentity.tier || "free";
+
+  let nextActionText = "";
+  let nextActionLink = "course-admin.html";
+  
+  if (adminVerifiedCount === 0) {
+    nextActionText = "Continue Admin Module 1 - Salesforce Platform Foundations";
+    nextActionLink = "course-admin.html?module=0";
+  } else if (adminVerifiedCount === 1) {
+    if (currentTier !== "founder") {
+      nextActionText = "Upgrade to Founder Access to continue Admin Module 2";
+      nextActionLink = "pricing.html";
+    } else {
+      nextActionText = "Continue Admin Module 2 - Student Success CRM Object Model";
+      nextActionLink = "course-admin.html?module=1";
+    }
+  } else if (adminVerifiedCount === 2) {
+    nextActionText = "Continue Admin Module 3 - Security and Access Control";
+    nextActionLink = "course-admin.html?module=2";
+  } else if (adminVerifiedCount === 3) {
+    nextActionText = "Continue Admin Module 4 - Data Management and Quality";
+    nextActionLink = "course-admin.html?module=3";
+  } else {
+    nextActionText = "All modules verified! Go to final exam.";
+    nextActionLink = "course-admin.html";
+  }
+
   const recommendationElement = document.getElementById("trackRecommendation");
-  recommendationElement.innerHTML = `<div><strong>Recommended next: ${recommendation.title}</strong><span>${message}</span></div><button type="button">${recommendationAction} →</button>`;
-  recommendationElement.querySelector("button").addEventListener("click", () => enrollAndOpen(recommendation.track, recommendation.href));
+  if (recommendationElement) {
+    recommendationElement.innerHTML = `
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-slate-50 border border-slate-200 rounded-3xl p-6 shadow-sm">
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xs bg-brand-50 text-brand-700 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Active Track</span>
+            <span class="text-slate-500 text-xs font-semibold">Salesforce Admin Track</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+            <div>
+              <span class="text-[11px] text-slate-400 block uppercase font-bold tracking-wider">Admin Track Progress</span>
+              <strong class="text-sm text-slate-800 font-extrabold">Admin Track Progress: ${adminVerifiedCount} / 4 modules verified</strong>
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-400 block uppercase font-bold tracking-wider">Verified Skills</span>
+              <strong class="text-sm text-slate-800 font-extrabold">Verified Skills: ${verifiedSkillsCount}</strong>
+            </div>
+            <div>
+              <span class="text-[11px] text-slate-400 block uppercase font-bold tracking-wider">Best Score</span>
+              <strong class="text-sm text-slate-800 font-extrabold">Best Score: ${maxBestScore > 0 ? maxBestScore + '%' : '0%'}</strong>
+            </div>
+          </div>
+          <div class="pt-2">
+            <span class="text-[11px] text-slate-400 block uppercase font-bold tracking-wider font-semibold">Next Action</span>
+            <span class="text-xs font-bold text-brand-650" style="color: #056b8d;">Next Action: ${nextActionText.replace("Next Action: ", "").replace("Upgrade to Founder Access to continue Admin Module 2", "Upgrade to Founder Access to continue Admin Module 2").replace("Continue Admin Module 2 - Student Success CRM Object Model", "Continue Admin Module 2 - Student Success CRM Object Model")}</span>
+          </div>
+        </div>
+        <a href="${nextActionLink}" class="shrink-0 rounded-xl bg-brand-600 px-5 py-3 font-bold text-white hover:bg-brand-700 transition text-sm inline-block text-center whitespace-nowrap">
+          ${nextActionText.includes("Upgrade") ? "Upgrade to Founder" : "Continue Path"} &rarr;
+        </a>
+      </div>
+    `;
+  }
 }
 
 const crmStages = [
@@ -714,21 +847,39 @@ function renderPocTracker() {
     let isCompleted = false;
     let score = 0;
 
-    try {
-      const scores = JSON.parse(localStorage.getItem(`tomcodex.${stage.course}MasteryScores.v1`)) || {};
-      if (scores[stage.moduleIndex]?.score >= 80) {
+    if (stage.course === "admin") {
+      let attempts = {};
+      try { attempts = JSON.parse(localStorage.getItem("tomcodex.adminLabAttempts.v1")) || {}; } catch {}
+      const moduleId = `admin-${stage.moduleIndex + 1}`;
+      const legacyId = `admin-module-${stage.moduleIndex + 1}`;
+      const bestScore = attempts[`${moduleId}:summary`]?.bestScore || attempts[`${legacyId}:summary`]?.bestScore || 0;
+      
+      let adminScores = {};
+      try { adminScores = JSON.parse(localStorage.getItem("tomcodex.adminMasteryScores.v1")) || {}; } catch {}
+      const quizScore = adminScores[stage.moduleIndex]?.score || 0;
+      
+      const maxScore = Math.max(bestScore, quizScore);
+      if (maxScore >= 80) {
         isCompleted = true;
-        score = Math.max(score, scores[stage.moduleIndex].score);
+        score = maxScore;
       }
-    } catch {}
+    } else {
+      try {
+        const scores = JSON.parse(localStorage.getItem(`tomcodex.${stage.course}MasteryScores.v1`)) || {};
+        if (scores[stage.moduleIndex]?.score >= 80) {
+          isCompleted = true;
+          score = Math.max(score, scores[stage.moduleIndex].score);
+        }
+      } catch {}
 
-    try {
-      const screenshots = JSON.parse(localStorage.getItem(`tomcodex.${stage.course}MasteryScores.v1.screenshots`)) || {};
-      if (screenshots[stage.moduleIndex]?.score >= 80) {
-        isCompleted = true;
-        score = Math.max(score, screenshots[stage.moduleIndex].score);
-      }
-    } catch {}
+      try {
+        const screenshots = JSON.parse(localStorage.getItem(`tomcodex.${stage.course}MasteryScores.v1.screenshots`)) || {};
+        if (screenshots[stage.moduleIndex]?.score >= 80) {
+          isCompleted = true;
+          score = Math.max(score, screenshots[stage.moduleIndex].score);
+        }
+      } catch {}
+    }
 
     let status = "locked";
     if (isCompleted) {

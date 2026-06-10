@@ -40,21 +40,74 @@
   function saveScores() { localStorage.setItem(MASTERY_KEY, JSON.stringify(masteryScores)); }
   function scoreFor(index) { return Number(masteryScores[index]?.score) || 0; }
   function passed(index) { return scoreFor(index) >= 80; }
-  function unlocked(index) {
-    if (isAdmin) return true;
+  function getModuleState(index) {
+    if (isAdmin) {
+      return { state: "unlocked", label: "Admin access", canOpen: true };
+    }
+
+    const moduleId = `admin-${index + 1}`;
+    
+    // Check if verified
+    const attempts = loadJson("tomcodex.adminLabAttempts.v1", {});
+    const legacyId = `admin-module-${index + 1}`;
+    const bestScore = attempts[`${moduleId}:summary`]?.bestScore || attempts[`${legacyId}:summary`]?.bestScore || 0;
+    const isModuleVerified = bestScore >= 80;
+
+    if (isModuleVerified) {
+      return {
+        state: "verified",
+        label: `Verified · Score: ${bestScore}%`,
+        canOpen: true
+      };
+    }
+
+    // Check prerequisite (previous module must be verified)
+    if (index > 0) {
+      const prevModuleId = `admin-${index}`;
+      const prevModuleIdLegacy = `admin-module-${index}`;
+      const prevBestScore = attempts[`${prevModuleId}:summary`]?.bestScore || attempts[`${prevModuleIdLegacy}:summary`]?.bestScore || 0;
+      const isPrevVerified = prevBestScore >= 80;
+
+      if (!isPrevVerified) {
+        const prevModule = modules[index - 1];
+        return {
+          state: "gated",
+          label: `Locked - Complete ${prevModule.title} first`,
+          canOpen: false
+        };
+      }
+    }
+
+    // Check tier eligibility
     let authIdentity = {};
     try { authIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
-    const tier = authIdentity.tier || "free";
-    if (tier === "free" && index > 0) return false;
-    return index === 0 || passed(index - 1);
+    const currentTier = authIdentity.tier || "free";
+    const requiredTier = index === 0 ? "free" : "founder";
+
+    if (requiredTier === "founder" && currentTier !== "founder") {
+      return {
+        state: "paywall",
+        label: "Locked - Founder Access required",
+        canOpen: true
+      };
+    }
+
+    return {
+      state: "unlocked",
+      label: "Available",
+      canOpen: true
+    };
   }
+
+  function unlocked(index) {
+    const modState = getModuleState(index);
+    return modState.canOpen;
+  }
+
   function lockReason(index) {
-    if (isAdmin) return null;
-    let authIdentity = {};
-    try { authIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
-    const tier = authIdentity.tier || "free";
-    if (tier === "free" && index > 0) return "paywall";
-    if (index > 0 && !passed(index - 1)) return "gated";
+    const modState = getModuleState(index);
+    if (modState.state === "paywall") return "paywall";
+    if (modState.state === "gated") return "gated";
     return null;
   }
   function allModulesPassed() { return modules.every((_, index) => passed(index)); }
@@ -126,49 +179,40 @@
 
   function renderNav() {
     el("moduleNav").innerHTML = modules.map((module, index) => {
-      const isPassed = passed(index);
-      const reason = lockReason(index);
-      const isUnlocked = !reason;
+      const moduleState = getModuleState(index);
       
-      let status = "";
       let icon = "";
       let disabledAttr = "";
       let buttonClass = "";
       
-      if (isPassed) {
-        status = `Passed: ${scoreFor(index)}% · ${moduleHours} hrs`;
+      if (moduleState.state === "verified") {
         icon = "\u2713";
         buttonClass = "done";
-      } else if (isAdmin) {
-        status = `Admin access · ${moduleHours} hrs`;
-        icon = index + 1;
-      } else if (reason === "paywall") {
-        status = `★ Upgrade to Unlock`;
+      } else if (moduleState.state === "paywall") {
         icon = "★";
         buttonClass = "paywall-locked";
-      } else if (reason === "gated") {
-        status = `Locked: pass previous module`;
+      } else if (moduleState.state === "gated") {
         icon = "\uD83D\uDD12";
         disabledAttr = "disabled";
         buttonClass = "locked";
       } else {
-        status = `Ready to learn · ${moduleHours} hrs`;
         icon = index + 1;
+        buttonClass = "";
       }
       
       if (index === currentModule) buttonClass += " active";
       
-      return `<button type="button" data-module="${index}" ${disabledAttr} class="${buttonClass}"><span class="module-number">${icon}</span><span><strong>${module.title}</strong><span>${status}</span></span></button>`;
+      return `<button type="button" data-module="${index}" ${disabledAttr} class="${buttonClass}"><span class="module-number">${icon}</span><span><strong>${module.title}</strong><span>${moduleState.label}</span></span></button>`;
     }).join("");
 
     document.querySelectorAll("[data-module]").forEach((button) => button.addEventListener("click", () => {
       const index = Number(button.dataset.module);
-      const reason = lockReason(index);
-      if (reason === "paywall") {
+      const moduleState = getModuleState(index);
+      if (moduleState.state === "paywall") {
         showPaywall(index);
         return;
       }
-      if (reason === "gated") return;
+      if (moduleState.state === "gated") return;
       currentModule = index;
       render();
     }));
@@ -672,6 +716,32 @@
   }
 
   function render() {
+    const moduleState = getModuleState(currentModule);
+    if (moduleState.state === "paywall") {
+      showPaywall(currentModule);
+      renderNav();
+      renderProgress();
+      return;
+    }
+    if (moduleState.state === "gated") {
+      el("moduleContent").innerHTML = `
+        <div class="p-8 text-center bg-slate-100 rounded-2xl border border-slate-200 my-6">
+          <h2 class="text-xl font-bold text-slate-700">This module is locked</h2>
+          <p class="mt-2 text-slate-500 text-sm">${moduleState.label}</p>
+          <button id="backToAvailableBtn" class="mt-4 rounded-lg bg-brand-600 px-5 py-2 text-sm font-bold text-white hover:bg-brand-700 transition">
+            Go back
+          </button>
+        </div>
+      `;
+      document.getElementById("backToAvailableBtn").addEventListener("click", () => {
+        currentModule = 0;
+        render();
+      });
+      renderNav();
+      renderProgress();
+      return;
+    }
+
     const module = modules[currentModule];
     const isPassed = passed(currentModule);
     el("moduleLabel").textContent = `Module ${currentModule + 1} of ${modules.length} · ${isAdmin ? "Admin access" : `About ${moduleHours} hours`}`;
