@@ -955,7 +955,7 @@ function renderPocTracker() {
   if (progressText) progressText.textContent = `${progressPercent}%`;
 }
 
-function renderSkillPassport() {
+async function renderSkillPassport() {
   let authUser = {};
   try {
     authUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {};
@@ -1059,26 +1059,40 @@ function renderSkillPassport() {
     tierStatusEl.className = `block text-lg font-bold ${isFounder ? "text-brand-600" : "text-slate-600"}`;
   }
 
+  // --- Cert status (existing hero card) ---
   let adminScores = {};
   try { adminScores = JSON.parse(localStorage.getItem("tomcodex.adminMasteryScores.v1")) || {}; } catch {}
-  const adminCompleted = Object.values(adminScores).filter((entry) => Number(entry?.score) >= 80).length;
+
+  // Count verified admin modules from lab attempts (primary) and quiz scores (secondary)
+  const TOTAL_CERT_MODULES = 8;
+  let adminAttemptsCert = {};
+  try { adminAttemptsCert = JSON.parse(localStorage.getItem("tomcodex.adminLabAttempts.v1")) || {}; } catch {}
+  let adminVerifiedForCert = 0;
+  for (let i = 1; i <= TOTAL_CERT_MODULES; i++) {
+    const bestLab = adminAttemptsCert[`admin-${i}:summary`]?.bestScore || adminAttemptsCert[`admin-module-${i}:summary`]?.bestScore || 0;
+    const quizScore = adminScores[i - 1]?.score || 0;
+    if (bestLab >= 80 || quizScore >= 80) adminVerifiedForCert++;
+  }
 
   const certTitleEl = document.getElementById("passportCertTitle");
   const certStatusEl = document.getElementById("passportCertStatus");
   
-  if (adminCompleted >= 14) {
-    if (certTitleEl) certTitleEl.textContent = "Verified Salesforce Platform Graduate";
+  if (adminVerifiedForCert >= TOTAL_CERT_MODULES && isFounder) {
+    if (certTitleEl) certTitleEl.textContent = "✓ Verified Salesforce Admin Foundation Graduate";
     if (certStatusEl) {
       certStatusEl.className = "mt-6 w-full p-4 rounded-2xl bg-lime/20 border border-lime text-lime text-xs font-bold text-center";
-      certStatusEl.innerHTML = `★ Graduate Verified! Certificate Code: TCX-ADM-${identity.id ? identity.id.slice(0, 8).toUpperCase() : "GRAD"}`;
+      certStatusEl.innerHTML = `★ Certificate Eligible! ${adminVerifiedForCert}/${TOTAL_CERT_MODULES} modules verified`;
     }
   } else {
-    if (certTitleEl) certTitleEl.textContent = "Salesforce Platform Graduate";
+    if (certTitleEl) certTitleEl.textContent = "Salesforce Admin Foundation Graduate";
     if (certStatusEl) {
-      certStatusEl.className = "mt-6 w-full p-4 rounded-2xl bg-white/5 border border-white/10 text-slate-350 text-xs font-semibold text-center";
-      certStatusEl.textContent = `Status: Locked (${adminCompleted} of 14 Admin Modules Complete)`;
+      certStatusEl.className = "mt-6 w-full p-4 rounded-2xl bg-white/5 border border-white/10 text-slate-300 text-xs font-semibold text-center";
+      certStatusEl.textContent = `Status: Locked (${adminVerifiedForCert} of ${TOTAL_CERT_MODULES} modules verified)`;
     }
   }
+
+  // --- Certificate Eligibility Engine Card ---
+  await renderCertificateEligibilityCard();
 
   const historyList = document.getElementById("passportHistoryList");
   if (historyList) {
@@ -1117,6 +1131,152 @@ function renderSkillPassport() {
         `;
         historyList.appendChild(itemEl);
       });
+    }
+  }
+}
+
+async function renderCertificateEligibilityCard() {
+  const verifiedModulesEl = document.getElementById("certVerifiedModules");
+  const progressBarEl = document.getElementById("certProgressBar");
+  const founderStatusEl = document.getElementById("certFounderStatus");
+  const eligibilityStatusEl = document.getElementById("certEligibilityStatus");
+  const missingListEl = document.getElementById("certMissingList");
+
+  if (!eligibilityStatusEl) return;
+
+  // Set loading state
+  eligibilityStatusEl.textContent = "Checking eligibility…";
+  eligibilityStatusEl.className = "mt-2 w-full p-3 rounded-2xl text-center text-[11px] font-bold bg-slate-100 text-slate-400";
+  if (missingListEl) missingListEl.classList.add("hidden");
+
+  let result = null;
+
+  // Try backend engine first
+  try {
+    const resp = await fetch("/api/academy/certificate-eligibility", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({})
+    });
+    if (resp.ok) {
+      result = await resp.json();
+    }
+  } catch {
+    // Backend offline — fall through to local calculation
+  }
+
+  // Local fallback calculation
+  if (!result) {
+    let authUser = {};
+    try { authUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
+    const tier = authUser.tier || "free";
+    const TOTAL = 8;
+    const MIN_SCORE = 80;
+
+    let adminAttempts = {};
+    try { adminAttempts = JSON.parse(localStorage.getItem("tomcodex.adminLabAttempts.v1")) || {}; } catch {}
+    let adminScores = {};
+    try { adminScores = JSON.parse(localStorage.getItem("tomcodex.adminMasteryScores.v1")) || {}; } catch {}
+    let passport = {};
+    try { passport = JSON.parse(localStorage.getItem("tomcodex.skillPassport.v1")) || {}; } catch {}
+
+    const missingRequirements = [];
+    const verifiedSkills = [];
+    let verifiedModules = 0;
+
+    if (tier !== "founder") missingRequirements.push("Upgrade to Founder tier required.");
+
+    const skillNames = [
+      "Salesforce Platform Foundations", "Salesforce Object Modeling",
+      "Salesforce Security Foundations", "Page Layouts & App UX",
+      "Validation Rules & Data Quality", "Reports & Dashboards",
+      "Flow Automation Foundations", "Flow Automation Intermediate"
+    ];
+    const skillIds = [
+      "salesforce-platform-foundations", "salesforce-object-modeling",
+      "salesforce-security-foundations", "salesforce-app-user-experience",
+      "salesforce-data-quality-rules", "salesforce-reporting-dashboards",
+      "salesforce-flow-automation-foundations", "salesforce-flow-automation-intermediate"
+    ];
+
+    for (let i = 1; i <= TOTAL; i++) {
+      const bestLab = adminAttempts[`admin-${i}:summary`]?.bestScore || adminAttempts[`admin-module-${i}:summary`]?.bestScore || 0;
+      const quizScore = adminScores[i - 1]?.score || 0;
+      const passportSkill = passport[skillIds[i - 1]];
+      const isVerified = passportSkill?.status === "Verified";
+      const finalScore = passportSkill?.score || bestLab || 0;
+
+      if ((finalScore >= MIN_SCORE || bestLab >= MIN_SCORE || quizScore >= MIN_SCORE) && isVerified) {
+        verifiedModules++;
+        verifiedSkills.push(skillNames[i - 1]);
+      } else {
+        missingRequirements.push(`Complete Admin Module ${i} (${skillNames[i - 1]}) with ≥${MIN_SCORE}%.`);
+      }
+    }
+
+    result = {
+      eligible: missingRequirements.length === 0,
+      verifiedModules,
+      requiredModules: TOTAL,
+      minimumScore: MIN_SCORE,
+      verifiedSkills,
+      missingRequirements,
+      certificateName: "TomCodeX Academy Course Completion Certificate"
+    };
+  }
+
+  const { eligible, verifiedModules, requiredModules, missingRequirements } = result;
+  const percent = Math.round((verifiedModules / requiredModules) * 100);
+
+  // Get tier info
+  let authUser = {};
+  try { authUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
+  const isFounder = authUser.tier === "founder";
+
+  // Update verified modules counter
+  if (verifiedModulesEl) verifiedModulesEl.textContent = `${verifiedModules} / ${requiredModules}`;
+
+  // Update progress bar
+  if (progressBarEl) {
+    progressBarEl.style.width = `${percent}%`;
+    progressBarEl.className = `h-full rounded-full transition-all duration-700 ${eligible ? "bg-emerald-500" : percent >= 50 ? "bg-amber-400" : "bg-brand-500"}`;
+  }
+
+  // Update founder status
+  if (founderStatusEl) {
+    if (isFounder) {
+      founderStatusEl.textContent = "✓ Active";
+      founderStatusEl.className = "text-xs text-emerald-600";
+    } else {
+      founderStatusEl.textContent = "✗ Required";
+      founderStatusEl.className = "text-xs text-rose-500";
+    }
+  }
+
+  // Update main status badge
+  if (eligibilityStatusEl) {
+    if (eligible) {
+      eligibilityStatusEl.className = "mt-2 w-full p-3 rounded-2xl text-center text-[11px] font-bold bg-emerald-50 border border-emerald-200 text-emerald-700";
+      eligibilityStatusEl.innerHTML = `🏆 Certificate Eligible! All ${requiredModules} modules verified.`;
+    } else {
+      eligibilityStatusEl.className = "mt-2 w-full p-3 rounded-2xl text-center text-[11px] font-bold bg-amber-50 border border-amber-200 text-amber-700";
+      eligibilityStatusEl.innerHTML = `${verifiedModules}/${requiredModules} modules verified — ${requiredModules - verifiedModules} remaining`;
+    }
+  }
+
+  // Render missing requirements
+  if (missingListEl) {
+    if (!eligible && missingRequirements.length > 0) {
+      missingListEl.classList.remove("hidden");
+      missingListEl.innerHTML = `
+        <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mt-2 mb-1">Remaining Requirements</p>
+        ${missingRequirements.slice(0, 5).map(r =>
+          `<div class="flex items-start gap-1.5 text-[11px] text-rose-600 font-medium"><span class="mt-px shrink-0">✗</span><span>${r}</span></div>`
+        ).join("")}
+        ${missingRequirements.length > 5 ? `<p class="text-[10px] text-slate-400">+ ${missingRequirements.length - 5} more requirements</p>` : ""}
+      `;
+    } else {
+      missingListEl.classList.add("hidden");
     }
   }
 }

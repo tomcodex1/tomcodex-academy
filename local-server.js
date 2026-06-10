@@ -10,7 +10,7 @@ import { registerAiCodeReviewRoute } from "./server/ai-code-review-route.example
 import { registerAiInterviewRoute } from "./server/ai-interview-route.example.js";
 import { registerAiTranscriptionRoute } from "./server/ai-transcription-route.js";
 import { registerElevenLabsSpeechRoute } from "./server/elevenlabs-speech-route.js";
-import { createAcademyAiHandler, aiEngine, buildSkillPassportUpdate, moduleProgression } from "zentom-ai-core";
+import { createAcademyAiHandler, aiEngine, buildSkillPassportUpdate, moduleProgression, evaluateCertificateEligibility } from "zentom-ai-core";
 
 const app = express();
 const port = Number(process.env.PORT) || 3000;
@@ -1016,6 +1016,45 @@ app.post("/api/academy/verify-lab", async (request, response, next) => {
         reason: unlockDecision.reason
       }
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post("/api/academy/certificate-eligibility", async (request, response, next) => {
+  let userId = request.body?.userId;
+  let tier = request.body?.tier;
+
+  const session = authenticatedStudent(request);
+  if (session && !userId) {
+    userId = session.studentId;
+  }
+
+  if (!userId) {
+    return response.status(401).json({ error: "Student sign-in or userId is required." });
+  }
+
+  try {
+    const students = await loadStudents();
+    const student = students.find((candidate) => candidate.id === userId);
+    if (!student) {
+      return response.status(404).json({ error: "Student account not found." });
+    }
+
+    if (!tier) {
+      tier = student.tier || "free";
+    }
+
+    const studentAttempts = parseStudentProgress(student, ADMIN_LAB_ATTEMPTS_KEY, {});
+    const skillPassport = parseStudentProgress(student, SKILL_PASSPORT_KEY, {});
+
+    const result = evaluateCertificateEligibility({
+      studentAttempts,
+      skillPassport,
+      tier
+    });
+
+    return response.json(result);
   } catch (error) {
     next(error);
   }
