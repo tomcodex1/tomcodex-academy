@@ -343,27 +343,142 @@ const modules = [
     }
   },
   {
-    title: "Forms, Validation, and User Experience",
-    description: "Create efficient record experiences and enforce business rules without code.",
+    title: "Validation Rules and Data Quality",
+    description: "Create efficient record experiences and enforce business rules without code using Salesforce validation rules.",
     points: [
-      "Customize page layouts and Lightning record pages.",
-      "Build formula fields and validation rules.",
-      "Use Dynamic Forms, actions, and compact layouts."
+      "Explain the purpose of validation rules and data quality in Salesforce.",
+      "Create validation rules to enforce email and phone fields.",
+      "Configure enrollment status rules to restrict status transitions."
     ],
     resources: [
-      ["Lightning Experience Customization", "https://trailhead.salesforce.com/content/learn/modules/lex_customization"],
-      ["Formulas and Validations", "https://trailhead.salesforce.com/content/learn/modules/point_click_business_logic"]
+      ["Formulas and Validations Trailhead", "https://trailhead.salesforce.com/content/learn/modules/point_click_business_logic"],
+      ["Salesforce Validation Rules Help", "https://help.salesforce.com/s/articleView?id=sf.validation_rules_overview.htm&type=5"]
     ],
     practice: [
-      "Create role-specific Incident page layouts.",
-      "Build an Incident Age formula.",
-      "Prevent invalid critical incident records."
+      "Create a validation rule requiring Student Email on Student__c.",
+      "Create a validation rule for Enrollment Status on Enrollment__c.",
+      "Test validation rules with positive and negative records."
     ],
     questions: [
-      "Validation rule versus required field?",
-      "Page layout versus Lightning page?",
-      "How do you reduce user clicks?"
-    ]
+      "What is the difference between a required field and a validation rule?",
+      "How do validation rules improve data quality?",
+      "Can validation rules bypass system administrators?"
+    ],
+    richContent: {
+      moduleGoal: "Build data quality controls for your Student Success CRM using validation rules to prevent incorrect data entry.",
+      learningOutcomes: [
+        "Enforce required fields (like Email) conditionally using formulas.",
+        "Restrict invalid status changes on core CRM objects.",
+        "Understand formula functions like ISBLANK, ISPICKVAL, and AND/OR logic.",
+        "Differentiate between UI-level requirements and system-level validation."
+      ],
+      simpleExplanation: `
+        <h4 class="font-bold text-slate-800 text-sm">What is a Validation Rule?</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          A Validation Rule is a business rule defined by a formula that evaluates to <strong>True</strong> or <strong>False</strong>. If the formula evaluates to True, it means the record contains invalid data. Salesforce blocks the save operation and displays a custom error message to the user.
+        </p>
+        <h4 class="font-bold text-slate-800 text-sm mt-3">Data Quality at the Core</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          While making a field required on a Page Layout makes it mandatory on the UI, it doesn't prevent API uploads (like Data Loader) from inserting blank values. Validation Rules run at the database level, ensuring data quality across all entry channels.
+        </p>
+      `,
+      realBusinessExample: `
+        <p class="text-slate-600 text-xs leading-relaxed">
+          At <strong>TomCodeX Academy</strong>, program managers must have a valid email for every student to send notifications. We build validation rules on <strong>Student Success CRM</strong>:
+        </p>
+        <ul class="list-disc pl-5 mt-2 space-y-1 text-slate-600 text-xs">
+          <li><strong>Student Email Required</strong>: Blocks saving a student if the Email field is blank.</li>
+          <li><strong>Enrollment Status Check</strong>: Blocks setting enrollment status to completed if grade criteria aren't met.</li>
+        </ul>
+      `,
+      whereUsed: `
+        <div class="space-y-3">
+          <div>
+            <strong class="text-brand-700 text-xs block">Validation Rules Section</strong>
+            <span class="text-slate-500 text-xs">Located in Object Manager under each object's side menu. Used to create and manage rules.</span>
+          </div>
+          <div>
+            <strong class="text-brand-700 text-xs block">Formula Editor</strong>
+            <span class="text-slate-500 text-xs">The logic canvas where you construct expressions using merge fields, operators, and functions.</span>
+          </div>
+        </div>
+      `,
+      stepByStepImplementation: [
+        "Go to <strong>Object Manager → Student__c → Validation Rules</strong> and click New.",
+        "Name the rule <strong>Student_Email_Required</strong>. Set the formula to <code>ISBLANK(Email__c)</code> (or standard Email field if custom).",
+        "Set the error message: 'Student Email is required.' and position it next to the Email field.",
+        "Go to <strong>Object Manager → Enrollment__c → Validation Rules</strong> and create a rule named <strong>Enrollment_Status_Required</strong>.",
+        "Test both rules by trying to save records that violate the criteria in your app."
+      ],
+      bestPractices: [
+        "Always write clear, helpful error messages that explain exactly how to fix the problem.",
+        "Test validation rules as non-admin users to ensure they don't block normal user operations."
+      ],
+      commonMistakes: [
+        "Writing validation formulas that evaluate to True for valid records, which completely blocks users from saving.",
+        "Forgetting to handle blank values in compound logic, leading to unexpected record saves."
+      ],
+      whyMattersInJob: `
+        <p class="text-slate-600 text-xs leading-relaxed">
+          Clean data is essential for accurate reports and automation. As an administrator, you will regularly write validation rules to guard data entry, preventing downstream errors in flows, emails, and integrations.
+        </p>
+      `,
+      interviewQuestions: [
+        "Explain the difference between a validation rule and making a field required on a layout.",
+        "What happens when a validation rule formula evaluates to True?",
+        "How do you bypass a validation rule for integration users?"
+      ],
+      handsOnLab: {
+        title: "Lab 1: Configure Validation Rules",
+        instructions: `
+          <p class="text-slate-600 text-xs leading-relaxed mb-3">
+            Implement these rules in your <strong>Salesforce Developer Org</strong>, then answer the <strong>Check My Work</strong> questions below.
+          </p>
+          <ol class="list-decimal pl-5 space-y-1.5 text-slate-600 text-xs">
+            <li>Create a validation rule on <strong>Student__c</strong> to require email.</li>
+            <li>Create a validation rule on <strong>Enrollment__c</strong> to require status.</li>
+            <li>Test both rules in your custom app to verify they display custom error messages correctly.</li>
+          </ol>
+        `
+      },
+      labCriteria: [
+        {
+          id: "q1",
+          question: "What validation rule did you create to require Student Email?",
+          type: "text",
+          placeholder: "Enter validation rule name",
+          hint: "Confirm the validation rule name you created on Student__c."
+        },
+        {
+          id: "q2",
+          question: "Which object contains your Student Email validation rule?",
+          type: "text",
+          placeholder: "Enter object API name",
+          hint: "API name of the object containing the rule (e.g. Student__c)."
+        },
+        {
+          id: "q3",
+          question: "What validation rule did you create for Enrollment Status?",
+          type: "text",
+          placeholder: "Enter status validation rule name",
+          hint: "Confirm the validation rule name you created on Enrollment__c."
+        },
+        {
+          id: "q4",
+          question: "Why are validation rules important in Salesforce?",
+          type: "text",
+          placeholder: "Explain validation rules importance",
+          hint: "Explain what validation rules enforce (e.g. data quality)."
+        },
+        {
+          id: "q5",
+          question: "Name any two fields you protected using validation rules.",
+          type: "text",
+          placeholder: "Enter two fields (e.g. Email, Status)",
+          hint: "Specify fields like Email, Status, etc."
+        }
+      ]
+    }
   },
   {
     title: "Flow Automation",
