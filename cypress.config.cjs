@@ -1,6 +1,4 @@
-const { defineConfig } = require("cypress");
-
-module.exports = defineConfig({
+module.exports = {
   e2e: {
     setupNodeEvents(on, config) {
       // implement node event listeners here
@@ -18,17 +16,8 @@ module.exports = defineConfig({
     responseTimeout: 20000,
     taskTimeout: 60000,
     numTestsKeptInMemory: 5,
-    experimentalSessionAndOrigin: true,
     experimentalInteractiveRunEvents: true,
-    experimentalRunAllSpecs: true,
-    reporter: 'mochawesome',
-    reporterOptions: {
-      reportDir: 'cypress/reports',
-      quite: true,
-      overwrite: false,
-      html: false,
-      json: true
-    }
+    experimentalRunAllSpecs: true
   },
   component: {
     devServer: {
@@ -40,4 +29,4 @@ module.exports = defineConfig({
       // implement node event listeners required for component testing
     },
   },
-});
+};

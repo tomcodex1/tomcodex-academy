@@ -72,6 +72,11 @@ function showStudentTab(tabName) {
   document.querySelectorAll("[data-student-panel]").forEach((panel) => {
     panel.classList.toggle("hidden", panel.dataset.studentPanel !== tabName);
   });
+  
+  const googleSection = document.getElementById("googleAuthSection");
+  if (googleSection) {
+    googleSection.classList.toggle("hidden", tabName === "reset");
+  }
 }
 
 async function restoreExistingSession() {
@@ -140,6 +145,13 @@ function openLearnerWorkspace(student) {
 learnerAccessBtn.addEventListener("click", () => showRole("student"));
 document.querySelectorAll("[data-student-tab]").forEach((button) => button.addEventListener("click", () => showStudentTab(button.dataset.studentTab)));
 document.querySelectorAll("[data-open-student-tab]").forEach((button) => button.addEventListener("click", () => showStudentTab(button.dataset.openStudentTab)));
+
+const googleAuthBtn = document.getElementById("googleAuthBtn");
+if (googleAuthBtn) {
+  googleAuthBtn.addEventListener("click", () => {
+    window.location.href = "/api/auth/google";
+  });
+}
 
 document.getElementById("studentSignInForm").addEventListener("submit", async (event) => {
   event.preventDefault();

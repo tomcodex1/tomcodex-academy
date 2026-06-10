@@ -45,6 +45,8 @@
     button.setAttribute("aria-expanded", String(open));
     if (open) {
       contextBox.textContent = `Guiding you on: ${context()}`;
+      answer.hidden = true;
+      answer.textContent = "";
       input.focus();
     }
   }

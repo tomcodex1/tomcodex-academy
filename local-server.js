@@ -86,6 +86,10 @@ function createStudentSession(response, student) {
 }
 
 function publicStudent(student) {
+  const usage = student.usage || {
+    requestsToday: 0,
+    lastRequestDate: new Date().toISOString().split("T")[0]
+  };
   return {
     id: student.id,
     name: student.name,
@@ -93,7 +97,14 @@ function publicStudent(student) {
     role: "student",
     enrolledAt: student.createdAt,
     progress: student.progress || {},
-    reminderSettings: student.reminderSettings || { enabled: true, morning: "09:00", evening: "18:00" }
+    reminderSettings: student.reminderSettings || { enabled: true, morning: "09:00", evening: "18:00" },
+    tier: student.tier || "free",
+    personalApiKey: student.personalApiKey || "",
+    usage: {
+      requestsToday: usage.requestsToday,
+      lastRequestDate: usage.lastRequestDate,
+      dailyLimit: 50
+    }
   };
 }
 
@@ -203,7 +214,18 @@ app.post("/api/student-signup", async (request, response) => {
   if (students.some((student) => student.email === email)) return response.status(409).json({ error: "A student account already exists for this email." });
   const passwordData = await hashPassword(password);
   const createdAt = new Date().toISOString();
-  const student = { id: randomBytes(12).toString("hex"), name, email, passwordSalt: passwordData.salt, passwordHash: passwordData.hash, progress: {}, createdAt, lastLoginAt: createdAt };
+  const student = {
+    id: randomBytes(12).toString("hex"),
+    name,
+    email,
+    passwordSalt: passwordData.salt,
+    passwordHash: passwordData.hash,
+    progress: {},
+    createdAt,
+    lastLoginAt: createdAt,
+    tier: "free",
+    personalApiKey: ""
+  };
   students.push(student);
   await saveStudents(students);
   const tutorToken = readCookie(request, "tomcodexTutor");
@@ -254,6 +276,100 @@ app.post("/api/student-reset-password", async (request, response) => {
   await saveStudents(students);
   passwordResets.delete(email);
   return response.json({ message: "Password updated successfully." });
+});
+
+app.post("/api/student-upgrade", async (request, response) => {
+  const session = authenticatedStudent(request);
+  if (!session) return response.status(401).json({ error: "Student sign-in is required." });
+  const students = await loadStudents();
+  const student = students.find((candidate) => candidate.id === session.studentId);
+  if (!student) return response.status(404).json({ error: "Student account not found." });
+  student.tier = "founder";
+  await saveStudents(students);
+  return response.json({ success: true, tier: "founder" });
+});
+
+app.put("/api/student-settings", async (request, response) => {
+  const session = authenticatedStudent(request);
+  if (!session) return response.status(401).json({ error: "Student sign-in is required." });
+  const personalApiKey = String(request.body?.personalApiKey ?? "").trim();
+  const name = String(request.body?.name ?? "").trim();
+
+  const students = await loadStudents();
+  const student = students.find((candidate) => candidate.id === session.studentId);
+  if (!student) return response.status(404).json({ error: "Student account not found." });
+
+  if (personalApiKey !== undefined) student.personalApiKey = personalApiKey;
+  if (name && name.length >= 2) student.name = name;
+
+  await saveStudents(students);
+  return response.json({ success: true, student: publicStudent(student) });
+});
+
+app.post("/api/ai/evaluate-screenshot", async (request, response) => {
+  const session = authenticatedStudent(request);
+  if (!session) return response.status(401).json({ error: "Student sign-in is required." });
+  const { image, mimeType, course, module } = request.body;
+  if (!image || !mimeType) {
+    return response.status(400).json({ error: "A valid screenshot image is required." });
+  }
+  const students = await loadStudents();
+  const student = students.find((candidate) => candidate.id === session.studentId);
+  if (!student) return response.status(404).json({ error: "Student account not found." });
+
+  const apiKey = (student.personalApiKey || "").trim() || process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    return response.status(503).json({ error: "No Gemini API key is configured. Please add one in your Account Settings." });
+  }
+
+  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  const prompt = `You are a Senior Salesforce Architect evaluating a student's screenshot proof for the "${course}" course, "${module}" lab.
+  Analyze this image. Verify if it shows a correct Salesforce Setup configuration page, Object Manager layout, or schema matching the lab request.
+  Return ONLY a valid JSON object (no markdown, no backticks, no code block formatting) containing exactly these fields:
+  - score: integer from 0 to 100
+  - passed: boolean (true if score >= 80)
+  - feedback: constructive review feedback on what is visible in the image, pointing out standard Salesforce details and explaining next steps.`;
+
+  try {
+    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              { text: prompt },
+              { inlineData: { mimeType, data: image } }
+            ]
+          }
+        ],
+        generationConfig: { responseMimeType: "application/json" }
+      })
+    });
+
+    if (!geminiResponse.ok) {
+      return response.status(502).json({ error: `Gemini screenshot evaluation failed with status ${geminiResponse.status}.` });
+    }
+
+    const data = await geminiResponse.json();
+    const text = data.candidates?.[0]?.content?.parts?.map((part) => part.text).join("") || "{}";
+    
+    let result;
+    try {
+      result = JSON.parse(text);
+    } catch {
+      return response.status(502).json({ error: "Gemini returned invalid screenshot evaluation JSON." });
+    }
+
+    return response.json({
+      score: Math.max(0, Math.min(100, Number(result.score) || 0)),
+      passed: Boolean(result.passed),
+      feedback: String(result.feedback || "Review completed."),
+      source: "gemini-multimodal-api"
+    });
+  } catch (error) {
+    return response.status(502).json({ error: "Could not connect to Gemini screenshot service." });
+  }
 });
 
 app.put("/api/student-progress", async (request, response) => {
@@ -378,13 +494,182 @@ app.get("/api/auth-session", async (request, response) => {
   return response.status(401).json({ authenticated: false });
 });
 
+// Rate Limit Middleware
+async function checkAiQuota(request, response, next) {
+  const session = authenticatedStudent(request);
+  if (!session) {
+    return next();
+  }
+  
+  const students = await loadStudents();
+  const student = students.find((candidate) => candidate.id === session.studentId);
+  if (!student) return response.status(404).json({ error: "Student account not found." });
+  
+  // Tier based content gating: Free users can only access the first module of any course
+  if (student.tier !== "founder") {
+    const moduleName = String(request.body?.module || "").trim().toLowerCase();
+    if (moduleName) {
+      const ALLOWED_FREE_MODULES = [
+        "salesforce platform foundations",
+        "basics",
+        "platform foundations",
+        "flow builder foundations",
+        "apex and the salesforce runtime",
+        "lwc and web platform foundations"
+      ];
+      if (!ALLOWED_FREE_MODULES.includes(moduleName)) {
+        return response.status(403).json({
+          error: "Founder Access Required",
+          message: "This module is locked under the Free Starter tier. Please upgrade to Founder Access to unlock all modules."
+        });
+      }
+    }
+  }
+
+  if (student.personalApiKey) {
+    request.personalApiKey = student.personalApiKey;
+    return next();
+  }
+  
+  const today = new Date().toISOString().split("T")[0];
+  student.usage ||= {
+    requestsToday: 0,
+    lastRequestDate: today
+  };
+  
+  if (student.usage.lastRequestDate !== today) {
+    student.usage.requestsToday = 0;
+    student.usage.lastRequestDate = today;
+  }
+  
+  if (request.method === "POST" && student.usage.requestsToday >= 50) {
+    return response.status(429).json({
+      error: "Daily AI Limit Reached",
+      message: "You have reached your daily free AI quota (50 requests/day). Please configure your personal Gemini API Key in Settings for unlimited access, or wait until tomorrow for your quota to reset."
+    });
+  }
+  
+  if (request.method === "POST") {
+    student.usage.requestsToday++;
+    await saveStudents(students);
+  }
+  next();
+}
+
+// Google OAuth Integration
+app.get("/api/auth/google", (request, response) => {
+  const clientID = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  
+  if (clientID && clientSecret) {
+    const redirectUri = encodeURIComponent(`${request.protocol}://${request.get('host')}/api/auth/google/callback`);
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientID}&redirect_uri=${redirectUri}&response_type=code&scope=email%20profile`;
+    return response.redirect(googleAuthUrl);
+  } else {
+    return response.redirect("/google-mock-auth.html");
+  }
+});
+
+app.get("/api/auth/google/callback", async (request, response) => {
+  const mock = request.query.mock === "true";
+  let email = "";
+  let name = "";
+  
+  if (mock) {
+    email = String(request.query.email || "").trim().toLowerCase();
+    name = String(request.query.name || "").trim();
+  } else {
+    const code = request.query.code;
+    const clientID = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const redirectUri = `${request.protocol}://${request.get('host')}/api/auth/google/callback`;
+    
+    if (!code || !clientID || !clientSecret) {
+      return response.redirect("/access.html?error=Google authentication failed");
+    }
+    
+    try {
+      const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          code,
+          client_id: clientID,
+          client_secret: clientSecret,
+          redirect_uri: redirectUri,
+          grant_type: "authorization_code"
+        })
+      });
+      
+      const tokens = await tokenRes.json();
+      if (!tokens.access_token) throw new Error("No access token returned");
+      
+      const infoRes = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+        headers: { Authorization: `Bearer ${tokens.access_token}` }
+      });
+      const profile = await infoRes.json();
+      email = String(profile.email || "").trim().toLowerCase();
+      name = String(profile.name || "").trim() || email.split("@")[0];
+    } catch (error) {
+      return response.redirect("/access.html?error=Google API token exchange failed");
+    }
+  }
+  
+  if (!email) {
+    return response.redirect("/access.html?error=No email provided by Google account");
+  }
+  
+  const students = await loadStudents();
+  let student = students.find((candidate) => candidate.email === email);
+  if (!student) {
+    student = {
+      id: `std_${randomBytes(16).toString("hex")}`,
+      name: name || "Google Student",
+      email,
+      passwordHash: "",
+      passwordSalt: "",
+      createdAt: new Date().toISOString(),
+      progress: {},
+      tier: "free",
+      personalApiKey: "",
+      usage: {
+        requestsToday: 0,
+        lastRequestDate: new Date().toISOString().split("T")[0]
+      }
+    };
+    students.push(student);
+  } else {
+    student.usage ||= {
+      requestsToday: 0,
+      lastRequestDate: new Date().toISOString().split("T")[0]
+    };
+  }
+  
+  student.lastLoginAt = new Date().toISOString();
+  await saveStudents(students);
+  
+  const tutorToken = readCookie(request, "tomcodexTutor");
+  if (tutorToken) tutorSessions.delete(tutorToken);
+  
+  createStudentSession(response, student);
+  return response.redirect("/learner-dashboard");
+});
+
+app.get(["/", "/index.html"], (request, response, next) => {
+  const studentSession = authenticatedStudent(request);
+  if (studentSession) return response.redirect("/dashboard.html");
+  const tutorSession = authenticatedTutor(request);
+  if (tutorSession) return response.redirect("/tutor-dashboard.html");
+  next();
+});
+
 app.get(["/tutor-dashboard", "/tutor-dashboard.html", "/tutor-catalog"], (request, response) => {
-  if (!authenticatedTutor(request)) return response.redirect("/index.html?tutor=required");
+  if (!authenticatedTutor(request)) return response.redirect("/access.html?tutor=required");
   return response.sendFile(resolve("tutor-dashboard.html"));
 });
 
 app.get("/academy-home.html", (request, response) => {
-  if (!authenticatedStudent(request) && !authenticatedTutor(request)) return response.redirect("/index.html");
+  if (!authenticatedStudent(request) && !authenticatedTutor(request)) return response.redirect("/access.html");
   return response.sendFile(resolve("academy-home.html"));
 });
 
@@ -405,15 +690,17 @@ const protectedAcademyPages = [
 ];
 
 app.get(protectedAcademyPages.map((page) => `/${page}`), (request, response) => {
-  if (!authenticatedStudent(request) && !authenticatedTutor(request)) return response.redirect("/index.html");
+  if (!authenticatedStudent(request) && !authenticatedTutor(request)) return response.redirect("/access.html");
   return response.sendFile(resolve(request.path.slice(1)));
 });
 
 app.get(["/learner-dashboard", "/dashboard.html"], (request, response) => {
   const session = authenticatedStudent(request);
-  if (!session) return response.redirect("/index.html?student=required");
+  if (!session) return response.redirect("/access.html?student=required");
   return response.sendFile(resolve("dashboard.html"));
 });
+
+app.use(/\/api\/ai\/.*/, checkAiQuota);
 
 registerAiTrainerRoute(app);
 registerAiEvaluatorRoute(app);

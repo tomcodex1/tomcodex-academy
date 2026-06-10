@@ -1,0 +1,112 @@
+@startuml Salesforce Master Dashboard Architecture
+
+!theme plain
+skinparam monochrome true
+skinparam linetype ortho
+skinparam shadowing false
+
+title Salesforce Master Dashboard Architecture
+
+package "Frontend Components" {
+  [User Interface] as UI
+  [Authentication Module] as Auth
+  [Dashboard Controller] as Dashboard
+  [Learning Modules] as Modules
+  [AI Features] as AI
+  [Progress Tracker] as Progress
+}
+
+package "Backend Services" {
+  [Learning Service] as LS
+  [AI Service] as AIS
+  [Data Management] as DM
+}
+
+database "Data Storage" as DB
+
+UI --> Auth : Login/Registration
+Auth --> Dashboard : Authenticated User
+Dashboard --> Modules : Load Learning Content
+Dashboard --> AI : AI Interactions
+Dashboard --> Progress : Update Progress
+Modules --> LS : Request Content
+AI --> AIS : Process AI Requests
+Progress --> DM : Save Progress Data
+LS --> DB : Store/Retrieve Data
+AIS --> DB : Store/Retrieve Data
+DM --> DB : Store/Retrieve Data
+
+' Component relationships
+UI --> Dashboard : User Input
+Dashboard --> AI : User Questions
+AI --> LS : Learning Context
+LS --> DM : User Data
+DM --> Progress : Progress Data
+Progress --> UI : Visual Updates
+
+' Learning Modules breakdown
+package "Learning Modules" {
+  [Admin Foundations] as Admin
+  [Apex Development] as Apex
+  [Flow Automation] as Flow
+  [LWC Development] as LWC
+  [Integration & DevOps] as DevOps
+}
+
+Modules --> Admin : Load Content
+Modules --> Apex : Load Content
+Modules --> Flow : Load Content
+Modules --> LWC : Load Content
+Modules --> DevOps : Load Content
+
+' AI Features breakdown
+package "AI Features" {
+  [AI Tutor] as Tutor
+  [Practice Lab] as Lab
+  [Interview Prep] as Interview
+  [Code Review] as CodeReview
+}
+
+AI --> Tutor : Question Answering
+AI --> Lab : Practice Exercises
+AI --> Interview : Mock Interviews
+AI --> CodeReview : Code Evaluation
+
+note right of UI
+  Main user interface
+  including dashboard, 
+  learning modules, and 
+  AI interactions
+end note
+
+note right of Auth
+  Handles user authentication
+  and role-based access
+  control for students and tutors
+end note
+
+note right of Dashboard
+  Central controller that
+  manages UI updates and
+  coordinates between components
+end note
+
+note right of LS
+  Manages curriculum content,
+  learning paths, and
+  personalized recommendations
+end note
+
+note right of AIS
+  Processes natural language,
+  evaluates code, and provides
+  intelligent feedback
+end note
+
+note right of DM
+  Handles user profiles,
+  learning records, and
+  assessment results
+end note
+
+@enduml

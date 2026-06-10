@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="View plans and pricing for TomCodeX Academy. Choose between Free Starter and Founder Access." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://tomcodex-academy.vercel.app/pricing.html" />
+  <title>Pricing Plans | TomCodeX Academy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { brand: { 50: "#eef8ff", 100: "#d9f0ff", 500: "#087ea4", 600: "#056b8d", 700: "#075875", 950: "#062c3a" }, ink: "#172b4d", lime: "#d8ff5f" },
+        fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"] }
+      }}
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .hero-gradient {
+      background: radial-gradient(circle at 80% 20%, rgba(36, 181, 255, 0.1) 0%, transparent 40%), #062c3a;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 font-sans text-ink antialiased">
+  <!-- Top Navigation -->
+  <header class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <div class="mx-auto flex max-w-7xl items-center gap-5 px-5 py-3 lg:px-8">
+      <a href="index.html" class="flex shrink-0 items-center gap-2" aria-label="TomCodeX Academy home">
+        <img src="assets/tomcodex-logo.svg" alt="TomCodeX logo" class="h-10 w-auto">
+        <span class="border-l border-slate-300 pl-3 text-lg font-extrabold text-brand-950">TomCodeX</span>
+      </a>
+      <nav class="ml-auto hidden items-center gap-7 text-sm font-semibold text-slate-600 md:flex">
+        <a href="index.html" class="hover:text-brand-600">Home</a>
+        <a href="dashboard.html" class="hover:text-brand-600">Dashboard</a>
+      </nav>
+      <div id="navAuthGroup" class="flex items-center gap-3">
+        <a href="access.html" class="rounded-lg border border-brand-600 px-4 py-2 text-sm font-bold text-brand-700 hover:bg-brand-50">Sign In</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-gradient text-white py-14 text-center">
+      <div class="mx-auto max-w-3xl px-5">
+        <h1 class="text-4xl lg:text-5xl font-extrabold">Invest in Real Salesforce Practice</h1>
+        <p class="mt-4 text-slate-300 text-lg">Choose the tier that matches your career acceleration goals.</p>
+      </div>
+    </section>
+
+    <!-- Pricing Cards -->
+    <section class="py-16">
+      <div class="mx-auto max-w-5xl px-5">
+        <div id="statusAlert" class="hidden mb-8 p-4 rounded-xl text-sm font-bold border" role="status"></div>
+
+        <div class="grid gap-8 md:grid-cols-2">
+          <!-- Free Plan -->
+          <div class="border border-slate-200 rounded-3xl p-8 bg-white flex flex-col justify-between shadow-sm">
+            <div>
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="text-xl font-extrabold">Free Starter</h3>
+                  <p class="mt-2 text-sm text-slate-500">Perfect for exploring the platform and testing the workspace.</p>
+                </div>
+                <span id="currentFreeBadge" class="hidden bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full text-xs font-bold">Current Plan</span>
+              </div>
+              <div class="mt-6">
+                <span class="text-5xl font-extrabold">$0</span>
+                <span class="text-sm text-slate-500">/ forever</span>
+              </div>
+              <ul class="mt-8 space-y-4 text-sm text-slate-600">
+                <li class="flex items-center gap-2">✓ Module 1 of all learning programs</li>
+                <li class="flex items-center gap-2">✓ Basic AI evaluations (mock fallback)</li>
+                <li class="flex items-center gap-2">✓ Dynamic Skill Passport profile</li>
+                <li class="flex items-center gap-2">✓ Community Slack/Chat access</li>
+              </ul>
+            </div>
+            <button id="selectFreeBtn" class="mt-8 block w-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-center font-bold py-3 rounded-xl transition">
+              Select Free Starter
+            </button>
+          </div>
+
+          <!-- Founder Plan -->
+          <div class="border-2 border-brand-600 rounded-3xl p-8 bg-brand-950 text-white flex flex-col justify-between relative shadow-xl">
+            <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-brand-600 text-white px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Founder Launch Offer</span>
+            <div>
+              <div class="flex justify-between items-start">
+                <div>
+                  <h3 class="text-xl font-extrabold">Founder Access</h3>
+                  <p class="mt-2 text-sm text-slate-300">Complete, unlimited entry to all platform features and tracks.</p>
+                </div>
+                <span id="currentFounderBadge" class="hidden bg-lime/20 text-lime px-2.5 py-1 rounded-full text-xs font-bold">Current Plan</span>
+              </div>
+              <div class="mt-6">
+                <span class="text-5xl font-extrabold text-lime">$19</span>
+                <span class="text-sm text-slate-300">/ month</span>
+              </div>
+              <ul class="mt-8 space-y-4 text-sm text-slate-300">
+                <li class="flex items-center gap-2"><strong class="text-lime">✓ Unlock All Modules</strong> (Admin, Flow, Apex, LWC, Integration, AI)</li>
+                <li class="flex items-center gap-2">✓ Personal or Server-side Gemini AI assistance</li>
+                <li class="flex items-center gap-2">✓ Mock Interview Simulator with STAR coaching feedback</li>
+                <li class="flex items-center gap-2">✓ Multi-role Certification practice simulator (60 MCQs)</li>
+                <li class="flex items-center gap-2">✓ Shareable, verified Course Completion Certificate</li>
+              </ul>
+            </div>
+            <button id="upgradeFounderBtn" class="mt-8 block w-full bg-lime text-brand-950 hover:bg-white text-center font-extrabold py-3 rounded-xl transition">
+              Upgrade to Founder
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Simulated Checkout Modal -->
+    <div id="checkoutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+      <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-5 border border-slate-200 shadow-2xl">
+        <h3 class="text-2xl font-extrabold">Complete Founder Upgrade</h3>
+        <p class="mt-2 text-sm text-slate-500">Secure mock checkout. No real money will be charged.</p>
+        
+        <div class="mt-6 p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
+          <div class="flex justify-between text-sm">
+            <span>Founder Access (Monthly)</span>
+            <strong>$19.00 / mo</strong>
+          </div>
+          <div class="flex justify-between text-xs text-slate-500">
+            <span>Simulated checkout reference</span>
+            <span>#TCDX-MOCK-PAY</span>
+          </div>
+        </div>
+
+        <form id="checkoutForm" class="mt-6 space-y-4">
+          <div>
+            <label class="block text-xs font-bold uppercase text-slate-500 mb-1" for="cardNumber">Mock Card Number</label>
+            <input id="cardNumber" type="text" value="4242 4242 4242 4242" disabled class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 text-sm font-semibold">
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold uppercase text-slate-500 mb-1" for="expiry">Expiry</label>
+              <input id="expiry" type="text" value="12/28" disabled class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 text-sm font-semibold">
+            </div>
+            <div>
+              <label class="block text-xs font-bold uppercase text-slate-500 mb-1" for="cvv">CVV</label>
+              <input id="cvv" type="text" value="123" disabled class="w-full border border-slate-200 rounded-lg p-2.5 bg-slate-50 text-sm font-semibold">
+            </div>
+          </div>
+          <button type="submit" id="confirmPaymentBtn" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-lg mt-6">
+            Confirm Payment ($19.00)
+          </button>
+          <button type="button" id="closeCheckoutBtn" class="w-full border border-slate-200 hover:bg-slate-50 text-slate-600 font-semibold py-3 rounded-lg mt-2">
+            Cancel
+          </button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-brand-950 py-10 text-slate-300 mt-20">
+    <div class="mx-auto flex max-w-7xl flex-col justify-between gap-5 px-5 md:flex-row md:items-center lg:px-8">
+      <div>
+        <div class="flex items-center gap-3">
+          <img src="assets/tomcodex-logo-light.svg" alt="TomCodeX logo" class="h-10 w-auto">
+          <strong class="border-l border-white/20 pl-3 text-sm text-white">TomCodeX</strong>
+        </div>
+        <p class="mt-2 text-sm">One Org. One POC. Complete Salesforce Career Practice.</p>
+      </div>
+      <a href="dashboard.html" class="font-bold text-lime">Open student dashboard →</a>
+    </div>
+  </footer>
+
+  <script>
+    (async function () {
+      const statusAlert = document.getElementById("statusAlert");
+      const checkoutModal = document.getElementById("checkoutModal");
+      let currentUser = null;
+
+      function showAlert(type, msg) {
+        statusAlert.className = `mb-8 p-4 rounded-xl text-sm font-bold border ${
+          type === "success" ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-rose-50 border-rose-200 text-rose-800"
+        }`;
+        statusAlert.textContent = msg;
+        statusAlert.classList.remove("hidden");
+        statusAlert.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+
+      async function checkSession() {
+        try {
+          const response = await fetch("/api/auth-session");
+          if (response.ok) {
+            const result = await response.json();
+            if (result.authenticated && result.role === "student") {
+              currentUser = result.identity;
+              document.getElementById("navAuthGroup").innerHTML = `
+                <span class="text-sm font-semibold text-slate-600 mr-2">Hello, ${currentUser.name}</span>
+                <a href="dashboard.html" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-700">Open Dashboard</a>
+              `;
+              
+              if (currentUser.tier === "founder") {
+                document.getElementById("currentFounderBadge").classList.remove("hidden");
+                document.getElementById("upgradeFounderBtn").disabled = true;
+                document.getElementById("upgradeFounderBtn").textContent = "Plan Active";
+                document.getElementById("upgradeFounderBtn").className = "mt-8 block w-full bg-slate-800 text-slate-400 font-extrabold py-3 rounded-xl cursor-not-allowed";
+              } else {
+                document.getElementById("currentFreeBadge").classList.remove("hidden");
+              }
+            }
+          }
+        } catch {}
+      }
+
+      document.getElementById("selectFreeBtn").addEventListener("click", () => {
+        if (!currentUser) {
+          window.location.href = "access.html?tab=signup";
+        } else {
+          showAlert("success", "You are currently enrolled in the Free Starter plan!");
+        }
+      });
+
+      document.getElementById("upgradeFounderBtn").addEventListener("click", () => {
+        if (!currentUser) {
+          window.location.href = "access.html?tab=signup&next=pricing";
+        } else {
+          checkoutModal.classList.remove("hidden");
+        }
+      });
+
+      document.getElementById("closeCheckoutBtn").addEventListener("click", () => {
+        checkoutModal.classList.add("hidden");
+      });
+
+      document.getElementById("checkoutForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const confirmBtn = document.getElementById("confirmPaymentBtn");
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = "Processing payment...";
+
+        try {
+          const response = await fetch("/api/student-upgrade", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+          });
+          const result = await response.json();
+          if (response.ok && result.success) {
+            checkoutModal.classList.add("hidden");
+            showAlert("success", "Congratulations! Your account has been upgraded to Founder Access.");
+            
+            // Sync local storage identity if cached
+            const cachedIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1") || "{}");
+            cachedIdentity.tier = "founder";
+            localStorage.setItem("tomcodex.authIdentity.v1", JSON.stringify(cachedIdentity));
+            
+            // Reload page to reflect state
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            showAlert("error", result.error || "Simulated payment failed.");
+          }
+        } catch {
+          showAlert("error", "Cannot connect to server to process upgrade.");
+        } finally {
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = "Confirm Payment ($19.00)";
+        }
+      });
+
+      await checkSession();
+    })();
+  </script>
+</body>
+</html>

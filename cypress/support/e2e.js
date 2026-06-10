@@ -2,18 +2,18 @@
 import './commands.js'
 
 // Import and register global Cypress utilities
-import '@cypress/grep'
+// import '@cypress/grep'
 
 // Add custom commands for our application
 Cypress.Commands.add('loginAsStudent', (email, password) => {
-  cy.visit('/index.html');
+  cy.visit('/access.html');
   cy.get('#studentSignInEmail').type(email);
   cy.get('#studentSignInPassword').type(password);
   cy.get('#studentSignInForm').submit();
 });
 
 Cypress.Commands.add('loginAsTutor', (email, accessCode) => {
-  cy.visit('/index.html?tutor=required');
+  cy.visit('/access.html?tutor=required');
   cy.get('#tutorEmail').type(email);
   cy.get('#tutorAccessCode').type(accessCode);
   cy.get('#tutorLoginPanel').submit();

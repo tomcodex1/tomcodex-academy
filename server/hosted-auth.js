@@ -100,13 +100,24 @@ async function createStudent(student) {
 }
 
 function publicStudent(student) {
+  const usage = student.usage || {
+    requestsToday: 0,
+    lastRequestDate: new Date().toISOString().split("T")[0]
+  };
   return {
     id: student.id,
     name: student.name,
     email: student.email,
     role: "student",
     enrolledAt: student.createdAt,
-    progress: student.progress || {}
+    progress: student.progress || {},
+    tier: student.tier || "free",
+    personalApiKey: student.personalApiKey || "",
+    usage: {
+      requestsToday: usage.requestsToday,
+      lastRequestDate: usage.lastRequestDate,
+      dailyLimit: 50
+    }
   };
 }
 
@@ -172,6 +183,103 @@ async function sendResetEmail(email, resetCode) {
 }
 
 export function registerHostedAuthRoutes(app) {
+  app.get("/api/auth/google", (request, response) => {
+    const clientID = process.env.GOOGLE_CLIENT_ID;
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    
+    if (clientID && clientSecret) {
+      const redirectUri = encodeURIComponent(`${request.protocol}://${request.get('host')}/api/auth/google/callback`);
+      const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientID}&redirect_uri=${redirectUri}&response_type=code&scope=email%20profile`;
+      return response.redirect(googleAuthUrl);
+    } else {
+      return response.redirect("/google-mock-auth.html");
+    }
+  });
+
+  app.get("/api/auth/google/callback", async (request, response) => {
+    const mock = request.query.mock === "true";
+    let email = "";
+    let name = "";
+    
+    if (mock) {
+      email = String(request.query.email || "").trim().toLowerCase();
+      name = String(request.query.name || "").trim();
+    } else {
+      const code = request.query.code;
+      const clientID = process.env.GOOGLE_CLIENT_ID;
+      const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+      const redirectUri = `${request.protocol}://${request.get('host')}/api/auth/google/callback`;
+      
+      if (!code || !clientID || !clientSecret) {
+        return response.redirect("/access.html?error=Google authentication failed");
+      }
+      
+      try {
+        const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            code,
+            client_id: clientID,
+            client_secret: clientSecret,
+            redirect_uri: redirectUri,
+            grant_type: "authorization_code"
+          })
+        });
+        
+        const tokens = await tokenRes.json();
+        if (!tokens.access_token) throw new Error("No access token returned");
+        
+        const infoRes = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+          headers: { Authorization: `Bearer ${tokens.access_token}` }
+        });
+        const profile = await infoRes.json();
+        email = String(profile.email || "").trim().toLowerCase();
+        name = String(profile.name || "").trim() || email.split("@")[0];
+      } catch (error) {
+        return response.redirect("/access.html?error=Google API token exchange failed");
+      }
+    }
+    
+    if (!email) {
+      return response.redirect("/access.html?error=No email provided by Google account");
+    }
+    
+    try {
+      let student = await loadStudent(email);
+      if (!student) {
+        student = {
+          id: `std_${randomBytes(16).toString("hex")}`,
+          name: name || "Google Student",
+          email,
+          passwordHash: "",
+          passwordSalt: "",
+          createdAt: new Date().toISOString(),
+          progress: {},
+          tier: "free",
+          personalApiKey: "",
+          usage: {
+            requestsToday: 0,
+            lastRequestDate: new Date().toISOString().split("T")[0]
+          }
+        };
+        await saveStudent(student);
+      } else {
+        student.usage ||= {
+          requestsToday: 0,
+          lastRequestDate: new Date().toISOString().split("T")[0]
+        };
+        student.lastLoginAt = new Date().toISOString();
+        await saveStudent(student);
+      }
+      
+      createSession(response, { email: student.email, role: "student" });
+      return response.redirect("/learner-dashboard");
+    } catch (error) {
+      return response.redirect(`/access.html?error=${encodeURIComponent(error.message)}`);
+    }
+  });
+
   app.post("/api/student-signup", async (request, response) => {
     try {
       const name = String(request.body?.name || "").trim();
@@ -299,6 +407,51 @@ export function registerHostedAuthRoutes(app) {
     }
   });
 
+  app.post("/api/student-upgrade", async (request, response) => {
+    const session = requireStudent(request, response);
+    if (!session) return;
+    try {
+      if (!redisConfig()) return response.json({ success: true, tier: "founder", browserOnly: true });
+      const student = await loadStudent(session.email);
+      if (!student) return response.status(404).json({ error: "Student account not found." });
+      student.tier = "founder";
+      await saveStudent(student);
+      return response.json({ success: true, tier: "founder" });
+    } catch (error) {
+      return response.status(503).json({ error: error.message });
+    }
+  });
+
+  app.put("/api/student-settings", async (request, response) => {
+    const session = requireStudent(request, response);
+    if (!session) return;
+    try {
+      if (!redisConfig()) {
+        return response.json({
+          success: true,
+          student: {
+            name: String(request.body?.name || "").trim(),
+            personalApiKey: String(request.body?.personalApiKey || "").trim(),
+            browserOnly: true
+          }
+        });
+      }
+      const personalApiKey = String(request.body?.personalApiKey ?? "").trim();
+      const name = String(request.body?.name ?? "").trim();
+
+      const student = await loadStudent(session.email);
+      if (!student) return response.status(404).json({ error: "Student account not found." });
+
+      if (personalApiKey !== undefined) student.personalApiKey = personalApiKey;
+      if (name && name.length >= 2) student.name = name;
+
+      await saveStudent(student);
+      return response.json({ success: true, student: publicStudent(student) });
+    } catch (error) {
+      return response.status(503).json({ error: error.message });
+    }
+  });
+
   app.get("/api/tutor-students", async (request, response) => {
     if (!requireTutor(request, response)) return;
     try {
@@ -340,4 +493,70 @@ export function registerHostedAuthRoutes(app) {
     }
     return response.json({ authenticated: true, role: "tutor", identity: { email: session.email, role: "tutor", name: "Academy Tutor" } });
   });
+}
+
+export async function checkAiQuota(request, response, next) {
+  const session = readSession(request);
+  if (!session) {
+    return next();
+  }
+  
+  try {
+    const student = redisConfig() ? await loadStudent(session.email) : configuredStudent();
+    if (!student) return response.status(404).json({ error: "Student account not found." });
+    
+    // Tier based content gating: Free users can only access the first module of any course
+    if (student.tier !== "founder") {
+      const moduleName = String(request.body?.module || "").trim().toLowerCase();
+      if (moduleName) {
+        const ALLOWED_FREE_MODULES = [
+          "salesforce platform foundations",
+          "basics",
+          "platform foundations",
+          "flow builder foundations",
+          "apex and the salesforce runtime",
+          "lwc and web platform foundations"
+        ];
+        if (!ALLOWED_FREE_MODULES.includes(moduleName)) {
+          return response.status(403).json({
+            error: "Founder Access Required",
+            message: "This module is locked under the Free Starter tier. Please upgrade to Founder Access to unlock all modules."
+          });
+        }
+      }
+    }
+
+    if (student.personalApiKey) {
+      request.personalApiKey = student.personalApiKey;
+      return next();
+    }
+    
+    const today = new Date().toISOString().split("T")[0];
+    student.usage ||= {
+      requestsToday: 0,
+      lastRequestDate: today
+    };
+    
+    if (student.usage.lastRequestDate !== today) {
+      student.usage.requestsToday = 0;
+      student.usage.lastRequestDate = today;
+    }
+    
+    if (request.method === "POST" && student.usage.requestsToday >= 50) {
+      return response.status(429).json({
+        error: "Daily AI Limit Reached",
+        message: "You have reached your daily free AI quota (50 requests/day). Please configure your personal Gemini API Key in Settings for unlimited access, or wait until tomorrow for your quota to reset."
+      });
+    }
+    
+    if (request.method === "POST") {
+      student.usage.requestsToday++;
+      if (redisConfig()) {
+        await saveStudent(student);
+      }
+    }
+    next();
+  } catch (error) {
+    next();
+  }
 }

@@ -34,10 +34,11 @@ function chooseEfficientMode(doubt = "") {
 }
 
 export function registerAiTrainerRoute(app) {
-  app.get("/api/ai/status", (_request, response) => {
+  app.get("/api/ai/status", (request, response) => {
     const provider = process.env.AI_PROVIDER || "gemini";
     const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
-    const configured = provider === "gemini" && Boolean(process.env.GEMINI_API_KEY);
+    const hasPersonalKey = Boolean(request.personalApiKey);
+    const configured = (provider === "gemini" && Boolean(process.env.GEMINI_API_KEY)) || hasPersonalKey;
     response.status(configured ? 200 : 503).json({
       connected: configured,
       provider,
@@ -54,8 +55,9 @@ export function registerAiTrainerRoute(app) {
     if (provider !== "gemini") {
       return response.status(400).json({ error: `Unsupported AI provider: ${provider}` });
     }
-    if (!process.env.GEMINI_API_KEY) {
-      return response.status(503).json({ error: "Gemini API key is not configured on the backend." });
+    const apiKey = request.personalApiKey || process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return response.status(503).json({ error: "Gemini API key is not configured. Please configure a personal key or contact your administrator." });
     }
 
     const prompt = `Generate exactly ${questionCount} distinct Salesforce module mastery questions.
@@ -69,7 +71,7 @@ Requirements:
 - Questions must test understanding, not memorization alone.
 - Return only a valid JSON array of question strings.`;
 
-    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -105,8 +107,9 @@ Requirements:
     if (provider !== "gemini") {
       return response.status(400).json({ error: `Unsupported AI provider: ${provider}` });
     }
-    if (!process.env.GEMINI_API_KEY) {
-      return response.status(503).json({ error: "Gemini API key is not configured on the backend." });
+    const apiKey = request.personalApiKey || process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return response.status(503).json({ error: "Gemini API key is not configured. Please configure a personal key or contact your administrator." });
     }
 
     const prompt = `${speedPrompts[speedMode] || speedPrompts.flash}
@@ -117,7 +120,7 @@ Student doubt: ${request.body.doubt}`;
 
     let geminiResponse;
     try {
-      geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+      geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })

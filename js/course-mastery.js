@@ -40,7 +40,23 @@
   function saveScores() { localStorage.setItem(MASTERY_KEY, JSON.stringify(masteryScores)); }
   function scoreFor(index) { return Number(masteryScores[index]?.score) || 0; }
   function passed(index) { return scoreFor(index) >= 80; }
-  function unlocked(index) { return isAdmin || index === 0 || passed(index - 1); }
+  function unlocked(index) {
+    if (isAdmin) return true;
+    let authIdentity = {};
+    try { authIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
+    const tier = authIdentity.tier || "free";
+    if (tier === "free" && index > 0) return false;
+    return index === 0 || passed(index - 1);
+  }
+  function lockReason(index) {
+    if (isAdmin) return null;
+    let authIdentity = {};
+    try { authIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
+    const tier = authIdentity.tier || "free";
+    if (tier === "free" && index > 0) return "paywall";
+    if (index > 0 && !passed(index - 1)) return "gated";
+    return null;
+  }
   function allModulesPassed() { return modules.every((_, index) => passed(index)); }
   function finalExamUnlocked() { return isAdmin || allModulesPassed(); }
 
@@ -53,17 +69,106 @@
     if (!previous || result.score >= previous.score) localStorage.setItem(FINAL_EXAM_KEY, JSON.stringify(result));
   }
 
+  function showPaywall(index) {
+    const module = modules[index];
+    el("moduleContent").innerHTML = `
+      <div class="paywall-container p-8 text-center bg-brand-950 text-white rounded-2xl border border-brand-500 shadow-2xl relative overflow-hidden my-6">
+        <div class="absolute inset-0 opacity-15" style="background-image:radial-gradient(circle at 50% 50%,#24b5ff 0,transparent 60%)"></div>
+        <div class="relative z-10 max-w-xl mx-auto py-10">
+          <span class="text-xs bg-lime/20 text-lime px-3 py-1 rounded-full font-bold uppercase tracking-wider">Founder Access Required</span>
+          <h2 class="mt-6 text-3xl font-extrabold text-white">Unlock all modules in the program</h2>
+          <p class="mt-4 text-slate-300 text-sm leading-6">
+            You are currently on the <strong>Free Starter Access</strong> tier. Complete all 14 Salesforce Admin modules, get unlimited screenshot proof AI reviews, certification simulators, and verified completion credentials.
+          </p>
+          
+          <div class="mt-8 p-4 bg-white/5 rounded-xl border border-white/10 text-left text-xs space-y-2">
+            <h4 class="font-bold text-cyan-200 uppercase tracking-widest text-slate-200">Locked Module Info</h4>
+            <div class="flex justify-between">
+              <span>Module ${index + 1}: ${module.title}</span>
+              <span class="text-slate-400">Duration: ~${moduleHours} hours</span>
+            </div>
+            <p class="text-slate-400 font-medium">${module.description}</p>
+          </div>
+
+          <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="pricing.html" class="rounded-lg bg-lime px-6 py-3 font-extrabold text-brand-950 text-center hover:bg-white transition" style="box-shadow: 0 4px 14px rgba(216,255,95,.4);">
+              View Pricing plans
+            </a>
+            <button id="quickUpgradeBtn" class="rounded-lg border border-white/30 bg-white/5 px-6 py-3 font-bold text-white hover:bg-white/10 transition">
+              Quick Upgrade (Simulated)
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.getElementById("quickUpgradeBtn").addEventListener("click", async () => {
+      const btn = document.getElementById("quickUpgradeBtn");
+      btn.disabled = true;
+      btn.textContent = "Upgrading...";
+      try {
+        const res = await fetch("/api/student-upgrade", { method: "POST" });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          const cached = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1") || "{}");
+          cached.tier = "founder";
+          localStorage.setItem("tomcodex.authIdentity.v1", JSON.stringify(cached));
+          
+          currentModule = index;
+          render();
+        }
+      } catch {
+        btn.textContent = "Error upgrading";
+        btn.disabled = false;
+      }
+    });
+  }
+
   function renderNav() {
     el("moduleNav").innerHTML = modules.map((module, index) => {
       const isPassed = passed(index);
-      const isUnlocked = unlocked(index);
-      const status = isPassed ? `Passed: ${scoreFor(index)}% · ${moduleHours} hrs` : isAdmin ? `Admin access · ${moduleHours} hrs` : isUnlocked ? `Ready to learn · ${moduleHours} hrs` : "Locked: pass previous module";
-      const icon = isPassed ? "\u2713" : isUnlocked ? index + 1 : "\uD83D\uDD12";
-      return `<button type="button" data-module="${index}" ${isUnlocked ? "" : "disabled"} class="${index === currentModule ? "active" : ""} ${isPassed ? "done" : ""} ${isUnlocked ? "" : "locked"}"><span class="module-number">${icon}</span><span><strong>${module.title}</strong><span>${status}</span></span></button>`;
+      const reason = lockReason(index);
+      const isUnlocked = !reason;
+      
+      let status = "";
+      let icon = "";
+      let disabledAttr = "";
+      let buttonClass = "";
+      
+      if (isPassed) {
+        status = `Passed: ${scoreFor(index)}% · ${moduleHours} hrs`;
+        icon = "\u2713";
+        buttonClass = "done";
+      } else if (isAdmin) {
+        status = `Admin access · ${moduleHours} hrs`;
+        icon = index + 1;
+      } else if (reason === "paywall") {
+        status = `★ Upgrade to Unlock`;
+        icon = "★";
+        buttonClass = "paywall-locked";
+      } else if (reason === "gated") {
+        status = `Locked: pass previous module`;
+        icon = "\uD83D\uDD12";
+        disabledAttr = "disabled";
+        buttonClass = "locked";
+      } else {
+        status = `Ready to learn · ${moduleHours} hrs`;
+        icon = index + 1;
+      }
+      
+      if (index === currentModule) buttonClass += " active";
+      
+      return `<button type="button" data-module="${index}" ${disabledAttr} class="${buttonClass}"><span class="module-number">${icon}</span><span><strong>${module.title}</strong><span>${status}</span></span></button>`;
     }).join("");
+
     document.querySelectorAll("[data-module]").forEach((button) => button.addEventListener("click", () => {
       const index = Number(button.dataset.module);
-      if (!unlocked(index)) return;
+      const reason = lockReason(index);
+      if (reason === "paywall") {
+        showPaywall(index);
+        return;
+      }
+      if (reason === "gated") return;
       currentModule = index;
       render();
     }));
@@ -303,17 +408,113 @@
     `).join("");
   }
 
+  function loadScreenshotScores() {
+    try { return JSON.parse(localStorage.getItem(MASTERY_KEY + ".screenshots")) || {}; } catch { return {}; }
+  }
+  function saveScreenshotScore(index, result) {
+    const scores = loadScreenshotScores();
+    scores[index] = { score: result.score, passed: result.passed, feedback: result.feedback, timestamp: new Date().toISOString() };
+    localStorage.setItem(MASTERY_KEY + ".screenshots", JSON.stringify(scores));
+  }
+
+  async function evaluateScreenshot() {
+    const input = el("screenshotInput");
+    const file = input.files?.[0];
+    if (!file) {
+      alert("Please select a screenshot image file first.");
+      return;
+    }
+    const btn = el("evaluateScreenshotBtn");
+    btn.disabled = true;
+    btn.textContent = "AI is evaluating...";
+    
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const base64Data = reader.result.split(",")[1];
+      const payload = {
+        image: base64Data,
+        mimeType: file.type,
+        course: courseName,
+        module: modules[currentModule].title
+      };
+      
+      try {
+        const result = await window.TomCodexAI.evaluateScreenshot(payload);
+        saveScreenshotScore(currentModule, result);
+        renderScreenshotResult(result);
+        if (result.passed) {
+          window.TomCodexLearning?.record("task", 20, `Passed ${recordLabel} screenshot lab: ${modules[currentModule].title} (${result.score}%)`);
+        }
+      } catch (err) {
+        alert(err.message || "Failed to evaluate screenshot.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Evaluate with AI";
+      }
+    };
+    reader.onerror = () => {
+      alert("Error reading file.");
+      btn.disabled = false;
+      btn.textContent = "Evaluate with AI";
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function renderScreenshotResult(result) {
+    el("screenshotReviewContainer").classList.remove("hidden");
+    const badge = el("screenshotScoreBadge");
+    badge.textContent = `${result.score}%`;
+    badge.style.background = result.passed ? "#10b981" : "#ef4444";
+    el("screenshotReviewSummary").textContent = result.passed ? "Lab configuration verified!" : "Lab review needs improvement.";
+    el("screenshotReviewFeedback").textContent = result.feedback;
+    el("screenshotReviewBox").className = `mt-3 p-4 rounded-xl border flex gap-4 items-start ${result.passed ? "bg-emerald-50 border-emerald-200 text-emerald-800" : "bg-rose-50 border-rose-200 text-rose-800"}`;
+  }
+
   function render() {
     const module = modules[currentModule];
     const isPassed = passed(currentModule);
     el("moduleLabel").textContent = `Module ${currentModule + 1} of ${modules.length} · ${isAdmin ? "Admin access" : `About ${moduleHours} hours`}`;
     el("moduleTitle").textContent = module.title;
     el("moduleDescription").textContent = module.description;
-    el("lessonPoints").innerHTML = module.points.map((item) => `<div>${item}</div>`).join("");
-    renderTopicCoverage(module);
-    el("resourceList").innerHTML = module.resources.map(([name, url]) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${name}<span>\u2197</span></a>`).join("");
-    el("practiceList").innerHTML = module.practice.map((item) => `<div>${item}</div>`).join("");
-    el("questionList").innerHTML = module.questions.map((item) => `<div>${item}</div>`).join("");
+
+    const hasRich = Boolean(module.richContent);
+    const richPanel = el("richModuleContent");
+    const defaultPanel = el("defaultModuleContent");
+
+    if (richPanel && defaultPanel) {
+      richPanel.classList.toggle("hidden", !hasRich);
+      defaultPanel.classList.toggle("hidden", hasRich);
+    }
+
+    if (hasRich) {
+      el("richGoal").textContent = module.richContent.moduleGoal;
+      el("richOutcomes").innerHTML = module.richContent.learningOutcomes.map((out) => `<li>${out}</li>`).join("");
+      el("richExplanation").innerHTML = module.richContent.simpleExplanation;
+      el("richBusiness").innerHTML = module.richContent.realBusinessExample;
+      el("richWhereUsed").innerHTML = module.richContent.whereUsed;
+      el("richStepByStep").innerHTML = module.richContent.stepByStepImplementation.map((step) => `<li>${step}</li>`).join("");
+      el("richBestPractices").innerHTML = module.richContent.bestPractices.map((bp) => `<li>${bp}</li>`).join("");
+      el("richCommonMistakes").innerHTML = module.richContent.commonMistakes.map((cm) => `<li>${cm}</li>`).join("");
+      el("richWhyMatters").innerHTML = module.richContent.whyMattersInJob;
+      el("richInterview").innerHTML = module.richContent.interviewQuestions.map((q) => `<li>${q}</li>`).join("");
+      el("richLabDescription").innerHTML = module.richContent.handsOnLab.instructions;
+      
+      const screenshotScores = loadScreenshotScores();
+      const labScore = screenshotScores[currentModule];
+      if (labScore) {
+        renderScreenshotResult(labScore);
+      } else {
+        el("screenshotReviewContainer").classList.add("hidden");
+        el("screenshotInput").value = "";
+      }
+    } else {
+      el("lessonPoints").innerHTML = module.points.map((item) => `<div>${item}</div>`).join("");
+      renderTopicCoverage(module);
+      el("resourceList").innerHTML = module.resources.map(([name, url]) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${name}<span>\u2197</span></a>`).join("");
+      el("practiceList").innerHTML = module.practice.map((item) => `<div>${item}</div>`).join("");
+      el("questionList").innerHTML = module.questions.map((item) => `<div>${item}</div>`).join("");
+    }
+
     el("completeModuleBtn").textContent = isPassed ? `Mastery passed: ${scoreFor(currentModule)}%` : "AI mastery test required";
     el("completeModuleBtn").classList.toggle("done", isPassed);
     el("startMasteryTestBtn").textContent = isPassed ? "Retake AI mastery test" : "Start AI mastery test";
@@ -386,6 +587,8 @@
 
   el("completeModuleBtn").addEventListener("click", startTest);
   el("startMasteryTestBtn").addEventListener("click", startTest);
+  el("startMasteryTestBtnRich")?.addEventListener("click", startTest);
+  el("evaluateScreenshotBtn")?.addEventListener("click", evaluateScreenshot);
   el("submitMasteryTestBtn").addEventListener("click", submitTest);
   el("previousModuleBtn").addEventListener("click", () => { if (currentModule > 0) { currentModule -= 1; render(); } });
   el("nextModuleBtn").addEventListener("click", () => {

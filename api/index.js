@@ -6,7 +6,7 @@ import { registerAiCodeReviewRoute } from "../server/ai-code-review-route.exampl
 import { registerAiInterviewRoute } from "../server/ai-interview-route.example.js";
 import { registerAiTranscriptionRoute } from "../server/ai-transcription-route.js";
 import { registerElevenLabsSpeechRoute } from "../server/elevenlabs-speech-route.js";
-import { registerHostedAuthRoutes } from "../server/hosted-auth.js";
+import { registerHostedAuthRoutes, checkAiQuota } from "../server/hosted-auth.js";
 
 const app = express();
 
@@ -21,6 +21,8 @@ app.use((_request, response, next) => {
   next();
 });
 app.use(express.json({ limit: "15mb" }));
+
+app.use(/\/api\/ai\/.*/, checkAiQuota);
 registerAiTrainerRoute(app);
 registerAiEvaluatorRoute(app);
 registerAiCodeReviewRoute(app);

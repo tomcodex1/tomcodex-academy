@@ -606,3 +606,16 @@
     min-width: 0;
   }
 }
+
+.module-nav button.paywall-locked {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  opacity: 0.9;
+}
+.module-nav button.paywall-locked .module-number {
+  background: #f59e0b;
+}
+.module-nav button.paywall-locked:hover {
+  background: #fef3c7;
+  border-color: #d97706;
+}

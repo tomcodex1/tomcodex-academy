@@ -24,15 +24,33 @@
   };
   const learnItems = [
     ["course-admin.html", "Salesforce Admin", "Administration, security, data, and reporting"],
+    ["course-flow.html", "Flow Automation", "Low-code automation and delivery"],
     ["course-apex.html", "Apex Development", "Code, triggers, testing, and integrations"],
-    ["course-flow.html", "Salesforce Flow", "Low-code automation and delivery"],
-    ["course-lwc.html", "Lightning Web Components", "Modern Salesforce user interfaces"]
+    ["course-lwc.html", "Lightning Web Components", "Modern Salesforce user interfaces"],
+    ["#", "Salesforce Integration", "REST APIs, Named Credentials, OAuth (Coming Soon)"],
+    ["#", "Agentforce and AI", "Agents, Topics, Prompt engineering (Coming Soon)"],
+    ["#", "Final POC Project", "Build the Student Success CRM project (Coming Soon)"]
   ];
   const studentGroups = [
     { label: "Learn", items: learnItems },
-    { label: "AI Tools", items: [["personalized-paths.html", "My Learning Path", "Adaptive milestones and skill gaps"], ["interview.html", "AI Interviewer", "Technical and behavioral practice"], ["code-review-ai.html", "Code Review AI", "Review Salesforce implementations"]] },
-    { label: "Community", items: [["study-groups.html", "Study Groups", "Learn with focused groups"], ["discussion-forums.html", "Discussion Forums", "Ask questions and share knowledge"], ["peer-review.html", "Peer Review", "Get feedback from other learners"]] },
-    { label: "Progress", items: [["analytics.html", "Learning Analytics", "Activity, growth, and interview trends"], ["analytics-enhanced.html", "Skill Insights", "Detailed progress and recommendations"], ["gamification-dashboard.html", "Achievements", "Points, streaks, and badges"]] }
+    { label: "AI Lab", items: [
+      ["dashboard.html?tab=trainer", "AI Learning Mentor", "Explain doubts and concepts"],
+      ["course-admin.html", "Screenshot Practice Review", "Upload screenshots for AI review"],
+      ["course-admin.html", "AI Mastery Test", "15-question module evaluation"],
+      ["interview.html", "AI Interviewer", "Technical and behavioral mock interviews"],
+      ["code-review-ai.html", "Code Review AI", "Review Apex/LWC code and flows"],
+      ["#", "Resume Project Generator", "Generate project resume points (Coming Soon)"]
+    ] },
+    { label: "Certification Prep", items: [
+      ["#", "Salesforce Administrator", "60 MCQ simulator (Coming Soon)"],
+      ["#", "Platform App Builder", "Certification simulator (Coming Soon)"],
+      ["#", "Roadmap & Plan", "Certification schedule (Coming Soon)"]
+    ] },
+    { label: "Progress", items: [
+      ["analytics.html", "Learning Analytics", "Consistency heatmap & metrics"],
+      ["dashboard.html?tab=roadmap", "Skill Passport", "Verified credentials and passport portfolio"],
+      ["gamification-dashboard.html", "Achievements", "Streaks, badges, and leaderboards"]
+    ] }
   ];
   const tutorGroups = [
     { label: "Curriculum", items: learnItems },
@@ -51,7 +69,7 @@
   const isStudent = role === "student";
   const isTutor = role === "tutor";
   const homeHref = role ? "academy-home.html" : "index.html";
-  const dashboardHref = isStudent ? "/learner-dashboard" : isTutor ? "tutor-dashboard.html" : "index.html?next=dashboard";
+  const dashboardHref = isStudent ? "/learner-dashboard" : isTutor ? "tutor-dashboard.html" : "access.html?next=dashboard";
   const dashboardLabel = isStudent ? "Student Dashboard" : isTutor ? "Tutor Dashboard" : "Sign in to Dashboard";
   const groups = isTutor ? tutorGroups : studentGroups;
   const accountName = isStudent ? authIdentity.name || "Student" : isTutor ? String(authIdentity.email || authSession.identifier || "Tutor").split("@")[0] : "";
@@ -65,9 +83,9 @@
   header.className = "site-header";
   header.innerHTML = `
     <div class="site-header-main">
-      <a class="site-brand" href="${homeHref}" aria-label="TomCodex AI Academy home">
+      <a class="site-brand" href="${homeHref}" aria-label="TomCodeX AI Academy home">
         <img src="assets/tomcodex-logo.svg" alt="Tom Codex">
-        <span><strong>AI Academy</strong><small>${pageLabel}</small></span>
+        <span><strong>TomCodeX</strong><small>${pageLabel}</small></span>
       </a>
       <button class="site-menu-toggle" type="button" aria-expanded="false" aria-controls="siteNavigation">
         <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span><b>Menu</b>
@@ -86,10 +104,13 @@
           <details class="site-nav-group site-account-group">
             <summary class="site-login-link">${accountLabel}<span aria-hidden="true">&#9662;</span></summary>
             <div class="site-nav-menu site-account-menu">
-              <a href="${dashboardHref}"><strong>Open ${isTutor ? "tutor" : "student"} dashboard</strong><small>${accountDetail}</small></a>
-              <button id="siteLogoutBtn" type="button">Sign out</button>
+              ${isStudent ? `<div class="site-nav-plan-badge" style="padding: .65rem; border-bottom: 1px solid #e2e8f0; font-size: .7rem; font-weight: 850; color: #526276; text-transform: uppercase; letter-spacing: .05em;">Plan: ${authIdentity.tier === 'founder' ? '<span style="color:#087ea4">★ Founder Access</span>' : '<span style="color:#64748b">Free Starter</span>'}</div>` : ''}
+              ${isStudent && authIdentity.tier !== 'founder' ? `<a href="pricing.html" style="background: linear-gradient(135deg, #d8ff5f, #a6ff00); color: #062c3a; text-align: center; font-weight: 800; border-radius: .4rem; padding: .5rem; margin: .5rem; display: block; box-shadow: 0 4px 12px rgba(166,255,0,.3);">Upgrade to Founder</a>` : ''}
+              <a href="${dashboardHref}"><strong>Open dashboard</strong><small>${accountDetail}</small></a>
+              ${isStudent ? `<a href="dashboard.html?tab=settings"><strong>Account Settings</strong><small>API Keys & Profile</small></a>` : ''}
+              <button id="siteLogoutBtn" type="button" style="margin-top: .5rem;">Sign out</button>
             </div>
-          </details>` : `<a class="site-login-link" href="index.html">${accountLabel}</a>`}
+          </details>` : `<a class="site-login-link" href="access.html">${accountLabel}</a>`}
       </nav>
     </div>
   `;

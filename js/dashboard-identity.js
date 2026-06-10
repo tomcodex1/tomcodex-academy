@@ -45,8 +45,23 @@
       const response = await fetch("/api/student-progress");
       if (!response.ok) throw new Error("Student session unavailable");
       const result = await response.json();
-      const identity = { id: result.student.id, name: result.student.name, email: result.student.email, role: "student", enrolledAt: result.student.enrolledAt };
+      const identity = {
+        id: result.student.id,
+        name: result.student.name,
+        email: result.student.email,
+        role: "student",
+        enrolledAt: result.student.enrolledAt,
+        tier: result.student.tier || "free",
+        personalApiKey: result.student.personalApiKey || "",
+        usage: result.student.usage || { requestsToday: 0, dailyLimit: 50 }
+      };
       localStorage.setItem(IDENTITY_KEY, JSON.stringify(identity));
+      
+      // Restore all progress fields to localStorage
+      Object.entries(result.progress || {}).forEach(([key, value]) => {
+        localStorage.setItem(key, value);
+      });
+
       render(identity);
     } catch {
       if (cached.role !== "student") card.hidden = true;

@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Sign in to the TomCodex AI Academy learner workspace or access the restricted tutor curriculum catalog." />
+  <meta name="description" content="TomCodeX Academy is a reading-first, hands-on Salesforce learning platform. Build one continuous Salesforce POC project in your Developer Org step-by-step." />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://tomcodex-academy.vercel.app/" />
-  <title>Login | TomCodex AI Academy</title>
+  <title>TomCodeX Academy | Salesforce Career Learning</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -20,102 +20,281 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/auth.css" />
-  <link rel="stylesheet" href="css/floating-guide.css" />
-  <link rel="stylesheet" href="css/floating-guide-auto.css" />
+  <style>
+    /* Premium visual enhancements */
+    .hero-gradient {
+      background: radial-gradient(circle at 80% 20%, rgba(36, 181, 255, 0.15) 0%, transparent 40%),
+                  radial-gradient(circle at 10% 80%, rgba(216, 255, 95, 0.08) 0%, transparent 30%),
+                  #062c3a;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .hover-lime:hover {
+      box-shadow: 0 0 20px rgba(216, 255, 95, 0.4);
+    }
+  </style>
 </head>
 <body class="bg-slate-50 font-sans text-ink antialiased">
-  <main class="auth-shell">
-    <section class="auth-brand-panel">
-      <a href="index.html" aria-label="Return to TomCodex Academy home"><img src="assets/tomcodex-logo-light.svg" alt="Tom Codex" class="h-20 w-auto"></a>
-      <div class="relative z-10 max-w-xl">
-        <span class="auth-eyebrow">Your personal AI academy</span>
-        <h1>Learn Salesforce your way, every day.</h1>
-        <p>Create a secure student account for AI-personalized lessons, Trailhead practice, workplace projects, certifications, and lifelong Salesforce growth.</p>
-        <div class="auth-benefits">
-          <div><strong>24/7</strong><span>AI tutor support</span></div>
-          <div><strong>Instant</strong><span>Feedback and correction</span></div>
-          <div><strong>Adaptive</strong><span>Daily learning plan</span></div>
+  <!-- Top Navigation -->
+  <header class="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <div class="mx-auto flex max-w-7xl items-center gap-5 px-5 py-3 lg:px-8">
+      <a href="index.html" class="flex shrink-0 items-center gap-2" aria-label="TomCodeX Academy home">
+        <img src="assets/tomcodex-logo.svg" alt="TomCodeX logo" class="h-10 w-auto">
+        <span class="border-l border-slate-300 pl-3 text-lg font-extrabold text-brand-950">TomCodeX</span>
+      </a>
+      <nav class="ml-auto hidden items-center gap-7 text-sm font-semibold text-slate-600 md:flex">
+        <a href="#promise" class="hover:text-brand-600">The Promise</a>
+        <a href="#curriculum" class="hover:text-brand-600">Curriculum</a>
+        <a href="#pricing" class="hover:text-brand-600">Pricing</a>
+      </nav>
+      <div class="flex items-center gap-3">
+        <a href="access.html" class="rounded-lg border border-brand-600 px-4 py-2 text-sm font-bold text-brand-700 hover:bg-brand-50">Sign In</a>
+        <a href="access.html?tab=signup" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-bold text-white hover:bg-brand-700">Get Started Free</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-gradient text-white py-20 lg:py-32 relative overflow-hidden">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8 grid gap-12 lg:grid-cols-[1.2fr_.8fr] items-center relative z-10">
+        <div>
+          <div class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-bold text-cyan-200">
+            <span class="h-2 w-2 rounded-full bg-lime"></span>One Org. One POC. Complete Practice.
+          </div>
+          <h1 class="mt-6 text-5xl lg:text-7xl font-extrabold leading-tight tracking-tight">
+            Students do not just learn Salesforce.<br>
+            <span class="text-lime">They build Salesforce.</span>
+          </h1>
+          <p class="mt-6 text-lg lg:text-xl leading-8 text-slate-300 max-w-2xl">
+            TomCodeX Academy is a reading-first, hands-on learning platform. Provision a fresh Salesforce Developer Org and build one continuous Enterprise project step by step: the <strong>Student Success CRM with Agentforce AI Assistant</strong>.
+          </p>
+          <div class="mt-10 flex flex-col sm:flex-row gap-4">
+            <a href="access.html?tab=signup" class="rounded-lg bg-lime px-8 py-4 text-center font-extrabold text-brand-950 transition hover:bg-white hover-lime">
+              Start Free Starter Access
+            </a>
+            <a href="#pricing" class="rounded-lg border border-white/30 bg-white/5 px-8 py-4 text-center font-bold text-white hover:bg-white/10">
+              View Pricing plans
+            </a>
+          </div>
+          <div class="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm font-medium text-slate-300">
+            <span>✓ Read. Build. Prove. Explain.</span>
+            <span>✓ Per-User Gemini API Quotas</span>
+            <span>✓ Verified Student Passport Portfolio</span>
+          </div>
+        </div>
+
+        <!-- Visual POC Showcase -->
+        <div class="glass-card rounded-3xl p-6 shadow-2xl">
+          <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+            <h3 class="font-bold text-sm text-cyan-200 uppercase tracking-widest">Active POC CRM Project</h3>
+            <span class="text-xs bg-lime/20 text-lime px-2.5 py-1 rounded-full font-bold">In Progress</span>
+          </div>
+          <div class="space-y-4">
+            <div class="flex items-center justify-between text-sm">
+              <span>Student Success CRM</span>
+              <strong class="text-lime">Stage 1 Complete</strong>
+            </div>
+            <div class="h-2.5 bg-white/10 rounded-full overflow-hidden">
+              <div class="h-full bg-lime rounded-full" style="width: 14%"></div>
+            </div>
+            
+            <div class="mt-6 space-y-3">
+              <div class="flex items-center gap-3 text-xs bg-white/5 p-3 rounded-lg border border-white/5">
+                <span class="h-5 w-5 rounded-full bg-lime text-brand-950 flex items-center justify-center font-bold">1</span>
+                <div>
+                  <h4 class="font-bold">Module 1: Platform Foundations</h4>
+                  <p class="text-slate-400">Created Developer Org & Student Custom Object.</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3 text-xs bg-white/5 p-3 rounded-lg opacity-60">
+                <span class="h-5 w-5 rounded-full bg-white/10 text-white flex items-center justify-center font-bold">2</span>
+                <div>
+                  <h4 class="font-bold">Module 2: Data Modeling</h4>
+                  <p class="text-slate-400">Master-Detail relationship to Course Enrollments.</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <p class="relative z-10 text-xs text-slate-400">AI-powered learning with verified tutor-managed curriculum.</p>
     </section>
 
-    <section class="auth-form-panel">
-      <div class="auth-card">
-        <div class="mb-6 flex items-start justify-between gap-4">
+    <!-- The Promise (Read, Build, Prove, Explain) -->
+    <section id="promise" class="py-20 bg-white">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div class="mx-auto max-w-3xl text-center">
+          <h2 class="text-sm font-bold uppercase tracking-widest text-brand-600">The TomCodeX Method</h2>
+          <p class="mt-3 text-3xl lg:text-4xl font-extrabold tracking-tight">Four pillars of real Salesforce mastery.</p>
+        </div>
+        <div class="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div class="p-6 bg-slate-50 border border-slate-200 rounded-2xl">
+            <div class="text-brand-600 font-extrabold text-2xl mb-3">01. Read</div>
+            <h3 class="font-bold text-lg">Detailed Guides</h3>
+            <p class="mt-2 text-sm text-slate-500">Read focused, clear, text-first explanations of platform behavior without video fluff.</p>
+          </div>
+          <div class="p-6 bg-slate-50 border border-slate-200 rounded-2xl">
+            <div class="text-brand-600 font-extrabold text-2xl mb-3">02. Build</div>
+            <h3 class="font-bold text-lg">One Real Org</h3>
+            <p class="mt-2 text-sm text-slate-500">Build one continuous, enterprise-grade project inside your own Developer Org step by step.</p>
+          </div>
+          <div class="p-6 bg-slate-50 border border-slate-200 rounded-2xl">
+            <div class="text-brand-600 font-extrabold text-2xl mb-3">03. Prove</div>
+            <h3 class="font-bold text-lg">Screenshot Proof</h3>
+            <p class="mt-2 text-sm text-slate-500">Upload screenshot proof of your Salesforce setup. Our AI evaluates it and gives you a grade.</p>
+          </div>
+          <div class="p-6 bg-slate-50 border border-slate-200 rounded-2xl">
+            <div class="text-brand-600 font-extrabold text-2xl mb-3">04. Explain</div>
+            <h3 class="font-bold text-lg">AI Mock Interviews</h3>
+            <p class="mt-2 text-sm text-slate-500">Practice explaining what you built to our simulated AI technical interviewer with STAR method grading.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Curriculum Section -->
+    <section id="curriculum" class="py-20 bg-slate-100 border-t border-b border-slate-200">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between gap-4 md:items-end mb-12">
           <div>
-            <p class="text-xs font-bold uppercase tracking-widest text-brand-600">Academy access</p>
-            <h2 class="mt-2 text-3xl font-extrabold">Choose your experience</h2>
-            <p class="mt-2 text-sm leading-6 text-slate-500">Sign in to open your private learner dashboard, or choose restricted tutor access.</p>
+            <h2 class="text-sm font-bold uppercase tracking-widest text-brand-600">The Learning Roadmap</h2>
+            <p class="mt-2 text-3xl font-extrabold">Complete Salesforce Career Roadmap</p>
           </div>
-          <a href="index.html" class="rounded-full border border-slate-200 px-3 py-2 text-xs font-bold text-slate-500 hover:bg-slate-50">Home</a>
+          <a href="access.html" class="rounded-lg border border-brand-600 px-5 py-2.5 text-sm font-bold text-brand-700 hover:bg-brand-50">Explore Full Path</a>
         </div>
-
-        <div class="access-trust-bar">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.9 8.2 7 10 4.1-1.8 7-5.4 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/></svg>
-          <div><strong>Secure role-based access</strong><span>Students use personal accounts. Curriculum management requires tutor verification.</span></div>
-        </div>
-
-        <div class="access-options role-toggle" role="tablist" aria-label="Choose account type">
-          <button id="learnerAccessBtn" class="access-option access-option-primary active" type="button" role="tab" aria-selected="true" aria-controls="learnerAuthPanel">
-            <span class="access-option-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8ZM5 21v-2a7 7 0 0 1 14 0v2"/><path d="m16.5 7.5 1.3 1.3 2.7-3"/></svg></span>
-            <span class="access-option-copy"><span class="access-option-topline"><strong>Student account access</strong><em>Recommended</em></span><span>Sign in or create an account to access your learning plan, practice, progress, and interview preparation.</span><small>Sign in or create account <b>→</b></small></span>
-          </button>
-          <button id="tutorLoginBtn" class="access-option" type="button" role="tab" aria-selected="false" aria-controls="tutorLoginPanel">
-            <span class="access-option-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM8 9h8M8 13h5M8 17h8"/><path d="M16 13h4"/></svg></span>
-            <span class="access-option-copy"><span class="access-option-topline"><strong>Tutor curriculum access</strong><em>Restricted</em></span><span>Authorized tutors can review complete learning programs, module coverage, pathways, and course outcomes.</span><small>Sign in as tutor <b>→</b></small></span>
-          </button>
-        </div>
-
-        <section id="learnerAuthPanel" class="student-auth-panel" aria-label="Student account access">
-          <div class="auth-tabs" role="tablist" aria-label="Student account options">
-            <button class="auth-tab active" type="button" role="tab" aria-selected="true" data-student-tab="signin">Sign in</button>
-            <button class="auth-tab" type="button" role="tab" aria-selected="false" data-student-tab="signup">Create account</button>
-            <button class="auth-tab" type="button" role="tab" aria-selected="false" data-student-tab="reset">Reset password</button>
-          </div>
-          <form id="studentSignInForm" class="student-auth-form" data-student-panel="signin">
-            <label for="studentSignInEmail">Email address</label><input id="studentSignInEmail" type="email" autocomplete="username" required>
-            <label for="studentSignInPassword">Password</label><input id="studentSignInPassword" type="password" autocomplete="current-password" required>
-            <button class="auth-primary-button" type="submit">Sign in to learner workspace</button>
-            <button class="auth-text-button" type="button" data-open-student-tab="reset">Forgot your password?</button>
-          </form>
-          <form id="studentSignUpForm" class="student-auth-form hidden" data-student-panel="signup">
-            <label for="studentName">Full name</label><input id="studentName" type="text" autocomplete="name" minlength="2" required>
-            <label for="studentSignUpEmail">Email address</label><input id="studentSignUpEmail" type="email" autocomplete="email" required>
-            <label for="studentSignUpPassword">Create password</label><input id="studentSignUpPassword" type="password" autocomplete="new-password" minlength="8" required>
-            <p class="field-help">Use at least 8 characters with uppercase, lowercase, and a number.</p>
-            <button class="auth-primary-button" type="submit">Create student account</button>
-          </form>
-          <form id="studentResetForm" class="student-auth-form hidden" data-student-panel="reset">
-            <label for="studentResetEmail">Account email</label><input id="studentResetEmail" type="email" autocomplete="email" required>
-            <button id="requestResetBtn" class="auth-secondary-button" type="button">Request reset code</button>
-            <div id="resetCodeFields" class="hidden">
-              <label for="studentResetCode">Reset code</label><input id="studentResetCode" type="text" inputmode="numeric" autocomplete="one-time-code" required>
-              <label for="studentNewPassword">New password</label><input id="studentNewPassword" type="password" autocomplete="new-password" minlength="8" required>
-              <button class="auth-primary-button" type="submit">Set new password</button>
+        
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <!-- Course Card -->
+          <article class="bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
+            <div class="p-6">
+              <span class="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full">Course 1</span>
+              <h3 class="mt-3 text-xl font-extrabold">Salesforce Admin</h3>
+              <p class="mt-2 text-sm text-slate-500">Learn configuration, security, organization sharing defaults, permissions, and objects.</p>
+              <div class="mt-4 text-xs font-semibold text-slate-400">14 Modules · Hands-on Labs</div>
             </div>
-          </form>
-        </section>
+          </article>
+          <!-- Course Card -->
+          <article class="bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
+            <div class="p-6">
+              <span class="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full">Course 2</span>
+              <h3 class="mt-3 text-xl font-extrabold">Flow Automation</h3>
+              <p class="mt-2 text-sm text-slate-500">Master record-triggered flows, screen flows, decisions, subflows, and exception handling.</p>
+              <div class="mt-4 text-xs font-semibold text-slate-400">12 Modules · Hands-on Labs</div>
+            </div>
+          </article>
+          <!-- Course Card -->
+          <article class="bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
+            <div class="p-6">
+              <span class="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full">Course 3</span>
+              <h3 class="mt-3 text-xl font-extrabold">Apex Development</h3>
+              <p class="mt-2 text-sm text-slate-500">Write server logic, triggers, asynchronous queues, SOQL/SOSL queries, and test coverage suites.</p>
+              <div class="mt-4 text-xs font-semibold text-slate-400">12 Modules · Hands-on Labs</div>
+            </div>
+          </article>
+          <!-- Course Card -->
+          <article class="bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
+            <div class="p-6">
+              <span class="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full">Course 4</span>
+              <h3 class="mt-3 text-xl font-extrabold">Lightning Web Components</h3>
+              <p class="mt-2 text-sm text-slate-500">Build modern responsive Salesforce interfaces using custom web components and Apex connections.</p>
+              <div class="mt-4 text-xs font-semibold text-slate-400">12 Modules · Hands-on Labs</div>
+            </div>
+          </article>
+          <!-- Course Card -->
+          <article class="bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
+            <div class="p-6">
+              <span class="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full">Course 5</span>
+              <h3 class="mt-3 text-xl font-extrabold">Salesforce Integration</h3>
+              <p class="mt-2 text-sm text-slate-500">Connect to REST APIs, set up Named Credentials, authorize using OAuth, and handle callouts.</p>
+              <div class="mt-4 text-xs font-semibold text-slate-400">8 Modules · Hands-on Labs</div>
+            </div>
+          </article>
+          <!-- Course Card -->
+          <article class="bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
+            <div class="p-6">
+              <span class="text-xs font-bold uppercase tracking-wider text-brand-600 bg-brand-50 px-2.5 py-1 rounded-full">Course 6</span>
+              <h3 class="mt-3 text-xl font-extrabold">Agentforce and AI</h3>
+              <p class="mt-2 text-sm text-slate-500">Configure Agents, create topics, define actions, verify prompts, and audit AI outputs.</p>
+              <div class="mt-4 text-xs font-semibold text-slate-400">6 Modules · Capstone Integration</div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
 
-        <form id="tutorLoginPanel" class="tutor-login-panel hidden" autocomplete="on">
-          <div class="tutor-login-heading"><div><span class="course-tag">Tutor verification</span><h3>Sign in to curriculum catalog</h3></div></div>
-          <label for="tutorEmail">Tutor email</label>
-          <input id="tutorEmail" name="email" type="email" autocomplete="username" placeholder="tutor@academy.com" required>
-          <label for="tutorAccessCode">Access code</label>
-          <input id="tutorAccessCode" name="accessCode" type="password" autocomplete="current-password" placeholder="Enter your secure access code" required>
-          <button id="tutorSubmitBtn" class="auth-primary-button" type="submit">Verify and open curriculum</button>
-          <p class="tutor-login-note">Tutor credentials are verified securely by the academy server.</p>
-        </form>
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 bg-white">
+      <div class="mx-auto max-w-7xl px-5 lg:px-8">
+        <div class="mx-auto max-w-3xl text-center mb-16">
+          <h2 class="text-sm font-bold uppercase tracking-widest text-brand-600">Pricing Plans</h2>
+          <p class="mt-3 text-3xl lg:text-4xl font-extrabold tracking-tight">Flexible plans for every stage of your career</p>
+        </div>
+        
+        <div class="grid max-w-4xl mx-auto gap-8 md:grid-cols-2">
+          <!-- Free Plan -->
+          <div class="border border-slate-200 rounded-3xl p-8 bg-slate-50 flex flex-col justify-between">
+            <div>
+              <h3 class="text-xl font-extrabold">Free Starter Access</h3>
+              <p class="mt-2 text-sm text-slate-500">Test the platform and build Module 1 of all courses.</p>
+              <div class="mt-6">
+                <span class="text-4xl font-extrabold">$0</span>
+                <span class="text-sm text-slate-500">/ forever</span>
+              </div>
+              <ul class="mt-8 space-y-3.5 text-sm text-slate-600">
+                <li class="flex items-center gap-2">✓ Module 1 of all courses</li>
+                <li class="flex items-center gap-2">✓ Basic AI screenshot review</li>
+                <li class="flex items-center gap-2">✓ Free Starter Skill Passport</li>
+                <li class="flex items-center gap-2">✓ Community chat & support</li>
+              </ul>
+            </div>
+            <a href="access.html?tab=signup" class="mt-8 block w-full bg-slate-800 hover:bg-slate-900 text-white text-center font-bold py-3 rounded-lg">
+              Start Free
+            </a>
+          </div>
 
-        <div id="authMessage" class="auth-message hidden" role="status" aria-live="polite"></div>
-        <p class="mt-5 text-center text-xs leading-5 text-slate-400">Student accounts and learning progress are securely associated with the signed-in student.</p>
+          <!-- Founder Plan -->
+          <div class="border-2 border-brand-600 rounded-3xl p-8 bg-brand-950 text-white flex flex-col justify-between relative shadow-xl">
+            <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-brand-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Most Popular</span>
+            <div>
+              <h3 class="text-xl font-extrabold">Founder Access</h3>
+              <p class="mt-2 text-sm text-slate-300">Unlock all courses, AI tools, mock interviews, and earn certificates.</p>
+              <div class="mt-6">
+                <span class="text-4xl font-extrabold text-lime">$19</span>
+                <span class="text-sm text-slate-300">/ month</span>
+              </div>
+              <ul class="mt-8 space-y-3.5 text-sm text-slate-300">
+                <li class="flex items-center gap-2"><strong class="text-lime">✓ All Modules unlocked</strong> (Admin to Integration)</li>
+                <li class="flex items-center gap-2">✓ Agentforce AI Assistant integration</li>
+                <li class="flex items-center gap-2">✓ Uncapped AI screenshot evaluation</li>
+                <li class="flex items-center gap-2">✓ Mock Interview Simulator & STAR Coach</li>
+                <li class="flex items-center gap-2">✓ Certification Prep Simulator (60 MCQs)</li>
+                <li class="flex items-center gap-2">✓ Verified Certificate of Completion</li>
+              </ul>
+            </div>
+            <a href="access.html?tab=signup" class="mt-8 block w-full bg-lime text-brand-950 hover:bg-white text-center font-extrabold py-3 rounded-lg hover-lime">
+              Join Founder Access
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   </main>
-  <footer class="legal-footer">Copyright 2026 TomCodeX Inc. All rights reserved.</footer>
-  <script src="js/auth.js?v=20260609-1"></script>
-  <script src="js/learning-records.js"></script><script src="js/ai-client.js"></script><script src="js/floating-guide.js"></script><script src="js/voice-input.js"></script>
-  <script src="js/site-nav.js"></script>
+
+  <footer class="bg-brand-950 py-10 text-slate-300">
+    <div class="mx-auto flex max-w-7xl flex-col justify-between gap-5 px-5 md:flex-row md:items-center lg:px-8">
+      <div>
+        <div class="flex items-center gap-3">
+          <img src="assets/tomcodex-logo-light.svg" alt="TomCodeX logo" class="h-10 w-auto">
+          <strong class="border-l border-white/20 pl-3 text-sm text-white">TomCodeX</strong>
+        </div>
+        <p class="mt-2 text-sm">One Org. One POC. Complete Salesforce Career Practice.</p>
+        <p class="mt-3 text-xs text-slate-400">Copyright 2026 TomCodeX Inc. All rights reserved.</p>
+      </div>
+      <a href="access.html" class="font-bold text-lime">Open student dashboard →</a>
+    </div>
+  </footer>
 </body>
 </html>

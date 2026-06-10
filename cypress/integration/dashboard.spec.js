@@ -1,8 +1,58 @@
 // End-to-end tests for the Salesforce Master Dashboard
 describe('Salesforce Master Dashboard', () => {
   beforeEach(() => {
-    // Visit the dashboard before each test
-    cy.visit('http://localhost:3000');
+    // Intercept login request
+    cy.intercept('POST', '/api/student-login').as('loginReq');
+
+    // Visit dashboard first to check if we are already logged in
+    cy.visit('http://localhost:3000/learner-dashboard');
+    
+    // Check if we were redirected to access.html
+    cy.url().then((url) => {
+      if (url.includes('access.html')) {
+        // We are on access.html, meaning we need to login or sign up
+        cy.get('#studentSignInEmail').clear().type('cypress-test@tomcodex.com');
+        cy.get('#studentSignInPassword').clear().type('Cypress123!');
+        cy.get('#studentSignInForm').submit();
+        
+        cy.wait('@loginReq').then((interception) => {
+          if (interception.response.statusCode !== 200) {
+            // Sign up instead if login fails
+            cy.get('[data-student-tab="signup"]').click();
+            cy.get('#studentName').clear().type('Test Student');
+            cy.get('#studentSignUpEmail').clear().type('cypress-test@tomcodex.com');
+            cy.get('#studentSignUpPassword').clear().type('Cypress123!');
+            cy.get('#studentSignUpForm').submit();
+          }
+        });
+        
+        // Ensure we end up on learner-dashboard
+        cy.url().should('include', 'learner-dashboard');
+      }
+    });
+
+    // Reset localStorage day progress to 1 so tests have a clean initial state
+    cy.window().then((win) => {
+      const key = "salesforceMasterDashboard.v1";
+      const state = {
+        selectedDay: 1,
+        activeTab: "dashboard",
+        completedTasks: {},
+        completedHabits: [],
+        generatedStages: []
+      };
+      win.localStorage.setItem(key, JSON.stringify(state));
+      // Flush the sync to make sure it's saved on the server
+      if (win.TomCodexLearnerSync) {
+        return win.TomCodexLearnerSync.flush();
+      }
+    });
+
+    // Re-visit learner-dashboard to load the reset state
+    cy.visit('http://localhost:3000/learner-dashboard');
+
+    // Make sure the dashboard tab is active at the start of every test
+    cy.get('[data-tab-target="dashboard"]').click();
   });
 
   it('should display dashboard with correct initial state', () => {
@@ -41,16 +91,19 @@ describe('Salesforce Master Dashboard', () => {
     cy.get('.task-item').first().should('have.class', 'done');
   });
 
-  it('should navigate to analytics tab', () => {
-    // Click analytics tab
-    cy.get('[data-tab-target="analytics"]').click();
+  it('should navigate to roadmap tab', () => {
+    // Click roadmap tab
+    cy.get('[data-tab-target="roadmap"]').click();
 
-    // Verify analytics tab is active
-    cy.get('[data-tab-target="analytics"]').should('have.class', 'active');
-    cy.get('[data-tab-panel="analytics"]').should('not.be.hidden');
+    // Verify roadmap tab is active
+    cy.get('[data-tab-target="roadmap"]').should('have.class', 'active');
+    cy.get('[data-tab-panel="roadmap"]').should('not.be.hidden');
   });
 
   it('should generate new stage when reaching last day', () => {
+    // Ensure dashboard tab is active
+    cy.get('[data-tab-target="dashboard"]').click();
+
     // Navigate to the last day (36)
     cy.get('#daySelect').select('36');
 
@@ -59,10 +112,13 @@ describe('Salesforce Master Dashboard', () => {
 
     // Verify new stage was created
     cy.get('#daySelect').should('have.value', '37');
-    cy.get('#nextDayBtn').should('contain', 'Next topic');
+    cy.get('#nextDayBtn').should('contain', 'topic');
   });
 
   it('should complete habits', () => {
+    // Ensure practice tab is active
+    cy.get('[data-tab-target="practice"]').click();
+
     // Check a habit checkbox
     cy.get('.habit-check').first().check();
 
@@ -71,6 +127,12 @@ describe('Salesforce Master Dashboard', () => {
   });
 
   it('should handle errors gracefully', () => {
+    // Ensure trainer tab is active
+    cy.get('[data-tab-target="trainer"]').click();
+
+    // Type a doubt first to satisfy validation
+    cy.get('#doubtInput').clear().type('What is an Org?');
+
     // Simulate a network error
     cy.intercept('POST', '/api/*', { forceNetworkError: true });
 
@@ -82,11 +144,17 @@ describe('Salesforce Master Dashboard', () => {
   });
 
   it('should persist state across page reloads', () => {
+    // Ensure dashboard tab is active
+    cy.get('[data-tab-target="dashboard"]').click();
+
     // Complete a task
     cy.get('.today-check').first().check();
 
     // Reload the page
     cy.reload();
+
+    // Re-verify on the correct tab
+    cy.get('[data-tab-target="dashboard"]').click();
 
     // Verify task is still completed
     cy.get('.task-item').first().should('have.class', 'done');

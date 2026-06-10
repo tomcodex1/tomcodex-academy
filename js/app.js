@@ -523,6 +523,14 @@ function setupTabs() {
       panel.hidden = panel.dataset.tabPanel !== activeTab;
     });
 
+    if (activeTab === "poc") {
+      renderPocTracker();
+    } else if (activeTab === "passport") {
+      renderSkillPassport();
+    } else if (activeTab === "settings") {
+      renderSettingsForm();
+    }
+
     if (scrollToContent) {
       document.getElementById("tabContent").scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -543,7 +551,10 @@ function setupTabs() {
     button.addEventListener("click", () => showTab(button.dataset.goTab, false, true));
   });
 
-  showTab(state.activeTab);
+  // Support URL tab parameter overriding stored tab
+  const urlParams = new URLSearchParams(window.location.search);
+  const requestedTab = urlParams.get("tab");
+  showTab(requestedTab || state.activeTab);
 }
 
 function renderLearningTracks() {
@@ -621,6 +632,413 @@ function renderLearningTracks() {
   recommendationElement.querySelector("button").addEventListener("click", () => enrollAndOpen(recommendation.track, recommendation.href));
 }
 
+const crmStages = [
+  {
+    stage: 1,
+    name: "Platform & Core Objects",
+    desc: "Provision a Salesforce Developer Org and create the Student custom object to track learners.",
+    course: "admin",
+    moduleIndex: 0,
+    moduleName: "Admin Module 1",
+    url: "course-admin.html?module=0"
+  },
+  {
+    stage: 2,
+    name: "Data Modeling & Relationships",
+    desc: "Build Master-Detail relationships to track Course Enrollments and relate Students to Accounts.",
+    course: "admin",
+    moduleIndex: 1,
+    moduleName: "Admin Module 2",
+    url: "course-admin.html?module=1"
+  },
+  {
+    stage: 3,
+    name: "Access Control & Security",
+    desc: "Create Profiles, OWD, and Permission Sets to restrict access to sensitive student profile details.",
+    course: "admin",
+    moduleIndex: 2,
+    moduleName: "Admin Module 3",
+    url: "course-admin.html?module=2"
+  },
+  {
+    stage: 4,
+    name: "Flow Process Automation",
+    desc: "Design screen flows and record-triggered flows to automate student onboarding and email alerts.",
+    course: "flow",
+    moduleIndex: 0,
+    moduleName: "Flow Module 1",
+    url: "course-flow.html?module=0"
+  },
+  {
+    stage: 5,
+    name: "Apex Trigger Logic",
+    desc: "Build trigger handlers to calculate student completion metrics and auto-grade screenshot labs.",
+    course: "apex",
+    moduleIndex: 0,
+    moduleName: "Apex Module 1",
+    url: "course-apex.html?module=0"
+  },
+  {
+    stage: 6,
+    name: "LWC Student Dashboard",
+    desc: "Implement a responsive Lightning Web Component that queries student progress and displays earned skills.",
+    course: "lwc",
+    moduleIndex: 0,
+    moduleName: "LWC Module 1",
+    url: "course-lwc.html?module=0"
+  },
+  {
+    stage: 7,
+    name: "Agentforce Copilot Integration",
+    desc: "Configure an Agentforce Agent to serve as a curriculum copilot for live students.",
+    course: "lwc",
+    moduleIndex: 4,
+    moduleName: "Final Capstone POC",
+    url: "course-lwc.html?module=4"
+  }
+];
+
+function renderPocTracker() {
+  const grid = document.getElementById("pocStagesGrid");
+  if (!grid) return;
+  grid.replaceChildren();
+
+  let foundInProgress = false;
+  let completedCount = 0;
+
+  let identity = {};
+  try { identity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
+  const isFree = (identity.tier || "free") === "free";
+
+  crmStages.forEach((stage) => {
+    let isCompleted = false;
+    let score = 0;
+
+    try {
+      const scores = JSON.parse(localStorage.getItem(`tomcodex.${stage.course}MasteryScores.v1`)) || {};
+      if (scores[stage.moduleIndex]?.score >= 80) {
+        isCompleted = true;
+        score = Math.max(score, scores[stage.moduleIndex].score);
+      }
+    } catch {}
+
+    try {
+      const screenshots = JSON.parse(localStorage.getItem(`tomcodex.${stage.course}MasteryScores.v1.screenshots`)) || {};
+      if (screenshots[stage.moduleIndex]?.score >= 80) {
+        isCompleted = true;
+        score = Math.max(score, screenshots[stage.moduleIndex].score);
+      }
+    } catch {}
+
+    let status = "locked";
+    if (isCompleted) {
+      status = "completed";
+      completedCount++;
+    } else {
+      const isLockedByTier = isFree && (stage.course !== "admin" || stage.moduleIndex > 0);
+      if (isLockedByTier) {
+        status = "locked";
+      } else if (!foundInProgress) {
+        status = "in-progress";
+        foundInProgress = true;
+      } else {
+        status = "locked";
+      }
+    }
+
+    const card = document.createElement("div");
+    card.className = `p-5 bg-white border rounded-2xl flex flex-col justify-between gap-4 transition duration-200 hover:shadow-md ${
+      status === "completed" ? "border-emerald-250 bg-emerald-50/10" :
+      status === "in-progress" ? "border-brand-500 ring-1 ring-brand-500" :
+      "border-slate-200 opacity-70"
+    }`;
+
+    let badgeHtml = "";
+    if (status === "completed") {
+      badgeHtml = `<span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">Completed (${score}%)</span>`;
+    } else if (status === "in-progress") {
+      badgeHtml = `<span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-brand-50 text-brand-700 border border-brand-200 animate-pulse">In Progress</span>`;
+    } else {
+      badgeHtml = `<span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 border border-slate-200 flex items-center gap-1">🔒 Locked</span>`;
+    }
+
+    card.innerHTML = `
+      <div class="flex items-start justify-between gap-2">
+        <div>
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Stage ${stage.stage}</span>
+          <h4 class="font-extrabold text-sm text-slate-800 mt-1">${stage.name}</h4>
+        </div>
+        ${badgeHtml}
+      </div>
+      <p class="text-slate-500 text-xs leading-relaxed">${stage.desc}</p>
+      <div class="border-t border-slate-100 pt-3 flex items-center justify-between text-[11px] font-semibold">
+        <span class="text-slate-400">${stage.moduleName}</span>
+        ${status !== "locked" 
+          ? `<a href="${stage.url}" class="text-brand-600 hover:underline">View lab &rarr;</a>` 
+          : `<span class="text-slate-300">Unlock track</span>`
+        }
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  const progressPercent = Math.round((completedCount / crmStages.length) * 100);
+  const progressText = document.getElementById("pocOverallProgress");
+  if (progressText) progressText.textContent = `${progressPercent}%`;
+}
+
+function renderSkillPassport() {
+  let identity = {};
+  try { identity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
+  const isFounder = identity.tier === "founder";
+  const tierName = isFounder ? "★ Founder Access" : "Free Starter";
+
+  let totalLabs = 0;
+  let totalLabScoreSum = 0;
+  let totalQuizzes = 0;
+  const evaluationHistory = [];
+
+  const courses = ["admin", "apex", "flow", "lwc"];
+  
+  courses.forEach((course) => {
+    let quizScores = {};
+    let screenshotScores = {};
+    
+    try { quizScores = JSON.parse(localStorage.getItem(`tomcodex.${course}MasteryScores.v1`)) || {}; } catch {}
+    try { screenshotScores = JSON.parse(localStorage.getItem(`tomcodex.${course}MasteryScores.v1.screenshots`)) || {}; } catch {}
+    
+    Object.entries(quizScores).forEach(([modIndex, entry]) => {
+      if (entry?.score >= 80) {
+        totalQuizzes++;
+      }
+    });
+
+    Object.entries(screenshotScores).forEach(([modIndex, entry]) => {
+      const idx = Number(modIndex);
+      const scoreVal = Number(entry?.score) || 0;
+      if (scoreVal > 0) {
+        totalLabs++;
+        totalLabScoreSum += scoreVal;
+        
+        let modTitle = `${course.toUpperCase()} Module ${idx + 1}`;
+        if (course === "admin" && idx === 0) modTitle = "Salesforce Platform Foundations";
+        
+        evaluationHistory.push({
+          course,
+          moduleIndex: idx,
+          title: modTitle,
+          score: scoreVal,
+          passed: Boolean(entry.passed),
+          feedback: entry.feedback || "Lab evaluation complete.",
+          timestamp: entry.timestamp || new Date().toISOString()
+        });
+      }
+    });
+  });
+
+  const avgLabScore = totalLabs > 0 ? Math.round(totalLabScoreSum / totalLabs) : 0;
+
+  const labsCompletedEl = document.getElementById("passportLabsCompleted");
+  if (labsCompletedEl) labsCompletedEl.textContent = totalLabs;
+
+  const avgLabScoreEl = document.getElementById("passportAverageScore");
+  if (avgLabScoreEl) avgLabScoreEl.textContent = `${avgLabScore}%`;
+
+  const quizzesPassedEl = document.getElementById("passportQuizzesPassed");
+  if (quizzesPassedEl) quizzesPassedEl.textContent = totalQuizzes;
+
+  const tierStatusEl = document.getElementById("passportTierStatus");
+  if (tierStatusEl) {
+    tierStatusEl.textContent = tierName;
+    tierStatusEl.className = `block text-lg font-bold ${isFounder ? "text-brand-600" : "text-slate-600"}`;
+  }
+
+  let adminScores = {};
+  try { adminScores = JSON.parse(localStorage.getItem("tomcodex.adminMasteryScores.v1")) || {}; } catch {}
+  const adminCompleted = Object.values(adminScores).filter((entry) => Number(entry?.score) >= 80).length;
+
+  const certTitleEl = document.getElementById("passportCertTitle");
+  const certStatusEl = document.getElementById("passportCertStatus");
+  
+  if (adminCompleted >= 14) {
+    if (certTitleEl) certTitleEl.textContent = "Verified Salesforce Platform Graduate";
+    if (certStatusEl) {
+      certStatusEl.className = "mt-6 w-full p-4 rounded-2xl bg-lime/20 border border-lime text-lime text-xs font-bold text-center";
+      certStatusEl.innerHTML = `★ Graduate Verified! Certificate Code: TCX-ADM-${identity.id ? identity.id.slice(0, 8).toUpperCase() : "GRAD"}`;
+    }
+  } else {
+    if (certTitleEl) certTitleEl.textContent = "Salesforce Platform Graduate";
+    if (certStatusEl) {
+      certStatusEl.className = "mt-6 w-full p-4 rounded-2xl bg-white/5 border border-white/10 text-slate-350 text-xs font-semibold text-center";
+      certStatusEl.textContent = `Status: Locked (${adminCompleted} of 14 Admin Modules Complete)`;
+    }
+  }
+
+  const historyList = document.getElementById("passportHistoryList");
+  if (historyList) {
+    historyList.replaceChildren();
+    if (evaluationHistory.length === 0) {
+      const emptyItem = document.createElement("div");
+      emptyItem.className = "text-center py-8 text-slate-400 text-xs";
+      emptyItem.textContent = "No screenshot lab proofs uploaded yet. Go to your courses to submit your first lab screenshot.";
+      historyList.appendChild(emptyItem);
+    } else {
+      evaluationHistory.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      evaluationHistory.forEach((item) => {
+        const itemEl = document.createElement("div");
+        itemEl.className = `p-4 border rounded-2xl ${
+          item.passed ? "bg-emerald-50/30 border-emerald-100 text-slate-700" : "bg-rose-50/30 border-rose-100 text-slate-700"
+        }`;
+        
+        const formattedDate = new Date(item.timestamp).toLocaleDateString(undefined, {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        });
+
+        itemEl.innerHTML = `
+          <div class="flex items-center justify-between gap-2 border-b border-slate-100 pb-2 mb-2">
+            <div>
+              <h4 class="font-extrabold text-xs text-slate-800">${item.title}</h4>
+              <span class="text-[10px] text-slate-400">${formattedDate}</span>
+            </div>
+            <strong class="text-xs ${item.passed ? "text-emerald-700" : "text-rose-700"} bg-white px-2 py-0.5 rounded-full border border-slate-100">
+              Grade: ${item.score}%
+            </strong>
+          </div>
+          <p class="text-[11px] text-slate-600 leading-relaxed font-mono bg-white/50 p-2 rounded-xl border border-slate-100/50">${item.feedback}</p>
+        `;
+        historyList.appendChild(itemEl);
+      });
+    }
+  }
+}
+
+function renderSettingsForm() {
+  let identity = {};
+  try { identity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
+
+  const settingsName = document.getElementById("settingsName");
+  const settingsEmail = document.getElementById("settingsEmail");
+  const settingsApiKey = document.getElementById("settingsApiKey");
+  const settingsTierText = document.getElementById("settingsTierText");
+
+  if (settingsName) settingsName.value = identity.name || "";
+  if (settingsEmail) settingsEmail.value = identity.email || "";
+  if (settingsApiKey) settingsApiKey.value = identity.personalApiKey || "";
+  if (settingsTierText) {
+    const isFounder = identity.tier === "founder";
+    settingsTierText.innerHTML = isFounder 
+      ? `<span class="text-brand-600">★ Founder Access ($19/mo)</span>` 
+      : `<span class="text-slate-500">Free Starter Access ($0/mo)</span>`;
+  }
+
+  // Quota Visualization
+  const quotaLabel = document.getElementById("settingsQuotaLabel");
+  const quotaBar = document.getElementById("settingsQuotaBar");
+  const quotaHelpText = document.getElementById("settingsQuotaHelpText");
+
+  if (quotaLabel && quotaBar) {
+    const usage = identity.usage || { requestsToday: 0, dailyLimit: 50 };
+    const requestsToday = usage.requestsToday || 0;
+    const dailyLimit = usage.dailyLimit || 50;
+    const hasPersonalKey = !!identity.personalApiKey;
+
+    if (hasPersonalKey) {
+      quotaLabel.textContent = "Unlimited requests";
+      quotaLabel.className = "text-xs font-bold text-emerald-600";
+      quotaBar.style.width = "100%";
+      quotaBar.className = "bg-emerald-500 h-full rounded-full transition-all duration-500";
+      if (quotaHelpText) quotaHelpText.textContent = "Your personal Gemini API Key is configured. You have unlimited requests.";
+    } else {
+      quotaLabel.textContent = `${requestsToday} / ${dailyLimit} requests used`;
+      const percent = Math.min(100, Math.round((requestsToday / dailyLimit) * 100));
+      quotaBar.style.width = `${percent}%`;
+      
+      if (percent >= 90) {
+        quotaLabel.className = "text-xs font-bold text-red-650";
+        quotaBar.className = "bg-red-500 h-full rounded-full transition-all duration-500";
+      } else if (percent >= 70) {
+        quotaLabel.className = "text-xs font-bold text-amber-600";
+        quotaBar.className = "bg-amber-500 h-full rounded-full transition-all duration-500";
+      } else {
+        quotaLabel.className = "text-xs font-bold text-brand-700";
+        quotaBar.className = "bg-brand-600 h-full rounded-full transition-all duration-500";
+      }
+
+      if (quotaHelpText) quotaHelpText.textContent = "Quota resets daily. Setting a personal API key above unlocks unlimited requests.";
+    }
+  }
+}
+
+function setupSettingsForm() {
+  const settingsForm = document.getElementById("settingsForm");
+  if (!settingsForm) return;
+
+  settingsForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    
+    const settingsMessage = document.getElementById("settingsMessage");
+    const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+    
+    if (settingsMessage) {
+      settingsMessage.className = "p-3.5 rounded-xl text-xs font-semibold bg-blue-50 text-blue-800 border border-blue-250 block";
+      settingsMessage.textContent = "Updating settings on the server...";
+      settingsMessage.classList.remove("hidden");
+    }
+    if (saveSettingsBtn) saveSettingsBtn.disabled = true;
+
+    const name = document.getElementById("settingsName").value.trim();
+    const personalApiKey = document.getElementById("settingsApiKey").value.trim();
+
+    try {
+      const response = await fetch("/api/student-settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, personalApiKey })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.error || "Failed to update settings.");
+      }
+
+      const result = await response.json();
+      
+      let cachedIdentity = {};
+      try { cachedIdentity = JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
+      const updatedIdentity = {
+        ...cachedIdentity,
+        name: result.student.name,
+        personalApiKey: result.student.personalApiKey,
+        usage: result.student.usage
+      };
+      localStorage.setItem("tomcodex.authIdentity.v1", JSON.stringify(updatedIdentity));
+
+      const welcomeEl = document.getElementById("learnerWelcome");
+      if (welcomeEl) welcomeEl.textContent = `Welcome back, ${result.student.name}`;
+      
+      const avatarEl = document.getElementById("learnerAvatar");
+      if (avatarEl) avatarEl.textContent = String(result.student.name || "S").trim().slice(0, 1).toUpperCase();
+
+      if (settingsMessage) {
+        settingsMessage.className = "p-3.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-250 block";
+        settingsMessage.textContent = "Settings saved successfully!";
+        setTimeout(() => { settingsMessage.classList.add("hidden"); }, 3000);
+      }
+      renderSettingsForm();
+    } catch (err) {
+      if (settingsMessage) {
+        settingsMessage.className = "p-3.5 rounded-xl text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-250 block";
+        settingsMessage.textContent = err.message || "Failed to update settings.";
+      }
+    } finally {
+      if (saveSettingsBtn) saveSettingsBtn.disabled = false;
+    }
+  });
+}
+
 function init() {
   renderLearningTracks();
   renderSkillMeters();
@@ -634,6 +1052,7 @@ function init() {
   setupDoubtBox();
   setupDayNavigation();
   setupTabs();
+  setupSettingsForm();
 
   document.getElementById("phaseFilter").addEventListener("change", renderPhases);
   document.getElementById("phaseSearch").addEventListener("input", renderPhases);

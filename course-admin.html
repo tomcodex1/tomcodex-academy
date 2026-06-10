@@ -36,17 +36,130 @@
       </aside>
 
       <section id="moduleContent" class="course-panel module-content">
-        <div class="flex flex-wrap items-start justify-between gap-4"><div><span id="moduleLabel" class="course-tag">Module 1</span><h2 id="moduleTitle" class="mt-3 text-2xl">Salesforce Platform Foundations</h2><p id="moduleDescription" class="mt-3 text-slate-500"></p></div><button id="completeModuleBtn" class="complete-button" type="button">Mark module complete</button></div>
-
-        <div class="learning-cycle">
-          <div><strong>1. Learn with AI</strong><span>Understand the concept in simple language.</span></div><div><strong>2. Study sources</strong><span>Read official docs and watch free videos.</span></div><div><strong>3. Practice</strong><span>Complete Trailhead and hands-on tasks.</span></div><div><strong>4. Prove mastery</strong><span>Answer recall and workplace questions.</span></div>
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <span id="moduleLabel" class="course-tag">Module 1</span>
+            <h2 id="moduleTitle" class="mt-3 text-2xl font-extrabold text-brand-950">Salesforce Platform Foundations</h2>
+            <p id="moduleDescription" class="mt-3 text-slate-500"></p>
+          </div>
+          <button id="completeModuleBtn" class="complete-button" type="button">Mark module complete</button>
         </div>
 
-        <div class="content-section"><h3>AI lesson overview</h3><div id="lessonPoints" class="lesson-points"></div></div>
-        <div class="content-section"><div class="topic-coverage-heading"><div><span class="course-tag">Detailed curriculum</span><h3>Complete topic coverage</h3><p>Open each subcategory to study the concept, implementation, example, best practices, common mistakes, and practical proof.</p></div><strong id="topicCoverageCount"></strong></div><div id="topicCoverage" class="topic-coverage"></div></div>
-        <div class="grid gap-5 md:grid-cols-2"><div class="content-section"><h3>Official and free resources</h3><div id="resourceList" class="course-resource-list"></div></div><div class="content-section"><h3>Hands-on practice</h3><div id="practiceList" class="practice-list"></div></div></div>
-        <div class="content-section"><div class="flex flex-wrap items-center justify-between gap-3"><div><h3>Zentom AI mastery test</h3><p class="mt-2 text-xs text-slate-500">Zentom generates a fresh minimum of 15 questions for every attempt. Answer all questions and score 80% or higher to unlock the next module.</p></div><button id="startMasteryTestBtn" class="course-primary" type="button">Start 15-question AI test</button></div><div id="questionList" class="mastery-list"></div></div>
+        <!-- Rich Content timeline layout -->
+        <div id="richModuleContent" class="hidden mt-6 space-y-8">
+          <!-- Step 1: Goal -->
+          <div class="border-l-4 border-brand-500 pl-4 bg-brand-50/20 py-2 rounded-r-lg">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-700">Step 1: Module Goal</h3>
+            <p id="richGoal" class="text-slate-600 text-sm mt-2 font-medium"></p>
+          </div>
+          
+          <!-- Step 2: Outcomes -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-700">Step 2: Learning Outcomes</h3>
+            <ul id="richOutcomes" class="list-disc pl-5 mt-3 space-y-1.5 text-slate-600 text-sm"></ul>
+          </div>
+
+          <!-- Step 3: Simple Explanation -->
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-700 mb-3">Step 3: Simple Explanation</h3>
+            <div id="richExplanation" class="space-y-3 text-xs text-slate-600 leading-relaxed"></div>
+          </div>
+
+          <!-- Step 4: Real Business Example -->
+          <div class="bg-brand-50/50 p-5 rounded-2xl border border-brand-100">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-700 mb-3">Step 4: Real Business Example</h3>
+            <div id="richBusiness" class="space-y-3"></div>
+          </div>
+
+          <!-- Step 5: Where It Is Used in Salesforce -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-700 mb-3">Step 5: Where It Is Used</h3>
+            <div id="richWhereUsed"></div>
+          </div>
+
+          <!-- Step 6: Step-by-Step Implementation -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-700 mb-3">Step 6: Step-by-Step Walkthrough</h3>
+            <ol id="richStepByStep" class="list-decimal pl-5 space-y-2 text-slate-600 text-sm"></ol>
+          </div>
+
+          <!-- Step 7 & 8: Best Practices & Common Mistakes -->
+          <div class="grid gap-6 md:grid-cols-2">
+            <div class="bg-emerald-50/40 p-5 rounded-2xl border border-emerald-100">
+              <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-3">Step 7: Best Practices</h3>
+              <ul id="richBestPractices" class="list-disc pl-5 space-y-1.5 text-slate-600 text-xs"></ul>
+            </div>
+            <div class="bg-rose-50/40 p-5 rounded-2xl border border-rose-100">
+              <h3 class="text-sm font-bold uppercase tracking-wider text-rose-700 mb-3">Step 8: Common Mistakes</h3>
+              <ul id="richCommonMistakes" class="list-disc pl-5 space-y-1.5 text-slate-600 text-xs"></ul>
+            </div>
+          </div>
+
+          <!-- Step 9: Why This Matters in Job -->
+          <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-700 mb-3">Step 9: Why This Matters in Job</h3>
+            <div id="richWhyMatters"></div>
+          </div>
+
+          <!-- Step 10: Interview Questions -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-700 mb-3">Step 10: Interview Key Questions</h3>
+            <ul id="richInterview" class="list-disc pl-5 space-y-2 text-slate-600 text-sm"></ul>
+          </div>
+
+          <!-- Step 11, 12, 13: Hands-on Practice Lab & Screenshot Upload -->
+          <div class="bg-white p-6 rounded-2xl border-2 border-brand-500 shadow-lg">
+            <h3 class="text-md font-extrabold text-brand-950">Step 11: Hands-on Practice Lab</h3>
+            <div id="richLabDescription" class="mt-3"></div>
+            
+            <!-- Step 12: Screenshot Proof Upload -->
+            <div class="mt-6 border-t border-slate-100 pt-5">
+              <h4 class="text-sm font-bold text-slate-800">Step 12: Upload Screenshot Proof</h4>
+              <p class="text-xs text-slate-500 mt-1">Upload a PNG or JPEG screenshot of your Salesforce Developer Org configuration.</p>
+              
+              <div class="mt-4 flex flex-col sm:flex-row gap-3 items-center">
+                <input type="file" id="screenshotInput" accept="image/png, image/jpeg" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100">
+                <button id="evaluateScreenshotBtn" class="rounded-lg bg-brand-600 px-5 py-2 text-xs font-bold text-white hover:bg-brand-700 transition" type="button">Evaluate with AI</button>
+              </div>
+            </div>
+
+            <!-- Step 13: AI Review and Score -->
+            <div id="screenshotReviewContainer" class="hidden mt-6 border-t border-slate-100 pt-5">
+              <h4 class="text-sm font-bold text-slate-800">Step 13: AI Review & Score</h4>
+              <div class="mt-3 p-4 rounded-xl border flex gap-4 items-start" id="screenshotReviewBox">
+                <div class="rounded-full h-12 w-12 flex items-center justify-center font-extrabold text-sm text-white shrink-0" id="screenshotScoreBadge">0%</div>
+                <div class="flex-1">
+                  <h5 class="font-bold text-sm" id="screenshotReviewSummary">Evaluating screenshot...</h5>
+                  <p class="text-xs text-slate-600 mt-1 leading-relaxed" id="screenshotReviewFeedback"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 14: Zentom AI Mastery Test -->
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-brand-700 mb-2">Step 14: Zentom AI Mastery Test</h3>
+            <p class="text-xs text-slate-500">Zentom generates a fresh minimum of 15 questions for every attempt. Answer all questions and score 80% or higher to unlock the next module.</p>
+            <button id="startMasteryTestBtnRich" class="course-primary mt-3" type="button">Start 15-question AI test</button>
+          </div>
+        </div>
+
+        <!-- Default Content Container -->
+        <div id="defaultModuleContent" class="space-y-6 mt-6">
+          <div class="learning-cycle">
+            <div><strong>1. Learn with AI</strong><span>Understand the concept in simple language.</span></div><div><strong>2. Study sources</strong><span>Read official docs and watch free videos.</span></div><div><strong>3. Practice</strong><span>Complete Trailhead and hands-on tasks.</span></div><div><strong>4. Prove mastery</strong><span>Answer recall and workplace questions.</span></div>
+          </div>
+
+          <div class="content-section"><h3>AI lesson overview</h3><div id="lessonPoints" class="lesson-points"></div></div>
+          <div class="content-section"><div class="topic-coverage-heading"><div><span class="course-tag">Detailed curriculum</span><h3>Complete topic coverage</h3><p>Open each subcategory to study the concept, implementation, example, best practices, common mistakes, and practical proof.</p></div><strong id="topicCoverageCount"></strong></div><div id="topicCoverage" class="topic-coverage"></div></div>
+          <div class="grid gap-5 md:grid-cols-2"><div class="content-section"><h3>Official and free resources</h3><div id="resourceList" class="course-resource-list"></div></div><div class="content-section"><h3>Hands-on practice</h3><div id="practiceList" class="practice-list"></div></div></div>
+          <div class="content-section"><div class="flex flex-wrap items-center justify-between gap-3"><div><h3>Zentom AI mastery test</h3><p class="mt-2 text-xs text-slate-500">Zentom generates a fresh minimum of 15 questions for every attempt. Answer all questions and score 80% or higher to unlock the next module.</p></div><button id="startMasteryTestBtn" class="course-primary" type="button">Start 15-question AI test</button></div><div id="questionList" class="mastery-list"></div></div>
+        </div>
+
+        <!-- Shared Mastery Test Panel -->
         <div id="masteryTestPanel" class="mastery-test-panel hidden"><div class="flex items-center justify-between gap-3"><div><span class="course-tag">Centralized AI evaluation</span><h3 class="mt-3">15-question module mastery test</h3></div><strong class="pass-score">15 questions · Pass: 80%</strong></div><div id="masteryAnswerList" class="mastery-answer-list"></div><button id="submitMasteryTestBtn" class="course-primary" type="button">Submit 15 answers to AI</button><div id="masteryResult" class="mastery-result hidden" aria-live="polite"></div></div>
+
+        <!-- Navigation Buttons -->
         <div class="flex flex-wrap justify-between gap-3 border-t border-slate-200 pt-5"><button id="previousModuleBtn" class="course-secondary" type="button">Previous module</button><button id="nextModuleBtn" class="course-primary" type="button">Next module</button></div>
       </section>
     </section>
