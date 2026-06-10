@@ -1176,7 +1176,7 @@ async function renderCertificateEligibilityCard() {
     let authUser = {};
     try { authUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1")) || {}; } catch {}
     const tier = authUser.tier || "free";
-    const TOTAL = 8;
+    const TOTAL = 10;
     const MIN_SCORE = 80;
 
     let adminAttempts = {};
@@ -1196,13 +1196,15 @@ async function renderCertificateEligibilityCard() {
       "Salesforce Platform Foundations", "Salesforce Object Modeling",
       "Salesforce Security Foundations", "Page Layouts & App UX",
       "Validation Rules & Data Quality", "Reports & Dashboards",
-      "Flow Automation Foundations", "Flow Automation Intermediate"
+      "Flow Automation Foundations", "Flow Automation Intermediate",
+      "Salesforce Approval Processes", "Salesforce Data Management"
     ];
     const skillIds = [
       "salesforce-platform-foundations", "salesforce-object-modeling",
       "salesforce-security-foundations", "salesforce-app-user-experience",
       "salesforce-data-quality-rules", "salesforce-reporting-dashboards",
-      "salesforce-flow-automation-foundations", "salesforce-flow-automation-intermediate"
+      "salesforce-flow-automation", "salesforce-flow-automation-intermediate",
+      "salesforce-approval-processes", "salesforce-data-management"
     ];
 
     for (let i = 1; i <= TOTAL; i++) {

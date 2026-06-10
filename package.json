@@ -15,7 +15,7 @@
   "dependencies": {
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "zentom-ai-core": "file:../../TomCodeX Inc/zentom-suite"
+    "zentom-ai-core": "git+https://github.com/vcr50/Zentom-AI-Core.git"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.1",
