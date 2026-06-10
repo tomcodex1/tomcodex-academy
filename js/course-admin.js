@@ -1055,6 +1055,154 @@ const modules = [
         ]
       }
     }
+  },
+  {
+    title: "Data Management and Import Tools",
+    description: "Master bulk data operations in Salesforce: import clean data, export records for backup or analysis, find and merge duplicates, and understand data governance best practices.",
+    points: [
+      "Use Data Import Wizard to load Student and Course records in bulk.",
+      "Understand when to use Data Import Wizard vs. Data Loader.",
+      "Configure Duplicate Rules and Matching Rules to protect data quality."
+    ],
+    resources: [
+      ["Data Import Wizard Help", "https://help.salesforce.com/s/articleView?id=sf.data_import_wizard.htm&type=5"],
+      ["Trailhead: Data Management", "https://trailhead.salesforce.com/content/learn/modules/lex_implementation_data_management"],
+      ["Duplicate Management", "https://help.salesforce.com/s/articleView?id=sf.duplicate_prevention_overview.htm&type=5"]
+    ],
+    practice: [
+      "Prepare a CSV file with 10 Student records and import using Data Import Wizard.",
+      "Export existing Student records using Data Export (Setup).",
+      "Create a Duplicate Rule on Student__c using Email as the matching field.",
+      "Test the duplicate rule by trying to create a student with an existing email."
+    ],
+    questions: [
+      "What is the maximum record limit for Data Import Wizard?",
+      "When would you choose Data Loader over Data Import Wizard?",
+      "What is the difference between a Matching Rule and a Duplicate Rule?"
+    ],
+    richContent: {
+      moduleGoal: "Move your Student Success CRM from empty org to production-ready: bulk-load real data, protect against duplicates, and establish data governance practices used by every Salesforce Administrator.",
+      learningOutcomes: [
+        "Prepare a properly formatted CSV file for Salesforce import.",
+        "Use Data Import Wizard to load Student records with field mapping.",
+        "Export records using Data Export Service for backup purposes.",
+        "Configure Duplicate Rules and Matching Rules to prevent duplicate students."
+      ],
+      simpleExplanation: `
+        <h4 class="font-bold text-slate-800 text-sm">Why Data Management Matters</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          A Salesforce org is only as good as its data. When you first go live, you need to bring in existing records — students, courses, enrollments — from spreadsheets or old systems. This is called <strong>data migration</strong>.
+        </p>
+        <h4 class="font-bold text-slate-800 text-sm mt-3">Data Import Wizard vs Data Loader</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          <strong>Data Import Wizard</strong>: Browser-based, supports Standard + Custom Objects, max 50,000 records, no install needed. Perfect for admins.<br/>
+          <strong>Data Loader</strong>: Desktop app (Windows/Mac), supports all objects, handles millions of records, great for developers and large migrations.
+        </p>
+        <h4 class="font-bold text-slate-800 text-sm mt-3">Duplicate Rules</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          Duplicate Rules work with Matching Rules. The <strong>Matching Rule</strong> defines <em>how</em> to compare records (e.g., fuzzy match on Name, exact match on Email). The <strong>Duplicate Rule</strong> defines <em>what to do</em> when a match is found — Block, Allow with alert, or Report.
+        </p>
+      `,
+      realBusinessExample: `
+        <p class="text-slate-600 text-xs leading-relaxed">
+          TomCodeX Academy is launching and needs to migrate 200 students from a Google Sheet into the Student Success CRM.
+        </p>
+        <ul class="list-disc pl-5 mt-2 space-y-1 text-slate-600 text-xs">
+          <li><strong>Step 1:</strong> Export student data from Google Sheets as a CSV file.</li>
+          <li><strong>Step 2:</strong> Clean data — standardize email format, remove blanks, fix status values to match picklist.</li>
+          <li><strong>Step 3:</strong> Import using Data Import Wizard, mapping CSV columns to Salesforce fields.</li>
+          <li><strong>Step 4:</strong> Enable Duplicate Rule on Email so no student appears twice.</li>
+          <li><strong>Step 5:</strong> Schedule weekly Data Export to back up the org.</li>
+        </ul>
+      `,
+      whereUsed: `
+        <div class="space-y-3">
+          <div>
+            <strong class="text-brand-700 text-xs block">Setup → Data → Data Import Wizard</strong>
+            <span class="text-slate-500 text-xs">Upload CSV files to create or update records in bulk across standard and custom objects.</span>
+          </div>
+          <div>
+            <strong class="text-brand-700 text-xs block">Setup → Data → Data Export</strong>
+            <span class="text-slate-500 text-xs">Export all org data as ZIP/CSV files for backup, analysis, or migration to another system.</span>
+          </div>
+          <div>
+            <strong class="text-brand-700 text-xs block">Setup → Duplicate Management → Matching Rules</strong>
+            <span class="text-slate-500 text-xs">Define field-level logic for comparing records to detect potential duplicates.</span>
+          </div>
+          <div>
+            <strong class="text-brand-700 text-xs block">Setup → Duplicate Management → Duplicate Rules</strong>
+            <span class="text-slate-500 text-xs">Configure what action Salesforce takes when a match is found — block, warn, or log.</span>
+          </div>
+        </div>
+      `,
+      stepByStepImplementation: [
+        "Create a CSV file with columns: First_Name, Last_Name, Email__c, Status__c, Enrollment_Date__c. Add 10 rows of test student data.",
+        "In Setup, search for <strong>Data Import Wizard</strong>. Click <strong>Launch Wizard</strong>.",
+        "Select <strong>Custom Objects</strong> → <strong>Students</strong>. Choose <strong>Add new records</strong>.",
+        "Upload your CSV. On the field mapping screen, match each CSV column to the corresponding Salesforce field.",
+        "Review the import summary and click <strong>Start Import</strong>. Monitor progress in Setup → Bulk Data Load Jobs.",
+        "For Duplicate Rules: go to Setup → Duplicate Management → Matching Rules → New Rule on Student__c.",
+        "Add a match criterion: <strong>Email__c</strong> → Exact match. Activate the Matching Rule.",
+        "Go to Duplicate Rules → New Rule on Student__c. Set Action: <strong>Block</strong> if a duplicate is found. Activate.",
+        "Test by creating a student with the same email as an imported record — Salesforce should block it."
+      ],
+      bestPractices: [
+        "Always run a small test import (5-10 records) before loading your full dataset to catch field mapping errors early.",
+        "Back up your org with Data Export before any major import or configuration change.",
+        "Use <strong>Upsert</strong> (instead of Insert) in Data Loader when re-importing to avoid creating duplicates of existing records.",
+        "Set Duplicate Rules to <strong>Report</strong> first, review the duplicate report, then switch to <strong>Block</strong> once you're confident."
+      ],
+      labTask: {
+        title: "Admin Module 10 Lab — Bulk Import and Duplicate Management",
+        description: "Import Student records in bulk and configure Duplicate Rules to protect data quality in your Student Success CRM.",
+        steps: [
+          "Prepare a CSV with 10 Student records (First Name, Last Name, Email, Status).",
+          "Use Data Import Wizard to import them into your Student__c object.",
+          "Verify all 10 records appear in the Students list view.",
+          "Go to Setup → Duplicate Management → create a Matching Rule on Email__c (Exact).",
+          "Create a Duplicate Rule on Student__c — set action to Block.",
+          "Activate both rules. Attempt to create a student with a duplicate email and confirm it is blocked.",
+          "Take a screenshot of the error message showing the duplicate block."
+        ],
+        labQuestions: [
+          {
+            id: "q1",
+            question: "How many Student records did you import using Data Import Wizard?",
+            type: "text",
+            placeholder: "Enter number (e.g. 10)",
+            hint: "Count how many rows were in your CSV file."
+          },
+          {
+            id: "q2",
+            question: "What tool did you use to import the Student records?",
+            type: "text",
+            placeholder: "Enter tool name (e.g. Data Import Wizard)",
+            hint: "The browser-based bulk import tool in Salesforce Setup."
+          },
+          {
+            id: "q3",
+            question: "What field did you use in your Matching Rule to detect duplicate students?",
+            type: "text",
+            placeholder: "Enter field name (e.g. Email__c)",
+            hint: "The unique identifier used to identify the same student across records."
+          },
+          {
+            id: "q4",
+            question: "What action did you set in your Duplicate Rule when a match is found?",
+            type: "text",
+            placeholder: "Enter action (e.g. Block)",
+            hint: "The Duplicate Rule can Block, Allow with alert, or Report."
+          },
+          {
+            id: "q5",
+            question: "What is the key difference between Data Import Wizard and Data Loader?",
+            type: "text",
+            placeholder: "Explain the difference",
+            hint: "Think about record limits, objects supported, and who typically uses each tool."
+          }
+        ]
+      }
+    }
   }
 ];
 

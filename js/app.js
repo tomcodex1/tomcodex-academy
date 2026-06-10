@@ -587,7 +587,7 @@ function setupTabs() {
 
 function renderLearningTracks() {
   const definitions = [
-    ["admin", "course-admin.html", 9],
+    ["admin", "course-admin.html", 10],
     ["apex", "course-apex.html", 12],
     ["flow", "course-flow.html", 12],
     ["lwc", "course-lwc.html", 12]
@@ -742,8 +742,11 @@ function renderLearningTracks() {
   } else if (adminVerifiedCount === 8) {
     nextActionText = "Continue Admin Module 9 - Approval Processes and Advanced Automation";
     nextActionLink = "course-admin.html?module=8";
+  } else if (adminVerifiedCount === 9) {
+    nextActionText = "Continue Admin Module 10 - Data Management and Import Tools";
+    nextActionLink = "course-admin.html?module=9";
   } else {
-    nextActionText = "All 9 modules verified! View your certificate eligibility.";
+    nextActionText = "All 10 modules verified! View your certificate eligibility.";
     nextActionLink = "dashboard.html?tab=passport";
   }
 
