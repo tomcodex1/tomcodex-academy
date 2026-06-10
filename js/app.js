@@ -587,7 +587,7 @@ function setupTabs() {
 
 function renderLearningTracks() {
   const definitions = [
-    ["admin", "course-admin.html", 7],
+    ["admin", "course-admin.html", 8],
     ["apex", "course-apex.html", 12],
     ["flow", "course-flow.html", 12],
     ["lwc", "course-lwc.html", 12]
@@ -736,6 +736,9 @@ function renderLearningTracks() {
   } else if (adminVerifiedCount === 6) {
     nextActionText = "Continue Admin Module 7 - Flow Automation Foundations";
     nextActionLink = "course-admin.html?module=6";
+  } else if (adminVerifiedCount === 7) {
+    nextActionText = "Continue Admin Module 8 - Flow Automation Intermediate";
+    nextActionLink = "course-admin.html?module=7";
   } else {
     nextActionText = "All modules verified! Go to final exam.";
     nextActionLink = "course-admin.html";

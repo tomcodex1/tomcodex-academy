@@ -764,27 +764,166 @@ const modules = [
     }
   },
   {
-    title: "Workplace Admin and Continuous Growth",
-    description: "Apply admin skills after placement through support, governance, releases, and continuous improvement.",
+    title: "Flow Automation Intermediate",
+    description: "Automate complex business processes with record-triggered conditions, decision branching, creating/updating related records, and error handling.",
     points: [
-      "Investigate user issues and communicate resolutions.",
-      "Manage requirements, sandboxes, testing, and releases.",
-      "Track Salesforce releases and improve the org continuously."
+      "Define record-triggered flows with criteria/conditions.",
+      "Branch logic using complex Decision outcomes.",
+      "Insert or modify related records using Create Records and Update Records elements.",
+      "Enforce safety in automations with fault path error handling."
     ],
     resources: [
-      ["Salesforce Release Notes", "https://help.salesforce.com/s/articleView?id=release-notes.salesforce_release_notes.htm&type=5"],
-      ["Salesforce Admins Hub", "https://admin.salesforce.com/"],
-      ["Trailhead Admin Career", "https://trailhead.salesforce.com/career-path/admin"]
+      ["Intermediate Salesforce Flow", "https://trailhead.salesforce.com/content/learn/modules/record-triggered-flows"],
+      ["Flow Error Handling", "https://help.salesforce.com/s/articleView?id=sf.flow_troubleshoot.htm&type=5"]
     ],
     practice: [
-      "Resolve a simulated production support ticket.",
-      "Plan and test a small release.",
-      "Create a quarterly org health review."
+      "Build a flow to automatically update Student Status when enrollments change.",
+      "Create follow-up tasks for program managers when fees are pending.",
+      "Add fault paths to capture database issues during updates."
     ],
     questions: [
-      "How do you investigate a user issue?",
-      "What belongs in a release checklist?",
-      "How do you prioritize admin improvements?"
+      "How do entry criteria optimize flow performance?",
+      "What is the difference between update record options in Flow?",
+      "Why should you always write error details to the screen or logs in a fault path?"
+    ],
+    richContent: {
+      moduleGoal: "Create efficient multi-object automations that react to record changes, create or update related records, and handle errors using fault paths.",
+      learningOutcomes: [
+        "Configure entry criteria to prevent unnecessary flow executions.",
+        "Use Decision outcomes to evaluate complex business logic.",
+        "Create related Task records automatically on record creation.",
+        "Implement Fault Paths to intercept and handle database exceptions safely."
+      ],
+      simpleExplanation: `
+        <h4 class="font-bold text-slate-800 text-sm">Intermediate Automation Patterns</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          Basic flows trigger actions, but real business logic requires conditions (e.g. only trigger if status changes) and multi-step changes. For instance, creating a record might fail if a validation rule blocks it. To prevent this from crashing the user's interface, you add a <strong>Fault Path</strong> to handle the error.
+        </p>
+        <h4 class="font-bold text-slate-800 text-sm mt-3">Create and Update Records Elements</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          Flows can write changes directly to the database. The <strong>Create Records</strong> element lets you insert new records (like Tasks or Logs) automatically. The <strong>Update Records</strong> element updates other records in the system that are linked to the triggering record.
+        </p>
+      `,
+      realBusinessExample: `
+        <p class="text-slate-600 text-xs leading-relaxed">
+          At <strong>TomCodeX Academy</strong>, when a student is created and has a pending fee payment, we want to automate follow-up:
+        </p>
+        <ul class="list-disc pl-5 mt-2 space-y-1 text-slate-600 text-xs">
+          <li><strong>Condition Trigger</strong>: Triggers on Enrollment__c when Status is 'Pending'.</li>
+          <li><strong>Create Record Action</strong>: Automatically creates a follow-up Task for the administrator.</li>
+          <li><strong>Fault Path</strong>: If task creation fails, writes to a debug log instead of blocking the student record.</li>
+        </ul>
+      `,
+      whereUsed: `
+        <div class="space-y-3">
+          <div>
+            <strong class="text-brand-700 text-xs block">Create Records Element</strong>
+            <span class="text-slate-500 text-xs">The Flow element used to define field values and insert a new record into any Salesforce object.</span>
+          </div>
+          <div>
+            <strong class="text-brand-700 text-xs block">Fault Path Connector</strong>
+            <span class="text-slate-500 text-xs">The error-handling branch added to data elements (Create, Update, Delete) to route execution when an error occurs.</span>
+          </div>
+        </div>
+      `,
+      stepByStepImplementation: [
+        "Create a new <strong>Record-Triggered Flow</strong> on the <strong>Enrollment__c</strong> object.",
+        "Set the trigger to run when a record is created or updated, and set the entry criteria to: <code>Status__c Equals 'Pending'</code>.",
+        "Add a <strong>Decision</strong> element to confirm if a follow-up is already required.",
+        "Drag a <strong>Create Records</strong> element to create a Task. Map Subject to 'Follow Up on Fee Payment', and set the Related ID to the Enrollment's ID.",
+        "Right-click the Create Records element, select <strong>Add Fault Path</strong>, and connect it to a Post to Chatter or email action to notify the admin of the error.",
+        "Save the Flow as <strong>Enrollment_Follow_Up_Flow</strong> and activate it."
+      ],
+      bestPractices: [
+        "Use tight entry criteria to make sure your flows only run when absolutely necessary, saving system resources.",
+        "Never leave a fault path empty; always post to Chatter, send an email, or write a log record so failures are visible."
+      ],
+      commonMistakes: [
+        "Building conflicting validation rules and flows that block each other, causing save loops.",
+        "Triggering recursive update loops by updating the same record that triggered the flow in an after-save update."
+      ],
+      whyMattersInJob: `
+        <p class="text-slate-600 text-xs leading-relaxed">
+          Every production Salesforce org has complex automation. An administrator is expected to build flows that update related tables (like updating student enrollment totals) and prevent raw red-screen errors from reaching end-users.
+        </p>
+      `,
+      interviewQuestions: [
+        "Explain what a Fault Path is and why you should use it in data elements.",
+        "How do you update related records in a flow without writing Apex code?",
+        "Why is it better to use entry criteria instead of a Decision element immediately after the Start element?"
+      ],
+      handsOnLab: {
+        title: "Lab 1: Build Related Record Automation with Error Handling",
+        instructions: `
+          <p class="text-slate-600 text-xs leading-relaxed mb-3">
+            Build this intermediate flow in your <strong>Salesforce Developer Org</strong>, then verify your work below.
+          </p>
+          <ol class="list-decimal pl-5 space-y-1.5 text-slate-600 text-xs">
+            <li>Create a new <strong>Record-Triggered Flow</strong> on <strong>Enrollment__c</strong> or <strong>Student__c</strong>.</li>
+            <li>Configure the flow to trigger on creation or update with specific conditions.</li>
+            <li>Use a <strong>Decision</strong> element to evaluate branching outcomes.</li>
+            <li>Add a <strong>Create Records</strong> or <strong>Update Records</strong> element to automatically create/update a related Task or record.</li>
+            <li>Configure a <strong>Fault Path</strong> on the data element to handle errors and activate the flow.</li>
+          </ol>
+        `
+      },
+      labCriteria: [
+        {
+          id: "q1",
+          question: "What is the API name of your intermediate flow?",
+          type: "text",
+          placeholder: "Enter Flow API name (e.g. Student_Status_Update_Automation)",
+          hint: "Confirm the API name of the Flow you configured."
+        },
+        {
+          id: "q2",
+          question: "Which object triggers your flow?",
+          type: "text",
+          placeholder: "Enter object API name (e.g. Enrollment__c)",
+          hint: "The API name of the object setting off the trigger."
+        },
+        {
+          id: "q3",
+          question: "Which Flow element did you use to branch logic?",
+          type: "text",
+          placeholder: "Enter branching element name (e.g. Decision)",
+          hint: "The Flow element used to evaluate multiple pathways."
+        },
+        {
+          id: "q4",
+          question: "Which Flow element did you use to create a follow-up task or record?",
+          type: "text",
+          placeholder: "Enter creation element name (e.g. Create Records)",
+          hint: "The data element used to insert a record into the database."
+        },
+        {
+          id: "q5",
+          question: "Why is a fault path important in Salesforce Flow?",
+          type: "text",
+          placeholder: "Explain fault path importance",
+          hint: "Explain what it handles when a database step fails."
+        }
+      ]
+    }
+  },
+  {
+    title: "Approval Processes and Advanced Automation",
+    description: "Design systematic record approval processes and explore complex declarative automation configurations.",
+    points: [
+      "Configure single-step and multi-step Approval Processes.",
+      "Understand approval steps, entry criteria, and automated actions.",
+      "Compare validation rules, flows, and approval capabilities."
+    ],
+    resources: [
+      ["Approvals Help Docs", "https://help.salesforce.com/s/articleView?id=sf.approvals.htm&type=5"]
+    ],
+    practice: [
+      "Create an approval process for Student Course graduation approvals.",
+      "Design final approval and rejection actions."
+    ],
+    questions: [
+      "When should you use an approval process instead of record-triggered flows?",
+      "What actions can be triggered during approval steps?"
     ]
   }
 ];
