@@ -587,7 +587,7 @@ function setupTabs() {
 
 function renderLearningTracks() {
   const definitions = [
-    ["admin", "course-admin.html", 5],
+    ["admin", "course-admin.html", 6],
     ["apex", "course-apex.html", 12],
     ["flow", "course-flow.html", 12],
     ["lwc", "course-lwc.html", 12]
@@ -668,7 +668,7 @@ function renderLearningTracks() {
   try { adminAttempts = JSON.parse(localStorage.getItem("tomcodex.adminLabAttempts.v1")) || {}; } catch {}
   let adminScores = {};
   try { adminScores = JSON.parse(localStorage.getItem("tomcodex.adminMasteryScores.v1")) || {}; } catch {}
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 6; i++) {
     const bestScore = adminAttempts[`admin-${i}:summary`]?.bestScore || adminAttempts[`admin-module-${i}:summary`]?.bestScore || 0;
     const quizScore = adminScores[i - 1]?.score || 0;
     if (bestScore >= 80 || quizScore >= 80) {
@@ -729,6 +729,9 @@ function renderLearningTracks() {
   } else if (adminVerifiedCount === 4) {
     nextActionText = "Continue Admin Module 5 - Validation Rules and Data Quality";
     nextActionLink = "course-admin.html?module=4";
+  } else if (adminVerifiedCount === 5) {
+    nextActionText = "Continue Admin Module 6 - Reports and Dashboards";
+    nextActionLink = "course-admin.html?module=5";
   } else {
     nextActionText = "All modules verified! Go to final exam.";
     nextActionLink = "course-admin.html";

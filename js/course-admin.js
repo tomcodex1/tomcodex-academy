@@ -481,7 +481,149 @@ const modules = [
     }
   },
   {
-    title: "Flow Automation",
+    title: "Reports and Dashboards",
+    description: "Turn Salesforce data into useful operational and leadership insights with custom reports and dashboard visual components.",
+    points: [
+      "Explain the purpose of Reports and Dashboards in Salesforce.",
+      "Understand standard vs custom Report Types.",
+      "Differentiate between Tabular, Summary, and Matrix reports.",
+      "Design Dashboards with visual components to track business KPIs."
+    ],
+    resources: [
+      ["Reports and Dashboards Trailhead", "https://trailhead.salesforce.com/content/learn/modules/lex_implementation_reports_dashboards"],
+      ["Reports and Dashboards Help Docs", "https://help.salesforce.com/s/articleView?id=sf.reports_and_dashboards_overview.htm&type=5"]
+    ],
+    practice: [
+      "Build custom reports grouping Students by Status and Enrollments by Course.",
+      "Build a report tracking Pending Fee Payments.",
+      "Create a Student Success CRM Dashboard with at least 3 components."
+    ],
+    questions: [
+      "What is the difference between a Summary and a Matrix report?",
+      "How do report types control the fields available for reports?",
+      "What determines the access a user has to report data?"
+    ],
+    richContent: {
+      moduleGoal: "Track and visualize your CRM metrics by building real reports and dashboard charts in your Developer Org.",
+      learningOutcomes: [
+        "Create custom reports with groupings and summary formulas.",
+        "Design a custom Dashboard with multiple components (charts, metrics, tables).",
+        "Understand folder sharing and how security controls record visibility in reports.",
+        "Implement report filters and conditional formatting."
+      ],
+      simpleExplanation: `
+        <h4 class="font-bold text-slate-800 text-sm">Reports and Dashboards Overview</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          A report is a list of records that meet standard filtering criteria (e.g. active students). A dashboard is a graphical representation of report data, utilizing visual components such as bar charts, line charts, gauges, metrics, and tables.
+        </p>
+        <h4 class="font-bold text-slate-800 text-sm mt-3">Visualizing CRM KPIs</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          Data is only as good as the insights it provides. Reports organize raw database records into rows and columns, while Dashboards aggregate those reports into a single, comprehensive command center view for business leaders.
+        </p>
+      `,
+      realBusinessExample: `
+        <p class="text-slate-600 text-xs leading-relaxed">
+          At <strong>TomCodeX Academy</strong>, program managers need to track student signups, enrollment trends, and financial collections. We create the following items:
+        </p>
+        <ul class="list-disc pl-5 mt-2 space-y-1 text-slate-600 text-xs">
+          <li><strong>Students by Status Report</strong>: Groups student records by active, inactive, or graduated.</li>
+          <li><strong>Enrollments by Course Report</strong>: Tracks how many students are enrolled in Admin vs Developer courses.</li>
+          <li><strong>Student Success CRM Dashboard</strong>: Consolidates these reports into pie charts, gauges, and total collections metrics.</li>
+        </ul>
+      `,
+      whereUsed: `
+        <div class="space-y-3">
+          <div>
+            <strong class="text-brand-700 text-xs block">Reports Tab</strong>
+            <span class="text-slate-500 text-xs">The application tab where users can run, customize, and schedule reports.</span>
+          </div>
+          <div>
+            <strong class="text-brand-700 text-xs block">Dashboard Builder</strong>
+            <span class="text-slate-500 text-xs">The drag-and-drop grid canvas where you add dashboard components linked to source reports.</span>
+          </div>
+        </div>
+      `,
+      stepByStepImplementation: [
+        "Go to the <strong>Reports</strong> tab, click New Report, choose the custom report type for Students, and group by Status. Save as <strong>Students by Status</strong>.",
+        "Create another report for Enrollments, group by Course, and save as <strong>Enrollments by Course</strong>.",
+        "Create a report filtering fee payments where Status is Pending, and save as <strong>Pending Fee Payments</strong>.",
+        "Go to the <strong>Dashboards</strong> tab, click New Dashboard, and name it <strong>Student Success CRM Dashboard</strong>.",
+        "Add at least 3 components (e.g., Donut Chart for Students by Status, Bar Chart for Course Enrollments, Metric component for Pending Fees)."
+      ],
+      bestPractices: [
+        "Always store reports and dashboards in shared folders with appropriate view permissions so colleagues can access them.",
+        "Keep dashboards clean by limiting them to 5-9 highly relevant components representing core business metrics."
+      ],
+      commonMistakes: [
+        "Linking dashboard components to reports stored in 'Private Reports' folder, which prevents other users from seeing them.",
+        "Not setting the 'Dashboard Viewer' property correctly, causing data security leakages."
+      ],
+      whyMattersInJob: `
+        <p class="text-slate-600 text-xs leading-relaxed">
+          Operational reporting is one of the top requests for admins. Managers want to see their business metrics in real-time, and you will be responsible for translating raw request requirements into clean charts.
+        </p>
+      `,
+      interviewQuestions: [
+        "What is the difference between a custom report type and standard report type?",
+        "Explain the differences between Tabular, Summary, and Matrix reports.",
+        "Why would a user see a dashboard component but no data when clicking into the report?"
+      ],
+      handsOnLab: {
+        title: "Lab 1: Create Custom Reports & Dashboard",
+        instructions: `
+          <p class="text-slate-600 text-xs leading-relaxed mb-3">
+            Build these reports and dashboards in your <strong>Salesforce Developer Org</strong>, then verify your work below.
+          </p>
+          <ol class="list-decimal pl-5 space-y-1.5 text-slate-600 text-xs">
+            <li>Create the <strong>Students by Status</strong> summary report.</li>
+            <li>Create the <strong>Enrollments by Course</strong> summary report.</li>
+            <li>Create the <strong>Pending Fee Payments</strong> report.</li>
+            <li>Create the <strong>Student Success CRM Dashboard</strong>.</li>
+            <li>Add at least 3 dashboard components linked to the reports you created.</li>
+          </ol>
+        `
+      },
+      labCriteria: [
+        {
+          id: "q1",
+          question: "What report did you create to group Students by Status?",
+          type: "text",
+          placeholder: "Enter Students by Status report name",
+          hint: "Verify the exact name of the Student Status report."
+        },
+        {
+          id: "q2",
+          question: "What report did you create to track Enrollments by Course?",
+          type: "text",
+          placeholder: "Enter Enrollments by Course report name",
+          hint: "Verify the exact name of the Course Enrollments report."
+        },
+        {
+          id: "q3",
+          question: "What report did you create to track Pending Fee Payments?",
+          type: "text",
+          placeholder: "Enter Pending Fee Payments report name",
+          hint: "Verify the exact name of the Pending Fee Payments report."
+        },
+        {
+          id: "q4",
+          question: "What dashboard did you create for Student Success CRM?",
+          type: "text",
+          placeholder: "Enter Student Success CRM Dashboard name",
+          hint: "Verify the exact name of the Dashboard."
+        },
+        {
+          id: "q5",
+          question: "Name any three dashboard components you added.",
+          type: "text",
+          placeholder: "Enter three component types (e.g. chart, metric, table)",
+          hint: "Name component types like bar chart, pie chart, metric, table."
+        }
+      ]
+    }
+  },
+  {
+    title: "Flow Automation Foundations",
     description: "Automate business processes safely using Salesforce Flow.",
     points: [
       "Choose Screen, Record-Triggered, Scheduled, or Autolaunched Flow.",
@@ -493,37 +635,14 @@ const modules = [
       ["Flow Builder Guide", "https://help.salesforce.com/s/articleView?id=sf.flow.htm&type=5"]
     ],
     practice: [
-      "Build an Incident creation Screen Flow.",
-      "Notify users when an Incident becomes critical.",
-      "Add a fault path and test negative scenarios."
+      "Build a student welcome Screen Flow.",
+      "Notify managers when a student registers.",
+      "Add a fault path to handle database update exceptions."
     ],
     questions: [
       "When should a flow run before save?",
-      "Why are fault paths important?",
-      "How do you prevent conflicting automation?"
-    ]
-  },
-  {
-    title: "Reports and Dashboards",
-    description: "Turn Salesforce data into useful operational and leadership insights.",
-    points: [
-      "Build tabular, summary, matrix, and joined reports.",
-      "Use report types, filters, grouping, and formulas.",
-      "Design dashboards for specific audiences."
-    ],
-    resources: [
-      ["Reports and Dashboards Trailhead", "https://trailhead.salesforce.com/content/learn/modules/lex_implementation_reports_dashboards"],
-      ["Reports Help", "https://help.salesforce.com/s/articleView?id=sf.reports.htm&type=5"]
-    ],
-    practice: [
-      "Build an Incident operational report.",
-      "Create a management dashboard.",
-      "Validate report access for multiple users."
-    ],
-    questions: [
-      "What controls which records appear in a report?",
-      "When is a custom report type required?",
-      "What makes a dashboard actionable?"
+      "Why are fault paths important in Flow Builder?",
+      "How do you prevent conflicting automation recursion?"
     ]
   },
   {
