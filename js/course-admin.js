@@ -643,7 +643,125 @@ const modules = [
       "When should a flow run before save?",
       "Why are fault paths important in Flow Builder?",
       "How do you prevent conflicting automation recursion?"
-    ]
+    ],
+    richContent: {
+      moduleGoal: "Learn the fundamentals of Salesforce Flow Builder, select appropriate triggers, evaluate branching logic with Decisions, and create automatic actions safely.",
+      learningOutcomes: [
+        "Select the correct Flow types (Screen Flow, Record-Triggered Flow, Scheduled-Triggered Flow).",
+        "Configure trigger events and object targets for automated backend changes.",
+        "Implement Decisions and Outcomes to branch automation paths dynamically.",
+        "Utilize global variables like $Record to read and modify context records."
+      ],
+      simpleExplanation: `
+        <h4 class="font-bold text-slate-800 text-sm">What is Salesforce Flow?</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          Flow is Salesforce's most powerful declarative automation tool. It allows you to build complex logic, execute actions, and perform operations on records using a visual designer. It functions similarly to coding but uses a drag-and-drop flowchart builder.
+        </p>
+        <h4 class="font-bold text-slate-800 text-sm mt-3">Triggering Automations</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          A Record-Triggered Flow is fired automatically when a record is created, updated, or deleted. Think of it as a database trigger in traditional SQL databases. It runs in the background and can update fields, send emails, or create related records.
+        </p>
+      `,
+      realBusinessExample: `
+        <p class="text-slate-600 text-xs leading-relaxed">
+          At <strong>TomCodeX Academy</strong>, program managers need automated operations on registration. When a student is created:
+        </p>
+        <ul class="list-disc pl-5 mt-2 space-y-1 text-slate-600 text-xs">
+          <li><strong>Trigger Flow</strong>: A Record-Triggered Flow triggers on Student__c creation.</li>
+          <li><strong>Decision Element</strong>: Checks if the student's status is 'Active'.</li>
+          <li><strong>Action</strong>: Automatically creates a welcome task or sends an automated welcome email.</li>
+        </ul>
+      `,
+      whereUsed: `
+        <div class="space-y-3">
+          <div>
+            <strong class="text-brand-700 text-xs block">Flow Builder</strong>
+            <span class="text-slate-500 text-xs">The visual development environment where you draw boxes, decisions, and actions to create automation flows.</span>
+          </div>
+          <div>
+            <strong class="text-brand-700 text-xs block">Flow Trigger Explorer</strong>
+            <span class="text-slate-500 text-xs">The dashboard tool to view and order all record-triggered flows operating on a specific object and database event.</span>
+          </div>
+        </div>
+      `,
+      stepByStepImplementation: [
+        "Go to <strong>Setup → Process Automation → Flows</strong> and click New Flow.",
+        "Select <strong>Record-Triggered Flow</strong> and click Create.",
+        "Set the object to <strong>Student__c</strong>, trigger when <strong>A record is created</strong>, and set the condition requirements to None.",
+        "Drag a <strong>Decision</strong> element onto the canvas. Label it 'Check Status' and configure an outcome where status is 'Active'.",
+        "Add a welcome task action or update field action, save the Flow as <strong>Student Registration Automation</strong> (API name: <code>Student_Registration_Automation</code>), and click <strong>Activate</strong>."
+      ],
+      bestPractices: [
+        "Always define fault paths on update/delete elements to handle exceptions gracefully without throwing raw system errors to users.",
+        "Limit the number of flows per object and event, and use the Flow Trigger Explorer to manage execution order."
+      ],
+      commonMistakes: [
+        "Building conflicting validation rules and flows that block each other, causing save loops.",
+        "Not utilizing the $Record global variable to retrieve details from the record that triggered the flow."
+      ],
+      whyMattersInJob: `
+        <p class="text-slate-600 text-xs leading-relaxed">
+          Flow is the primary automation tool in modern Salesforce environments. Companies rely on flows to replace legacy Workflow Rules and Process Builders. Knowing how to construct efficient, bug-free flows is highly sought after by employers.
+        </p>
+      `,
+      interviewQuestions: [
+        "What is the difference between a before-save and after-save Record-Triggered Flow?",
+        "Explain when you would use a Screen Flow versus a Record-Triggered Flow.",
+        "What is a fault path and why is it important in Flow Builder?"
+      ],
+      handsOnLab: {
+        title: "Lab 1: Create Student Welcome Flow",
+        instructions: `
+          <p class="text-slate-600 text-xs leading-relaxed mb-3">
+            Build this record-triggered flow in your <strong>Salesforce Developer Org</strong>, then verify your work below.
+          </p>
+          <ol class="list-decimal pl-5 space-y-1.5 text-slate-600 text-xs">
+            <li>Create a <strong>Record-Triggered Flow</strong> on the <strong>Student__c</strong> object.</li>
+            <li>Configure the flow to trigger when a record is created.</li>
+            <li>Name your flow <strong>Student Registration Automation</strong> (API name: <code>Student_Registration_Automation</code>).</li>
+            <li>Add a <strong>Decision</strong> element to evaluate the Student status.</li>
+            <li>Ensure the flow operates on the <code>$Record</code> global variable and activate the flow.</li>
+          </ol>
+        `
+      },
+      labCriteria: [
+        {
+          id: "q1",
+          question: "What type of Flow did you create to automate Student registration?",
+          type: "text",
+          placeholder: "Enter Flow Type (e.g. Record-Triggered Flow)",
+          hint: "Identify the starting template type you chose for the Flow."
+        },
+        {
+          id: "q2",
+          question: "Which object triggers your record-triggered flow?",
+          type: "text",
+          placeholder: "Enter object API name (e.g. Student__c)",
+          hint: "The API name of the starting object you selected in the Flow trigger setup."
+        },
+        {
+          id: "q3",
+          question: "What is the API name of the Flow you created?",
+          type: "text",
+          placeholder: "Enter Flow API name",
+          hint: "Verify the Flow API name (e.g. Student_Registration_Automation)."
+        },
+        {
+          id: "q4",
+          question: "What element in your flow evaluates conditions to branch logic?",
+          type: "text",
+          placeholder: "Enter element name (e.g. Decision)",
+          hint: "The element type used to branch outcomes (Decision, Loop, etc)."
+        },
+        {
+          id: "q5",
+          question: "What global variable refers to the record that triggered the flow?",
+          type: "text",
+          placeholder: "Enter global variable (e.g. $Record)",
+          hint: "Salesforce flow's default global resource referring to the source record."
+        }
+      ]
+    }
   },
   {
     title: "Workplace Admin and Continuous Growth",

@@ -680,7 +680,7 @@
     let nextModuleText = "";
     if (result.unlockDecision) {
       if (result.unlockDecision.eligibleToUnlock) {
-        nextModuleText = "Admin Module 2 unlocked";
+        nextModuleText = `Admin Module ${currentModule + 2} unlocked`;
       } else {
         if (result.unlockDecision.reason && result.unlockDecision.reason.includes("Founder")) {
           nextModuleText = "Locked - Founder Access required";
@@ -689,7 +689,7 @@
         }
       }
     } else {
-      nextModuleText = result.passed ? "Admin Module 2 unlocked" : "Locked";
+      nextModuleText = result.passed ? `Admin Module ${currentModule + 2} unlocked` : "Locked";
     }
 
     const skillId = result.skillPassportUpdate?.skillId || "salesforce-platform-foundations";

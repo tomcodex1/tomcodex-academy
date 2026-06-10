@@ -587,7 +587,7 @@ function setupTabs() {
 
 function renderLearningTracks() {
   const definitions = [
-    ["admin", "course-admin.html", 6],
+    ["admin", "course-admin.html", 7],
     ["apex", "course-apex.html", 12],
     ["flow", "course-flow.html", 12],
     ["lwc", "course-lwc.html", 12]
@@ -663,12 +663,13 @@ function renderLearningTracks() {
   });
 
   // Dynamic progress summary cards on dashboard
+  const TOTAL_ADMIN_MODULES = definitions[0][2];
   let adminVerifiedCount = 0;
   let adminAttempts = {};
   try { adminAttempts = JSON.parse(localStorage.getItem("tomcodex.adminLabAttempts.v1")) || {}; } catch {}
   let adminScores = {};
   try { adminScores = JSON.parse(localStorage.getItem("tomcodex.adminMasteryScores.v1")) || {}; } catch {}
-  for (let i = 1; i <= 6; i++) {
+  for (let i = 1; i <= TOTAL_ADMIN_MODULES; i++) {
     const bestScore = adminAttempts[`admin-${i}:summary`]?.bestScore || adminAttempts[`admin-module-${i}:summary`]?.bestScore || 0;
     const quizScore = adminScores[i - 1]?.score || 0;
     if (bestScore >= 80 || quizScore >= 80) {
@@ -732,6 +733,9 @@ function renderLearningTracks() {
   } else if (adminVerifiedCount === 5) {
     nextActionText = "Continue Admin Module 6 - Reports and Dashboards";
     nextActionLink = "course-admin.html?module=5";
+  } else if (adminVerifiedCount === 6) {
+    nextActionText = "Continue Admin Module 7 - Flow Automation Foundations";
+    nextActionLink = "course-admin.html?module=6";
   } else {
     nextActionText = "All modules verified! Go to final exam.";
     nextActionLink = "course-admin.html";
@@ -749,7 +753,7 @@ function renderLearningTracks() {
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
             <div>
               <span class="text-[11px] text-slate-400 block uppercase font-bold tracking-wider">Admin Track Progress</span>
-              <strong class="text-sm text-slate-800 font-extrabold">Admin Track Progress: ${adminVerifiedCount} / 4 modules verified</strong>
+              <strong class="text-sm text-slate-800 font-extrabold">Admin Track Progress: ${adminVerifiedCount} / ${TOTAL_ADMIN_MODULES} modules verified</strong>
             </div>
             <div>
               <span class="text-[11px] text-slate-400 block uppercase font-bold tracking-wider">Verified Skills</span>
