@@ -196,27 +196,151 @@ const modules = [
     ]
   },
   {
-    title: "Data Management and Quality",
-    description: "Import, update, clean, protect, and maintain trustworthy Salesforce data.",
+    title: "Page Layouts, Lightning App, and User Experience",
+    description: "Customize user interfaces with page layouts, list views, tabs, and create a custom Lightning app.",
     points: [
-      "Choose between Data Import Wizard and Data Loader.",
-      "Prevent duplicate and invalid records.",
-      "Plan backups and safe bulk changes."
+      "Create custom tabs for Student, Course, and Enrollment custom objects.",
+      "Design a custom Lightning CRM App to group Student Success tabs together.",
+      "Customize page layouts and assign compact views for optimal layout."
     ],
     resources: [
-      ["Trailhead Data Management", "https://trailhead.salesforce.com/content/learn/modules/lex_implementation_data_management"],
-      ["Data Loader Guide", "https://developer.salesforce.com/docs/atlas.en-us.dataLoader.meta/dataLoader/"]
+      ["App Customization Trailhead", "https://trailhead.salesforce.com/content/learn/modules/lex_migration_customization"],
+      ["Lightning App Builder Guide", "https://help.salesforce.com/s/articleView?id=sf.app_builder_overview.htm&type=5"]
     ],
     practice: [
-      "Import sample Incident records.",
-      "Create a matching and duplicate rule.",
-      "Document a safe data update checklist."
+      "Create the Student Success CRM Lightning App.",
+      "Create custom object tabs for Student, Course, and Enrollment.",
+      "Customize and assign the Student Layout page layout."
     ],
     questions: [
-      "What should happen before a bulk update?",
-      "How do external IDs help?",
-      "How do you measure data quality?"
-    ]
+      "What is the difference between a page layout and a Lightning record page?",
+      "How do compact layouts improve user experience on mobile devices?",
+      "What features can be customized inside the Lightning App Setup?"
+    ],
+    richContent: {
+      moduleGoal: "Group custom objects into a dedicated student CRM application and customize page layouts for ease of data entry.",
+      learningOutcomes: [
+        "Create custom tabs for custom objects (Student, Course, Enrollment).",
+        "Build a custom Lightning App called 'Student Success CRM'.",
+        "Configure fields and sections on the Student custom page layout.",
+        "Create a custom List View to filter active student records."
+      ],
+      simpleExplanation: `
+        <h4 class="font-bold text-slate-800 text-sm">Lightning Apps</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          A Lightning App is a curated collection of tabs, utilities, and items grouped together to serve a specific business user persona. It gives your users a single workspace where they can find everything they need.
+        </p>
+        <h4 class="font-bold text-slate-800 text-sm mt-3">Page Layouts and List Views</h4>
+        <p class="text-slate-600 text-xs mt-1 leading-relaxed">
+          Page Layouts control which fields, buttons, and related lists are visible on detail pages, and in what order. List Views allow users to filter and view lists of records that match certain criteria (e.g., Active Students).
+        </p>
+      `,
+      realBusinessExample: `
+        <p class="text-slate-600 text-xs leading-relaxed">
+          At <strong>TomCodeX Academy</strong>, program managers need a unified workspace to manage the CRM. We build a custom app called <strong>Student Success CRM</strong> containing:
+        </p>
+        <ul class="list-disc pl-5 mt-2 space-y-1 text-slate-600 text-xs">
+          <li><strong>Student Tab</strong>: A custom tab linking to Student__c records.</li>
+          <li><strong>Course Tab</strong>: A custom tab linking to Course__c records.</li>
+          <li><strong>Enrollment Tab</strong>: A custom tab linking to Enrollment__c records.</li>
+        </ul>
+      `,
+      whereUsed: `
+        <div class="space-y-3">
+          <div>
+            <strong class="text-brand-700 text-xs block">App Manager</strong>
+            <span class="text-slate-500 text-xs">The Setup tool used to create, customize, and assign Lightning Apps.</span>
+          </div>
+          <div>
+            <strong class="text-brand-700 text-xs block">Page Layout Editor</strong>
+            <span class="text-slate-500 text-xs">The drag-and-drop editor used to organize field sections, buttons, and related lists.</span>
+          </div>
+        </div>
+      `,
+      stepByStepImplementation: [
+        "Go to <strong>Setup → Custom Code → Tabs</strong> and create custom Custom Object Tabs for Student, Course, and Enrollment.",
+        "Go to <strong>Setup → App Manager</strong> and click New Lightning App. Name it <strong>Student Success CRM</strong>.",
+        "Add Student, Course, and Enrollment tabs to the navigation items and assign the app to your profile.",
+        "Go to <strong>Setup → Object Manager → Student__c → Page Layouts</strong> and edit the default layout. Group custom fields into a section called 'Contact Info'.",
+        "Create a custom List View on the Student tab named 'Active Students' to filter records by Status."
+      ],
+      bestPractices: [
+        "Only display necessary fields on page layouts to reduce user cognitive load and avoid clutter.",
+        "Name custom list views clearly so users understand the filter criteria immediately."
+      ],
+      commonMistakes: [
+        "Forgetting to assign the custom Lightning App to profiles, causing it to be invisible to users.",
+        "Putting too many fields in a single page layout section instead of grouping them logically."
+      ],
+      whyMattersInJob: `
+        <p class="text-slate-600 text-xs leading-relaxed">
+          Creating apps and customizing page layouts is one of the most common everyday requests for Salesforce Administrators. Making fields easy to find improves user adoption and data quality.
+        </p>
+      `,
+      interviewQuestions: [
+        "What is a Lightning App and how does it help users?",
+        "Explain how page layouts differ from compact layouts.",
+        "How do you configure list view visibility for different user groups?"
+      ],
+      handsOnLab: {
+        title: "Lab 1: Configure App Experience & Custom Layouts",
+        instructions: `
+          <p class="text-slate-600 text-xs leading-relaxed mb-3">
+            Perform these steps in your <strong>Salesforce Developer Org</strong>, then answer the <strong>Check My Work</strong> questions below to verify your work.
+          </p>
+          <ol class="list-decimal pl-5 space-y-1.5 text-slate-600 text-xs">
+            <li>Create Custom Object Tabs for your custom objects (Student, Course, Enrollment).</li>
+            <li>Build a new Lightning App named <strong>Student Success CRM</strong>, add the custom tabs, and assign it to System Administrator.</li>
+            <li>In Object Manager, customize the Student Page Layout to organize your fields.</li>
+            <li>On the Students tab, create a new List View named <strong>Active Students</strong>.</li>
+          </ol>
+        `
+      },
+      labCriteria: [
+        {
+          id: "q1",
+          question: "What is the exact name of the Lightning App you created?",
+          type: "text",
+          placeholder: "Enter the Lightning App Name",
+          hint: "Verify the exact app name you created in Setup App Manager."
+        },
+        {
+          id: "q2",
+          question: "What is the API name of the Student tab you created?",
+          type: "text",
+          placeholder: "Enter the Student Tab API name",
+          hint: "Verify the custom tab API name (usually Student__c)."
+        },
+        {
+          id: "q3",
+          question: "What is the API name of the Course tab you created?",
+          type: "text",
+          placeholder: "Enter the Course Tab API name",
+          hint: "Verify the Course tab API name (usually Course__c)."
+        },
+        {
+          id: "q4",
+          question: "What is the API name of the Enrollment tab you created?",
+          type: "text",
+          placeholder: "Enter the Enrollment Tab API name",
+          hint: "Verify the Enrollment tab API name (usually Enrollment__c)."
+        },
+        {
+          id: "q5",
+          question: "Name the customized Student Page Layout you configured.",
+          type: "text",
+          placeholder: "Enter the customized Page Layout name",
+          hint: "Verify the name of the page layout under Student Object Manager Page Layouts."
+        },
+        {
+          id: "q6",
+          question: "What is the name of the customized List View you created for Students?",
+          type: "text",
+          placeholder: "Enter the custom List View name",
+          hint: "Verify the name of the list view you configured on the Student record list page."
+        }
+      ]
+    }
   },
   {
     title: "Forms, Validation, and User Experience",

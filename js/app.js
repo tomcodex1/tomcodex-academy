@@ -724,7 +724,7 @@ function renderLearningTracks() {
     nextActionText = "Continue Admin Module 3 - Security and Access Control";
     nextActionLink = "course-admin.html?module=2";
   } else if (adminVerifiedCount === 3) {
-    nextActionText = "Continue Admin Module 4 - Data Management and Quality";
+    nextActionText = "Continue Admin Module 4 - Page Layouts, Lightning App, and User Experience";
     nextActionLink = "course-admin.html?module=3";
   } else {
     nextActionText = "All modules verified! Go to final exam.";
