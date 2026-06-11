@@ -5,7 +5,7 @@ export function registerAiTrainerRoute(app) {
 
   // Engine status check
   app.get("/api/ai/status", (request, response) => {
-    const hasServerKey = Boolean(process.env.GEMINI_API_KEY);
+    const hasServerKey = Boolean(process.env.GEMINI_API_KEY || process.env.OPENROUTER_API_KEY || process.env.GROQ_API_KEY);
     const hasPersonalKey = Boolean(request.personalApiKey);
     const provider = process.env.AI_PROVIDER || "gemini";
     return response.json({

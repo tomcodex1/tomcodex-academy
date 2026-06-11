@@ -55,16 +55,38 @@ class AIEngine {
 
   // ── Key Resolution: user key → server key → null ─────────────────────────
   resolveKey(request) {
-    return request?.personalApiKey || process.env.GEMINI_API_KEY || null;
+    if (request?.personalApiKey) return request.personalApiKey;
+    const provider = process.env.AI_PROVIDER || "gemini";
+    if (provider === "openrouter") return process.env.OPENROUTER_API_KEY || null;
+    if (provider === "groq") return process.env.GROQ_API_KEY || null;
+    return process.env.GEMINI_API_KEY || null;
   }
 
   // ── Model Resolution ──────────────────────────────────────────────────────
   getModel() {
+    const provider = process.env.AI_PROVIDER || "gemini";
+    if (provider === "openrouter") return process.env.OPENROUTER_MODEL || "meta-llama/llama-3.3-70b-instruct:free";
+    if (provider === "groq") return process.env.GROQ_MODEL || "llama-3.3-70b-specdec";
     return process.env.GEMINI_MODEL || "gemini-2.5-flash";
   }
 
   // ── Gemini API Call with Retry + Exponential Backoff ─────────────────────
   async callGemini({ key, contents, jsonMode = false, generationConfig = {}, retries = 3 }) {
+    const provider = process.env.AI_PROVIDER || "gemini";
+    const isPersonalGeminiKey = key && key !== process.env.OPENROUTER_API_KEY && key !== process.env.GROQ_API_KEY && key !== process.env.GEMINI_API_KEY;
+    const useDirectGemini = isPersonalGeminiKey || provider === "gemini";
+
+    if (!useDirectGemini) {
+      if (provider === "openrouter") {
+        console.info("Directly routing call to OpenRouter...");
+        return await this._callOpenRouter(contents, jsonMode);
+      }
+      if (provider === "groq") {
+        console.info("Directly routing call to Groq...");
+        return await this._callGroq(contents, jsonMode);
+      }
+    }
+
     const model = this.getModel();
     const url = `${GEMINI_BASE}/${model}:generateContent?key=${key}`;
     const config = {
@@ -527,7 +549,7 @@ export function registerCentralAiRoute(app) {
 
   // Health check for the centralized engine
   app.get("/api/ai/engine-status", (request, response) => {
-    const hasServerKey = Boolean(process.env.GEMINI_API_KEY);
+    const hasServerKey = Boolean(process.env.GEMINI_API_KEY || process.env.OPENROUTER_API_KEY || process.env.GROQ_API_KEY);
     const hasPersonalKey = Boolean(request.personalApiKey);
     return response.json({
       status: hasServerKey || hasPersonalKey ? "ready" : "no-key",
