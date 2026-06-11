@@ -94,6 +94,6 @@ describe("AI Engine Fallback Support", () => {
     expect(geminiCalled).toBe(1);
     expect(groqCalled).toBe(1);
     expect(result.text).toBe("This is Groq fallback answer");
-    expect(result.model).toBe("groq/llama-3.3-70b-specdec");
+    expect(result.model).toBe("groq/llama-3.3-70b-versatile");
   });
 });

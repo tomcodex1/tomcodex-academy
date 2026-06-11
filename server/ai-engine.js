@@ -66,7 +66,7 @@ class AIEngine {
   getModel() {
     const provider = process.env.AI_PROVIDER || "gemini";
     if (provider === "openrouter") return process.env.OPENROUTER_MODEL || "meta-llama/llama-3.3-70b-instruct:free";
-    if (provider === "groq") return process.env.GROQ_MODEL || "llama-3.3-70b-specdec";
+    if (provider === "groq") return process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
     return process.env.GEMINI_MODEL || "gemini-2.5-flash";
   }
 
@@ -192,7 +192,7 @@ class AIEngine {
   async _callGroq(contents, jsonMode) {
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) throw new Error("Groq API key not configured.");
-    const model = process.env.GROQ_MODEL || "llama-3.3-70b-specdec";
+    const model = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
     const messages = this._convertToOpenAiMessages(contents);
 
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
