@@ -472,10 +472,10 @@ function setupDoubtBox() {
       );
       return;
     }
-    answer.replaceChildren(
-      createElement("strong", "", `${speedModeSelect.options[speedModeSelect.selectedIndex].text} Response`),
-      createElement("p", "", result.answer)
-    );
+    const heading = createElement("strong", "", `${speedModeSelect.options[speedModeSelect.selectedIndex].text} Response`);
+    const bodyContainer = createElement("div", "rich-text-content");
+    answer.replaceChildren(heading, bodyContainer);
+    window.TomCodexAI.typeWriterEffect(bodyContainer, result.answer);
   });
 }
 

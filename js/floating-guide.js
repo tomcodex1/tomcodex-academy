@@ -74,9 +74,14 @@
       return;
     }
     const selectedMode = { flash: "Quick answer", normal: "Guided answer", deep: "Deep guidance" }[result.speedMode] || "Zentom answer";
-    answer.replaceChildren(Object.assign(document.createElement("strong"), { textContent: selectedMode }), Object.assign(document.createElement("p"), { textContent: result.answer }));
-    ask.disabled = false;
-    ask.textContent = "Ask Zentom";
+    const heading = Object.assign(document.createElement("strong"), { textContent: selectedMode });
+    const bodyContainer = document.createElement("div");
+    bodyContainer.className = "rich-text-content";
+    answer.replaceChildren(heading, bodyContainer);
+    window.TomCodexAI.typeWriterEffect(bodyContainer, result.answer, () => {
+      ask.disabled = false;
+      ask.textContent = "Ask Zentom";
+    });
     window.TomCodexLearning?.record("tutor", 2, `${context()}: ${doubt}`);
   });
 })();

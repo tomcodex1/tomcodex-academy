@@ -619,3 +619,58 @@
   background: #fef3c7;
   border-color: #d97706;
 }
+
+/* Zentom Rich Markdown styling overrides */
+.rich-text-content {
+  margin-top: 0.6rem;
+}
+.mock-answer, .course-doubt-answer, .tc-guide-answer {
+  white-space: normal !important;
+}
+.rich-text-content p, .tc-guide-answer p {
+  margin-bottom: 0.6rem;
+  line-height: 1.6;
+  color: #475569;
+}
+.rich-text-content p:last-child {
+  margin-bottom: 0;
+}
+.rich-text-content strong, .tc-guide-answer strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+.rich-text-content em {
+  font-style: italic;
+}
+.rich-text-content h1, .rich-text-content h2, .rich-text-content h3 {
+  color: #0f172a;
+  font-weight: 800;
+  margin: 0.8rem 0 0.4rem;
+}
+.rich-text-content h1 { font-size: 1.1rem; }
+.rich-text-content h2 { font-size: 1rem; }
+.rich-text-content h3 { font-size: 0.9rem; }
+.rich-text-content ul, .rich-text-content ol, .tc-guide-answer ul, .tc-guide-answer ol {
+  margin: 0.5rem 0 0.8rem 1.25rem;
+  padding: 0;
+}
+.rich-text-content ul, .tc-guide-answer ul {
+  list-style-type: disc !important;
+}
+.rich-text-content ol, .tc-guide-answer ol {
+  list-style-type: decimal !important;
+}
+.rich-text-content li, .tc-guide-answer li {
+  margin-top: 0.35rem;
+  line-height: 1.6;
+  color: #475569;
+}
+.rich-text-content code, .tc-guide-answer code {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  background-color: #f1f5f9;
+  color: #0f172a;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-size: 85%;
+}
+

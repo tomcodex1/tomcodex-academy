@@ -34,12 +34,14 @@
     }
 
     answerBox.className = "course-doubt-answer";
-    answerBox.replaceChildren(
-      Object.assign(document.createElement("strong"), { textContent: `${speed.options[speed.selectedIndex].text} guide answer` }),
-      Object.assign(document.createElement("p"), { textContent: result.answer })
-    );
-    askButton.disabled = false;
-    askButton.textContent = "Ask Zentom";
+    const heading = Object.assign(document.createElement("strong"), { textContent: `${speed.options[speed.selectedIndex].text} guide answer` });
+    const bodyContainer = document.createElement("div");
+    bodyContainer.className = "rich-text-content";
+    answerBox.replaceChildren(heading, bodyContainer);
+    window.TomCodexAI.typeWriterEffect(bodyContainer, result.answer, () => {
+      askButton.disabled = false;
+      askButton.textContent = "Ask Zentom";
+    });
     window.TomCodexLearning?.record("tutor", 2, `${moduleTitle}: ${doubt}`);
   });
 
@@ -76,12 +78,14 @@
     floatingAnswer.className = "course-doubt-answer";
     floatingAnswer.textContent = "Preparing your guided answer...";
     const result = await window.TomCodexAI.askTrainer({ topic: moduleTitle, answerMode: "Floating Course Guide", speedMode: floatingSpeed.value, doubt });
-    floatingAnswer.replaceChildren(
-      Object.assign(document.createElement("strong"), { textContent: `${floatingSpeed.options[floatingSpeed.selectedIndex].text} guide answer` }),
-      Object.assign(document.createElement("p"), { textContent: result.answer })
-    );
-    floatingAskButton.disabled = false;
-    floatingAskButton.textContent = "Ask AI guide";
+    const heading = Object.assign(document.createElement("strong"), { textContent: `${floatingSpeed.options[floatingSpeed.selectedIndex].text} guide answer` });
+    const bodyContainer = document.createElement("div");
+    bodyContainer.className = "rich-text-content";
+    floatingAnswer.replaceChildren(heading, bodyContainer);
+    window.TomCodexAI.typeWriterEffect(bodyContainer, result.answer, () => {
+      floatingAskButton.disabled = false;
+      floatingAskButton.textContent = "Ask AI guide";
+    });
     window.TomCodexLearning?.record("tutor", 2, `${moduleTitle}: ${doubt}`);
   });
 })();

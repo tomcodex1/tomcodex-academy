@@ -155,7 +155,119 @@
     } catch (err) {
       return evaluateScreenshotLocally(payload);
     }
+  function parseMarkdownToHTML(markdown) {
+    if (!markdown) return "";
+
+    const lines = markdown.split(/\r?\n/);
+    let html = "";
+    let inList = false;
+    let inOrderedList = false;
+
+    function parseInline(text) {
+      let escaped = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+      // Bold: **text**
+      escaped = escaped.replace(/\*\*([\s\S]+?)\*\*/g, "<strong>$1</strong>");
+      // Italic: *text* or _text_
+      escaped = escaped.replace(/\*([\s\S]+?)\*/g, "<em>$1</em>");
+      escaped = escaped.replace(/_([\s\S]+?)_/g, "<em>$1</em>");
+      // Inline code: `code`
+      escaped = escaped.replace(/`([^`]+)`/g, "<code>$1</code>");
+      return escaped;
+    }
+
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i];
+      let trimmed = line.trim();
+
+      if (trimmed === "") {
+        if (inList) { html += "</ul>"; inList = false; }
+        if (inOrderedList) { html += "</ol>"; inOrderedList = false; }
+        continue;
+      }
+
+      // Headers
+      if (trimmed.startsWith("### ")) {
+        if (inList) { html += "</ul>"; inList = false; }
+        if (inOrderedList) { html += "</ol>"; inOrderedList = false; }
+        html += `<h3>${parseInline(trimmed.slice(4))}</h3>`;
+        continue;
+      }
+      if (trimmed.startsWith("## ")) {
+        if (inList) { html += "</ul>"; inList = false; }
+        if (inOrderedList) { html += "</ol>"; inOrderedList = false; }
+        html += `<h2>${parseInline(trimmed.slice(3))}</h2>`;
+        continue;
+      }
+      if (trimmed.startsWith("# ")) {
+        if (inList) { html += "</ul>"; inList = false; }
+        if (inOrderedList) { html += "</ol>"; inOrderedList = false; }
+        html += `<h1>${parseInline(trimmed.slice(2))}</h1>`;
+        continue;
+      }
+
+      // Unordered list
+      if (trimmed.startsWith("* ") || trimmed.startsWith("- ")) {
+        if (inOrderedList) { html += "</ol>"; inOrderedList = false; }
+        if (!inList) {
+          html += "<ul>";
+          inList = true;
+        }
+        html += `<li>${parseInline(trimmed.slice(2))}</li>`;
+        continue;
+      }
+
+      // Ordered list
+      const olMatch = trimmed.match(/^(\d+)\.\s+(.*)/);
+      if (olMatch) {
+        if (inList) { html += "</ul>"; inList = false; }
+        if (!inOrderedList) {
+          html += "<ol>";
+          inOrderedList = true;
+        }
+        html += `<li>${parseInline(olMatch[2])}</li>`;
+        continue;
+      }
+
+      // Regular line
+      if (inList) { html += "</ul>"; inList = false; }
+      if (inOrderedList) { html += "</ol>"; inOrderedList = false; }
+      html += `<p>${parseInline(line)}</p>`;
+    }
+
+    if (inList) html += "</ul>";
+    if (inOrderedList) html += "</ol>";
+
+    return html;
   }
 
-  window.TomCodexAI = { evaluateMastery, generateMasteryQuestions, askTrainer, getStatus, evaluateScreenshot };
+  function typeWriterEffect(containerElement, rawText, callback) {
+    if (containerElement.__typingInterval) {
+      clearInterval(containerElement.__typingInterval);
+    }
+    containerElement.innerHTML = "";
+
+    const tokens = rawText.match(/\s+|\S+/g) || [];
+    let currentTokenIndex = 0;
+    let currentText = "";
+
+    const speed = tokens.length > 200 ? 12 : 20;
+
+    containerElement.__typingInterval = setInterval(() => {
+      if (currentTokenIndex < tokens.length) {
+        currentText += tokens[currentTokenIndex];
+        containerElement.innerHTML = parseMarkdownToHTML(currentText);
+        currentTokenIndex++;
+      } else {
+        clearInterval(containerElement.__typingInterval);
+        containerElement.__typingInterval = null;
+        if (callback) callback();
+      }
+    }, speed);
+  }
+
+  window.TomCodexAI = { evaluateMastery, generateMasteryQuestions, askTrainer, getStatus, evaluateScreenshot, parseMarkdownToHTML, typeWriterEffect };
 })();
