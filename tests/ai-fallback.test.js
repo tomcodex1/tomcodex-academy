@@ -54,7 +54,7 @@ describe("AI Engine Fallback Support", () => {
     expect(geminiCalled).toBe(1);
     expect(openRouterCalled).toBe(1);
     expect(result.text).toBe("This is OpenRouter fallback answer");
-    expect(result.model).toBe("openrouter/google/gemini-2.5-flash:free");
+    expect(result.model).toBe("openrouter/meta-llama/llama-3.3-70b-instruct:free");
   });
 
   test("falls back to Groq when OpenRouter key is not set", async () => {

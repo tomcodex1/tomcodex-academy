@@ -134,7 +134,7 @@ class AIEngine {
   async _callOpenRouter(contents, jsonMode) {
     const apiKey = process.env.OPENROUTER_API_KEY;
     if (!apiKey) throw new Error("OpenRouter API key not configured.");
-    const model = process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash:free";
+    const model = process.env.OPENROUTER_MODEL || "meta-llama/llama-3.3-70b-instruct:free";
     const messages = this._convertToOpenAiMessages(contents);
 
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
