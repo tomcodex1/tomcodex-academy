@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Verifiable Salesforce skills passport and learning portfolio on TomCodeX Academy." />
+  <meta name="robots" content="index, follow" />
+  <title>Learner Profile | TomCodeX AI Academy</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { brand: { 50: "#eef8ff", 100: "#d9f0ff", 500: "#087ea4", 600: "#056b8d", 700: "#075875", 950: "#062c3a" }, ink: "#172b4d", lime: "#d8ff5f" },
+        fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"] }
+      }}
+    };
+  </script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      background: radial-gradient(circle at 80% 10%, rgba(8, 126, 164, 0.18) 0%, transparent 45%),
+                  radial-gradient(circle at 10% 70%, rgba(216, 255, 95, 0.07) 0%, transparent 35%),
+                  #03161e;
+      color: #f8fafc;
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .glass-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .btn-lime {
+      background: #d8ff5f;
+      color: #062c3a;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-lime:hover {
+      background: #ffffff;
+      box-shadow: 0 0 24px rgba(216, 255, 95, 0.4);
+      transform: translateY(-2px);
+    }
+    .btn-lime:active {
+      transform: translateY(0);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      transition: all 0.2s ease;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+    .badge-locked {
+      filter: grayscale(100%);
+      opacity: 0.35;
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Skeleton Loader style */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+    }
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col">
+  
+  <!-- Site Header -->
+  <header class="border-b border-white/5 bg-black/25 backdrop-blur-md sticky top-0 z-50">
+    <div class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
+      <a href="index.html" class="flex items-center gap-2.5" aria-label="TomCodeX Academy Home">
+        <img src="assets/tomcodex-logo-light.svg" alt="TomCodeX logo" class="h-9 w-auto">
+        <span class="border-l border-white/20 pl-3 text-sm font-extrabold text-white">AI Academy</span>
+      </a>
+      <div id="headerActions" class="flex items-center gap-3">
+        <!-- Dynamically injected back to dashboard buttons -->
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow mx-auto max-w-5xl w-full px-5 py-10 lg:py-14">
+    
+    <!-- Loading Skeleton Card -->
+    <div id="skeletonLoader" class="glass-card rounded-3xl p-8 lg:p-12 mb-8 animate-pulse">
+      <div class="flex flex-col md:flex-row items-center gap-6 border-b border-white/5 pb-8">
+        <div class="w-24 h-24 rounded-full skeleton"></div>
+        <div class="flex-grow space-y-3 w-full">
+          <div class="h-8 w-48 rounded skeleton"></div>
+          <div class="h-4 w-32 rounded skeleton"></div>
+          <div class="h-4 w-64 rounded skeleton"></div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-8 border-b border-white/5">
+        <div class="h-16 rounded skeleton"></div>
+        <div class="h-16 rounded skeleton"></div>
+        <div class="h-16 rounded skeleton"></div>
+        <div class="h-16 rounded skeleton"></div>
+      </div>
+    </div>
+
+    <!-- Main Profile Card (Hidden until data is loaded) -->
+    <div id="profileContainer" class="hidden animate-fade-in">
+      
+      <!-- Hero Section -->
+      <div class="glass-card rounded-3xl p-8 lg:p-10 mb-8 relative overflow-hidden">
+        <div class="absolute -top-12 -right-12 w-48 h-48 bg-brand-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-12 -left-12 w-48 h-48 bg-lime/5 rounded-full blur-3xl"></div>
+        
+        <div class="flex flex-col md:flex-row items-center text-center md:text-left gap-6 border-b border-white/5 pb-8">
+          <div id="profileAvatar" class="w-24 h-24 rounded-full bg-lime text-brand-950 font-black text-3xl flex items-center justify-center shadow-lg shrink-0">
+            S
+          </div>
+          <div class="flex-grow">
+            <div class="flex flex-wrap items-center justify-center md:justify-start gap-2.5">
+              <h1 id="profileName" class="text-3xl font-extrabold tracking-tight">Student Name</h1>
+              <span id="profileTier" class="text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider bg-lime/20 text-lime border border-lime/30">Founder tier</span>
+            </div>
+            <p id="profileRole" class="text-cyan-300 font-semibold text-sm mt-1.5 uppercase tracking-widest">Salesforce Platform Learner</p>
+            <div class="flex flex-wrap items-center justify-center md:justify-start gap-x-6 gap-y-2 mt-4 text-xs text-slate-400">
+              <span class="flex items-center gap-1.5">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Joined <span id="profileJoined">Recently</span>
+              </span>
+              <span class="flex items-center gap-1.5">
+                <svg class="h-4 w-4 text-orange-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                </svg>
+                Streak: <strong id="profileStreak" class="text-orange-400 font-bold">1 Day</strong>
+              </span>
+            </div>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0 mt-4 md:mt-0">
+            <button id="shareProfileBtn" class="btn-lime w-full sm:w-auto px-6 py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 text-sm">
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 10.742l4.636-2.318m0 0a3 3 0 102.267-2.684 3 3 0 00-2.267 2.684zm0 0L8.684 13.258m0 0a3 3 0 12-2.267-2.684 3 3 0 022.267 2.684zm0 0l4.636 2.318m0 0a3 3 0 102.267-2.684 3 3 0 00-2.267 2.684z" />
+              </svg>
+              Share Portfolio
+            </button>
+          </div>
+        </div>
+
+        <!-- Career Stats Row -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-8">
+          <div class="glass-pill rounded-2xl p-4 text-center">
+            <strong id="statLabs" class="block text-2xl font-extrabold text-white">0</strong>
+            <span class="text-xs text-slate-400 mt-1 block">Verified Labs Passed</span>
+          </div>
+          <div class="glass-pill rounded-2xl p-4 text-center">
+            <strong id="statAvgScore" class="block text-2xl font-extrabold text-white">0%</strong>
+            <span class="text-xs text-slate-400 mt-1 block">Average Lab Score</span>
+          </div>
+          <div class="glass-pill rounded-2xl p-4 text-center">
+            <strong id="statModules" class="block text-2xl font-extrabold text-white">0</strong>
+            <span class="text-xs text-slate-400 mt-1 block">Modules Mastered</span>
+          </div>
+          <div class="glass-pill rounded-2xl p-4 text-center">
+            <strong id="statAiSessions" class="block text-2xl font-extrabold text-white">0</strong>
+            <span class="text-xs text-slate-400 mt-1 block">AI Tutor Requests</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Columns -->
+      <div class="grid gap-8 lg:grid-cols-[1.3fr_1.7fr]">
+        
+        <!-- Left Side: Credentials & Badges -->
+        <div class="space-y-8">
+          
+          <!-- Certificate Card -->
+          <div id="certCard" class="bg-gradient-to-br from-brand-950 to-brand-700 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden border border-brand-600 flex flex-col justify-between min-h-[22rem]">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-lime opacity-10 rounded-full blur-2xl"></div>
+            <div>
+              <span class="text-xs font-bold uppercase tracking-widest text-cyan-300">Curriculum Credential</span>
+              <div class="mt-6 flex flex-col items-center text-center">
+                <img src="assets/tomcodex-logo-light.svg" alt="TomCodeX logo" class="h-16 w-auto mb-4">
+                <h3 class="font-extrabold text-xl">Salesforce Platform Graduate</h3>
+                <p class="text-slate-300 text-xs mt-2 max-w-xs leading-relaxed">Verifiable certificate of completion for all 10 Admin foundations and screenshot labs.</p>
+              </div>
+            </div>
+            
+            <div id="certStatusWrap" class="mt-6">
+              <!-- Cert status will be dynamically injected (Locked progress bar or Graduate badge) -->
+            </div>
+          </div>
+
+          <!-- Badges Card -->
+          <div class="glass-card rounded-3xl p-6">
+            <h3 class="font-extrabold text-lg border-b border-white/5 pb-3 mb-4 flex items-center justify-between">
+              <span>Achievements & Badges</span>
+              <span id="badgeCount" class="text-xs font-bold text-lime">0 earned</span>
+            </h3>
+            <div id="badgesGrid" class="grid grid-cols-4 gap-4">
+              <!-- Dynamically populated badges -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side: Skills Passport & Activity Log -->
+        <div class="space-y-8">
+          
+          <!-- Skills Passport -->
+          <div class="glass-card rounded-3xl p-6">
+            <h3 class="font-extrabold text-lg border-b border-white/5 pb-3 mb-4">
+              Verified Skills Passport
+            </h3>
+            <div id="skillsPassportGrid" class="space-y-3">
+              <!-- Dynamically populated skills progress -->
+            </div>
+          </div>
+
+          <!-- Recent Activity Log -->
+          <div class="glass-card rounded-3xl p-6">
+            <h3 class="font-extrabold text-lg border-b border-white/5 pb-3 mb-4">
+              Screenshot Lab History
+            </h3>
+            <div id="activityLog" class="space-y-4">
+              <!-- Dynamically populated recent lab attempts -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="border-t border-white/5 bg-black/30 py-8 text-slate-400 text-center text-xs mt-auto">
+    <div class="mx-auto max-w-5xl px-5 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div>
+        <p>TomCodeX Academy verified learner credentials.</p>
+        <p class="text-[10px] text-slate-500 mt-1">Copyright 2026 TomCodeX Inc. All rights reserved.</p>
+      </div>
+      <div class="text-slate-500">
+        Verifiable via Blockchain-anchored Redis log
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-[999] bg-emerald-600 text-white font-bold text-sm px-6 py-4 rounded-2xl shadow-xl flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300" role="alert">
+    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+    <span id="toastMessage">Link copied to clipboard!</span>
+  </div>
+
+  <script src="js/learner-profile.js"></script>
+</body>
+</html>

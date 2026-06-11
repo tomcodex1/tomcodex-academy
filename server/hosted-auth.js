@@ -105,6 +105,14 @@ async function createStudent(student) {
   return true;
 }
 
+async function loadStudentById(id) {
+  if (!redisConfig()) return null;
+  const emails = await redis(["SMEMBERS", STUDENT_SET_KEY]) || [];
+  const students = (await Promise.all(emails.map(loadStudent))).filter(Boolean);
+  return students.find((candidate) => candidate.id === id) || null;
+}
+
+
 function publicStudent(student) {
   const usage = student.usage || {
     requestsToday: 0,
@@ -701,6 +709,37 @@ export function registerHostedAuthRoutes(app) {
   app.post("/api/logout", (_request, response) => {
     response.setHeader("Set-Cookie", "tomcodexHosted=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0");
     return response.json({ signedOut: true });
+  });
+
+  app.get("/api/public-profile", async (request, response) => {
+    try {
+      const id = String(request.query.id || "").trim();
+      if (!id) return response.status(400).json({ error: "Student ID is required." });
+      
+      let student = null;
+      if (redisConfig()) {
+        student = await loadStudentById(id);
+      } else {
+        const fallback = configuredStudent();
+        if (fallback && fallback.id === id) {
+          student = fallback;
+        }
+      }
+      
+      if (!student) {
+        return response.status(404).json({ error: "Student account not found." });
+      }
+      
+      return response.json({
+        id: student.id,
+        name: student.name,
+        createdAt: student.createdAt,
+        tier: student.tier || "free",
+        progress: student.progress || {}
+      });
+    } catch (error) {
+      return response.status(503).json({ error: error.message });
+    }
   });
 
   app.get("/api/auth-session", async (request, response) => {
