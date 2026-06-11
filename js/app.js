@@ -588,7 +588,7 @@ function setupTabs() {
 function renderLearningTracks() {
   const definitions = [
     ["admin", "course-admin.html", 10],
-    ["apex", "course-apex.html", 12],
+    ["apex", "course-apex.html", 13],
     ["flow", "course-flow.html", 12],
     ["lwc", "course-lwc.html", 12]
   ];
@@ -1070,7 +1070,7 @@ async function renderSkillPassport() {
   try { adminScores = JSON.parse(localStorage.getItem("tomcodex.adminMasteryScores.v1")) || {}; } catch {}
 
   // Count verified admin modules from lab attempts (primary) and quiz scores (secondary)
-  const TOTAL_CERT_MODULES = 8;
+  const TOTAL_CERT_MODULES = 10;
   let adminAttemptsCert = {};
   try { adminAttemptsCert = JSON.parse(localStorage.getItem("tomcodex.adminLabAttempts.v1")) || {}; } catch {}
   let adminVerifiedForCert = 0;
