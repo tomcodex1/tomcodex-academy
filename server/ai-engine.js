@@ -56,7 +56,7 @@ class AIEngine {
   // ── Key Resolution: user key → server key → null ─────────────────────────
   resolveKey(request) {
     if (request?.personalApiKey) return request.personalApiKey;
-    const provider = process.env.AI_PROVIDER || "gemini";
+    const provider = process.env.AI_PROVIDER || "groq";
     if (provider === "openrouter") return process.env.OPENROUTER_API_KEY || null;
     if (provider === "groq") return process.env.GROQ_API_KEY || null;
     return process.env.GEMINI_API_KEY || null;
@@ -64,97 +64,106 @@ class AIEngine {
 
   // ── Model Resolution ──────────────────────────────────────────────────────
   getModel() {
-    const provider = process.env.AI_PROVIDER || "gemini";
+    const provider = process.env.AI_PROVIDER || "groq";
     if (provider === "openrouter") return process.env.OPENROUTER_MODEL || "meta-llama/llama-3.3-70b-instruct:free";
     if (provider === "groq") return process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
     return process.env.GEMINI_MODEL || "gemini-2.5-flash";
   }
 
-  // ── Gemini API Call with Retry + Exponential Backoff ─────────────────────
+  // ── Standard API Call with Routing & Fallback ─────────────────────────────
   async callGemini({ key, contents, jsonMode = false, generationConfig = {}, retries = 3 }) {
-    const provider = process.env.AI_PROVIDER || "gemini";
-    const isPersonalGeminiKey = key && key !== process.env.OPENROUTER_API_KEY && key !== process.env.GROQ_API_KEY && key !== process.env.GEMINI_API_KEY;
-    const useDirectGemini = isPersonalGeminiKey || provider === "gemini";
+    let provider = process.env.AI_PROVIDER || "groq";
 
-    if (!useDirectGemini) {
-      if (provider === "openrouter") {
-        console.info("Directly routing call to OpenRouter...");
-        return await this._callOpenRouter(contents, jsonMode);
-      }
-      if (provider === "groq") {
-        console.info("Directly routing call to Groq...");
-        return await this._callGroq(contents, jsonMode);
+    if (key && typeof key === "string") {
+      if (key.startsWith("gsk_")) {
+        provider = "groq";
+      } else if (key.startsWith("sk-or-")) {
+        provider = "openrouter";
+      } else if (key.startsWith("AIza") || key.startsWith("AQ.")) {
+        provider = "gemini";
       }
     }
-
-    const model = this.getModel();
-    const url = `${GEMINI_BASE}/${model}:generateContent?key=${key}`;
-    const config = {
-      ...(jsonMode ? { responseMimeType: "application/json" } : {}),
-      ...generationConfig
-    };
 
     let lastError;
-    for (let attempt = 1; attempt <= retries; attempt++) {
+
+    if (provider === "groq") {
       try {
-        const res = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ contents, generationConfig: config })
-        });
-
-        // Rate limited → wait and retry
-        if (res.status === 429 && attempt < retries) {
-          await this._sleep(Math.pow(2, attempt) * 600);
-          continue;
-        }
-        // Server error → retry once
-        if ((res.status === 500 || res.status === 503) && attempt < retries) {
-          await this._sleep(1000);
-          continue;
-        }
-        if (!res.ok) throw new Error(`Gemini API error: ${res.status} ${res.statusText}`);
-
-        const data = await res.json();
-        const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join("") || "";
-        return { text, model, attempts: attempt };
+        return await this._callGroq(contents, jsonMode, key);
       } catch (err) {
         lastError = err;
-        if (attempt < retries) await this._sleep(Math.pow(2, attempt) * 300);
       }
-    }
-
-    // Fallback logic if primary Gemini call failed
-    console.warn(`Gemini API call failed: ${lastError?.message || "Unknown error"}. Attempting fallback providers...`);
-
-    // 1. Try OpenRouter fallback
-    if (process.env.OPENROUTER_API_KEY) {
+    } else if (provider === "openrouter") {
       try {
-        console.info("Attempting OpenRouter fallback...");
-        return await this._callOpenRouter(contents, jsonMode);
-      } catch (orErr) {
-        console.error(`OpenRouter fallback failed: ${orErr.message}`);
-        lastError = orErr;
+        return await this._callOpenRouter(contents, jsonMode, key);
+      } catch (err) {
+        lastError = err;
+      }
+    } else {
+      // Direct Gemini endpoint call (legacy/personal keys)
+      const model = this.getModel();
+      const url = `${GEMINI_BASE}/${model}:generateContent?key=${key}`;
+      const config = {
+        ...(jsonMode ? { responseMimeType: "application/json" } : {}),
+        ...generationConfig
+      };
+
+      for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+          const res = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contents, generationConfig: config })
+          });
+          if (res.status === 429 && attempt < retries) {
+            await this._sleep(Math.pow(2, attempt) * 600);
+            continue;
+          }
+          if ((res.status === 500 || res.status === 503) && attempt < retries) {
+            await this._sleep(1000);
+            continue;
+          }
+          if (!res.ok) throw new Error(`Gemini API error: ${res.status} ${res.statusText}`);
+          const data = await res.json();
+          const text = data.candidates?.[0]?.content?.parts?.map(p => p.text).join("") || "";
+          return { text, model, attempts: attempt };
+        } catch (err) {
+          lastError = err;
+          if (attempt < retries) await this._sleep(Math.pow(2, attempt) * 300);
+        }
       }
     }
 
-    // 2. Try Groq fallback
-    if (process.env.GROQ_API_KEY) {
-      try {
-        console.info("Attempting Groq fallback...");
-        return await this._callGroq(contents, jsonMode);
-      } catch (groqErr) {
-        console.error(`Groq fallback failed: ${groqErr.message}`);
-        lastError = groqErr;
+    // Dynamic Fallbacks: if primary fails, cascade to alternative provider
+    if (provider === "groq" || provider === "gemini") {
+      if (process.env.OPENROUTER_API_KEY) {
+        try {
+          console.info("AI call failed, attempting OpenRouter fallback...");
+          return await this._callOpenRouter(contents, jsonMode);
+        } catch (orErr) {
+          console.error(`OpenRouter fallback failed: ${orErr.message}`);
+          lastError = orErr;
+        }
       }
     }
 
-    throw lastError || new Error("Gemini call failed after retries and no fallback succeeded.");
+    if (provider === "openrouter" || provider === "gemini") {
+      if (process.env.GROQ_API_KEY) {
+        try {
+          console.info("AI call failed, attempting Groq fallback...");
+          return await this._callGroq(contents, jsonMode);
+        } catch (groqErr) {
+          console.error(`Groq fallback failed: ${groqErr.message}`);
+          lastError = groqErr;
+        }
+      }
+    }
+
+    throw lastError || new Error("AI call failed after retries and no fallback succeeded.");
   }
 
-  // ── OpenRouter Fallback Client ────────────────────────────────────────────
-  async _callOpenRouter(contents, jsonMode) {
-    const apiKey = process.env.OPENROUTER_API_KEY;
+  // ── OpenRouter Call Client ────────────────────────────────────────────────
+  async _callOpenRouter(contents, jsonMode, personalKey) {
+    const apiKey = personalKey || process.env.OPENROUTER_API_KEY;
     if (!apiKey) throw new Error("OpenRouter API key not configured.");
     const model = process.env.OPENROUTER_MODEL || "meta-llama/llama-3.3-70b-instruct:free";
     const messages = this._convertToOpenAiMessages(contents);
@@ -188,9 +197,9 @@ class AIEngine {
     return { text, model: `openrouter/${model}` };
   }
 
-  // ── Groq Fallback Client ──────────────────────────────────────────────────
-  async _callGroq(contents, jsonMode) {
-    const apiKey = process.env.GROQ_API_KEY;
+  // ── Groq Call Client ──────────────────────────────────────────────────────
+  async _callGroq(contents, jsonMode, personalKey) {
+    const apiKey = personalKey || process.env.GROQ_API_KEY;
     if (!apiKey) throw new Error("Groq API key not configured.");
     const model = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
     const messages = this._convertToOpenAiMessages(contents);

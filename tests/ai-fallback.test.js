@@ -7,7 +7,7 @@ describe("AI Engine Fallback Support", () => {
 
   beforeEach(() => {
     originalFetch = global.fetch;
-    process.env.GEMINI_API_KEY = "test-gemini-key";
+    process.env.GEMINI_API_KEY = "AIzaSyTestKey";
     process.env.OPENROUTER_API_KEY = "test-openrouter-key";
     process.env.GROQ_API_KEY = "test-groq-key";
   });
@@ -46,7 +46,7 @@ describe("AI Engine Fallback Support", () => {
     });
 
     const result = await aiEngine.callGemini({
-      key: "test-gemini-key",
+      key: "AIzaSyTestKey",
       contents: [{ parts: [{ text: "Hello" }] }],
       retries: 1
     });
@@ -86,7 +86,7 @@ describe("AI Engine Fallback Support", () => {
     });
 
     const result = await aiEngine.callGemini({
-      key: "test-gemini-key",
+      key: "AIzaSyTestKey",
       contents: [{ parts: [{ text: "Hello" }] }],
       retries: 1
     });

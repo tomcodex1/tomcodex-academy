@@ -1423,7 +1423,7 @@ function renderSettingsForm() {
       quotaLabel.className = "text-xs font-bold text-emerald-600";
       quotaBar.style.width = "100%";
       quotaBar.className = "bg-emerald-500 h-full rounded-full transition-all duration-500";
-      if (quotaHelpText) quotaHelpText.textContent = "Your personal Gemini API Key is configured. You have unlimited requests.";
+      if (quotaHelpText) quotaHelpText.textContent = "Your personal API Key is configured. You have unlimited requests.";
     } else {
       quotaLabel.textContent = `${requestsToday} / ${dailyLimit} requests used`;
       const percent = Math.min(100, Math.round((requestsToday / dailyLimit) * 100));

@@ -802,9 +802,13 @@ export function registerHostedAcademyAiCoreRoute(app) {
       const student = redisConfig() ? await loadStudent(session.email) : configuredStudent();
       if (!student) return response.status(404).json({ error: "Student account not found." });
 
-      const apiKey = (student.personalApiKey || "").trim() || process.env.GEMINI_API_KEY;
+      let apiKey = (student.personalApiKey || "").trim();
+      const isGeminiKey = apiKey.startsWith("AIza") || apiKey.startsWith("AQ.");
+      if (!isGeminiKey) {
+        apiKey = process.env.GEMINI_API_KEY;
+      }
       if (!apiKey) {
-        return response.status(503).json({ error: "No Gemini API key is configured. Please add one in your Account Settings." });
+        return response.status(503).json({ error: "No Gemini API key is configured on the server. Please contact support." });
       }
 
       const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
@@ -1087,7 +1091,7 @@ export async function checkAiQuota(request, response, next) {
     if (request.method === "POST" && student.usage.requestsToday >= 50) {
       return response.status(429).json({
         error: "Daily AI Limit Reached",
-        message: "You have reached your daily free AI quota (50 requests/day). Please configure your personal Gemini API Key in Settings for unlimited access, or wait until tomorrow for your quota to reset."
+        message: "You have reached your daily free AI quota (50 requests/day). Please configure your personal API Key in Settings for unlimited access, or wait until tomorrow for your quota to reset."
       });
     }
     
