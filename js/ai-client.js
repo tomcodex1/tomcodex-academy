@@ -87,7 +87,7 @@
         provider: "gemini",
         model: "unavailable",
         speedMode: payload.speedMode,
-        error: "Zentom AI could not connect to its learning service."
+        error: error.message || "Zentom AI could not connect to its learning service."
       };
     }
   }
