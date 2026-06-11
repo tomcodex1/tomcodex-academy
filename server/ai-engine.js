@@ -149,7 +149,8 @@ class AIEngine {
         models: [
           model,
           "meta-llama/llama-3.2-3b-instruct:free",
-          "qwen/qwen3-coder:free"
+          "openai/gpt-oss-20b:free",
+          "google/gemma-4-31b-it:free"
         ],
         messages,
         response_format: jsonMode ? { type: "json_object" } : undefined
