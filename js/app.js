@@ -1287,7 +1287,104 @@ async function renderCertificateEligibilityCard() {
       missingListEl.classList.add("hidden");
     }
   }
+
+  // Show / wire download buttons when eligible
+  const downloadWrap = document.getElementById("certDownloadWrap");
+  if (downloadWrap) {
+    if (eligible) {
+      downloadWrap.classList.remove("hidden");
+      wireCertificateButtons(result);
+    } else {
+      downloadWrap.classList.add("hidden");
+    }
+  }
 }
+
+function buildCertOptions(result) {
+  let identity = {};
+  try {
+    identity = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1"))
+      || JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1"))
+      || {};
+  } catch {}
+
+  const studentName = identity.name || identity.email?.split("@")[0] || "Academy Graduate";
+  const issueDate = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  const raw = `${studentName}-cert-${Date.now()}`;
+  let hash = 0;
+  for (let i = 0; i < raw.length; i++) hash = (Math.imul(31, hash) + raw.charCodeAt(i)) | 0;
+  const certId = `TCX-${Math.abs(hash).toString(16).toUpperCase().padStart(8, "0").slice(0, 4)}-${Math.abs(hash).toString(16).toUpperCase().padStart(8, "0").slice(4)}`;
+
+  return {
+    studentName,
+    courseName: result.certificateName || "Salesforce Admin Foundation",
+    verifiedSkills: result.verifiedSkills || [],
+    issueDate,
+    certId
+  };
+}
+
+function wireCertificateButtons(result) {
+  const previewBtn = document.getElementById("certPreviewBtn");
+  const downloadBtn = document.getElementById("certDownloadBtn");
+  const modal = document.getElementById("certModal");
+  const modalClose = document.getElementById("certModalClose");
+  const modalDownload = document.getElementById("certModalDownload");
+  const modalCanvas = document.getElementById("certModalCanvas");
+
+  async function generateAndShow() {
+    if (!window.__certGen) {
+      try {
+        const mod = await import("./certificate-generator.js");
+        window.__certGen = mod;
+      } catch (e) {
+        alert("Certificate generator failed to load. Please try refreshing.");
+        return null;
+      }
+    }
+    const opts = buildCertOptions(result);
+    return { mod: window.__certGen, opts };
+  }
+
+  if (previewBtn) {
+    previewBtn.onclick = async () => {
+      previewBtn.textContent = "Generating…";
+      previewBtn.disabled = true;
+      const loaded = await generateAndShow();
+      previewBtn.textContent = "🏆 Preview Certificate";
+      previewBtn.disabled = false;
+      if (!loaded) return;
+      await loaded.mod.showCertificatePreview(loaded.opts, "certModalCanvas");
+      if (modal) modal.classList.remove("hidden");
+    };
+  }
+
+  if (downloadBtn) {
+    downloadBtn.onclick = async () => {
+      downloadBtn.textContent = "Generating…";
+      downloadBtn.disabled = true;
+      const loaded = await generateAndShow();
+      downloadBtn.textContent = "⬇ Download Certificate (.PNG)";
+      downloadBtn.disabled = false;
+      if (!loaded) return;
+      await loaded.mod.downloadCertificate(loaded.opts);
+    };
+  }
+
+  if (modalClose && modal) {
+    modalClose.onclick = () => modal.classList.add("hidden");
+    modal.addEventListener("click", (e) => { if (e.target === modal) modal.classList.add("hidden"); });
+  }
+
+  if (modalDownload) {
+    modalDownload.onclick = async () => {
+      const loaded = await generateAndShow();
+      if (!loaded) return;
+      await loaded.mod.downloadCertificate(loaded.opts);
+    };
+  }
+}
+
 
 function renderSettingsForm() {
   let identity = {};
