@@ -146,7 +146,11 @@ class AIEngine {
         "X-Title": "TomCodex Academy"
       },
       body: JSON.stringify({
-        model,
+        models: [
+          model,
+          "meta-llama/llama-3.2-3b-instruct:free",
+          "qwen/qwen3-coder:free"
+        ],
         messages,
         response_format: jsonMode ? { type: "json_object" } : undefined
       })
