@@ -790,6 +790,72 @@ export function registerHostedAcademyAiCoreRoute(app) {
     }
   });
 
+  app.post("/api/ai/evaluate-screenshot", async (request, response) => {
+    const session = readSession(request);
+    if (!session) return response.status(401).json({ error: "Student sign-in is required." });
+    const { image, mimeType, course, module } = request.body;
+    if (!image || !mimeType) {
+      return response.status(400).json({ error: "A valid screenshot image is required." });
+    }
+    
+    try {
+      const student = redisConfig() ? await loadStudent(session.email) : configuredStudent();
+      if (!student) return response.status(404).json({ error: "Student account not found." });
+
+      const apiKey = (student.personalApiKey || "").trim() || process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        return response.status(503).json({ error: "No Gemini API key is configured. Please add one in your Account Settings." });
+      }
+
+      const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+      const prompt = `You are a Senior Salesforce Architect evaluating a student's screenshot proof for the "${course}" course, "${module}" lab.
+      Analyze this image. Verify if it shows a correct Salesforce Setup configuration page, Object Manager layout, or schema matching the lab request.
+      Return ONLY a valid JSON object (no markdown, no backticks, no code block formatting) containing exactly these fields:
+      - score: integer from 0 to 100
+      - passed: boolean (true if score >= 80)
+      - feedback: constructive review feedback on what is visible in the image, pointing out standard Salesforce details and explaining next steps.`;
+
+      const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: prompt },
+                { inlineData: { mimeType, data: image } }
+              ]
+            }
+          ],
+          generationConfig: { responseMimeType: "application/json" }
+        })
+      });
+
+      if (!geminiResponse.ok) {
+        return response.status(502).json({ error: `Gemini screenshot evaluation failed with status ${geminiResponse.status}.` });
+      }
+
+      const data = await geminiResponse.json();
+      const text = data.candidates?.[0]?.content?.parts?.map((part) => part.text).join("") || "{}";
+      
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch {
+        return response.status(502).json({ error: "Gemini returned invalid screenshot evaluation JSON." });
+      }
+
+      return response.json({
+        score: Math.max(0, Math.min(100, Number(result.score) || 0)),
+        passed: Boolean(result.passed),
+        feedback: String(result.feedback || "Review completed."),
+        source: "gemini-multimodal-api"
+      });
+    } catch (error) {
+      return response.status(502).json({ error: "Could not connect to Gemini screenshot service." });
+    }
+  });
+
   app.post("/api/academy/verify-lab", async (request, response, next) => {
     let userId = request.body?.userId;
     let tier = request.body?.tier;
