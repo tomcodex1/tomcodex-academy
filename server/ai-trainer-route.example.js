@@ -34,9 +34,15 @@ export function registerAiTrainerRoute(app) {
   // AI Trainer (doubt answering)
   app.post("/api/ai/trainer", async (request, response) => {
     const key = aiEngine.resolveKey(request);
-    if (!key) return response.status(503).json({ error: "AI service not configured." });
-    if ((process.env.AI_PROVIDER || "gemini") !== "gemini") {
-      return response.status(400).json({ error: "Only Gemini provider is supported." });
+    const provider = process.env.AI_PROVIDER || "gemini";
+    const hasServerKey = Boolean(process.env.GEMINI_API_KEY || process.env.OPENROUTER_API_KEY || process.env.GROQ_API_KEY);
+    const hasPersonalKey = Boolean(request.personalApiKey);
+    if (!hasServerKey && !hasPersonalKey) {
+      return response.status(503).json({ error: "AI service not configured." });
+    }
+    const allowedProviders = ["gemini", "openrouter", "groq"];
+    if (!allowedProviders.includes(provider)) {
+      return response.status(400).json({ error: `Provider ${provider} is not supported. Use gemini, openrouter, or groq.` });
     }
     try {
       const result = await aiEngine.handleTrain(request.body, key);

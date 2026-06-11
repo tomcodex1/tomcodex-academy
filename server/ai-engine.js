@@ -101,7 +101,111 @@ class AIEngine {
         if (attempt < retries) await this._sleep(Math.pow(2, attempt) * 300);
       }
     }
-    throw lastError || new Error("Gemini call failed after retries");
+
+    // Fallback logic if primary Gemini call failed
+    console.warn(`Gemini API call failed: ${lastError?.message || "Unknown error"}. Attempting fallback providers...`);
+
+    // 1. Try OpenRouter fallback
+    if (process.env.OPENROUTER_API_KEY) {
+      try {
+        console.info("Attempting OpenRouter fallback...");
+        return await this._callOpenRouter(contents, jsonMode);
+      } catch (orErr) {
+        console.error(`OpenRouter fallback failed: ${orErr.message}`);
+        lastError = orErr;
+      }
+    }
+
+    // 2. Try Groq fallback
+    if (process.env.GROQ_API_KEY) {
+      try {
+        console.info("Attempting Groq fallback...");
+        return await this._callGroq(contents, jsonMode);
+      } catch (groqErr) {
+        console.error(`Groq fallback failed: ${groqErr.message}`);
+        lastError = groqErr;
+      }
+    }
+
+    throw lastError || new Error("Gemini call failed after retries and no fallback succeeded.");
+  }
+
+  // ── OpenRouter Fallback Client ────────────────────────────────────────────
+  async _callOpenRouter(contents, jsonMode) {
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) throw new Error("OpenRouter API key not configured.");
+    const model = process.env.OPENROUTER_MODEL || "google/gemini-2.5-flash:free";
+    const messages = this._convertToOpenAiMessages(contents);
+
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+        "HTTP-Referer": "https://academytcx.vercel.app",
+        "X-Title": "TomCodex Academy"
+      },
+      body: JSON.stringify({
+        model,
+        messages,
+        response_format: jsonMode ? { type: "json_object" } : undefined
+      })
+    });
+
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      throw new Error(`OpenRouter API error: ${res.status} ${errText || res.statusText}`);
+    }
+
+    const data = await res.json();
+    const text = data.choices?.[0]?.message?.content || "";
+    return { text, model: `openrouter/${model}` };
+  }
+
+  // ── Groq Fallback Client ──────────────────────────────────────────────────
+  async _callGroq(contents, jsonMode) {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) throw new Error("Groq API key not configured.");
+    const model = process.env.GROQ_MODEL || "llama-3.3-70b-specdec";
+    const messages = this._convertToOpenAiMessages(contents);
+
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model,
+        messages,
+        response_format: jsonMode ? { type: "json_object" } : undefined
+      })
+    });
+
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      throw new Error(`Groq API error: ${res.status} ${errText || res.statusText}`);
+    }
+
+    const data = await res.json();
+    const text = data.choices?.[0]?.message?.content || "";
+    return { text, model: `groq/${model}` };
+  }
+
+  // ── Convert Gemini Contents Format to OpenAI Messages ────────────────────
+  _convertToOpenAiMessages(contents) {
+    const messages = [];
+    for (const item of contents) {
+      const parts = item.parts || [];
+      const textParts = parts.filter(p => p.text).map(p => p.text).join("\n");
+      if (textParts) {
+        messages.push({ role: item.role || "user", content: textParts });
+      }
+    }
+    if (messages.length === 0) {
+      messages.push({ role: "user", content: "" });
+    }
+    return messages;
   }
 
   // ── Safe JSON Parse ───────────────────────────────────────────────────────
