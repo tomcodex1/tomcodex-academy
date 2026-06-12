@@ -519,6 +519,87 @@ async function transcribeRecordedAnswer(blob) {
   }
 }
 
+let visualizerAudioCtx = null;
+let visualizerAnalyser = null;
+let visualizerSource = null;
+let visualizerAnimationFrame = null;
+let visualizerIsActive = false;
+
+function startAudioVisualizer(stream) {
+  const canvas = el("interviewerVisualizer");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  canvas.width = 160;
+  canvas.height = 40;
+  const wave = document.querySelector(".interviewer-wave");
+  if (wave) wave.classList.add("hidden");
+  canvas.classList.remove("hidden");
+  try {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    visualizerAudioCtx = new AudioContextClass();
+    visualizerSource = visualizerAudioCtx.createMediaStreamSource(stream);
+    visualizerAnalyser = visualizerAudioCtx.createAnalyser();
+    visualizerAnalyser.fftSize = 64;
+    visualizerSource.connect(visualizerAnalyser);
+    const bufferLength = visualizerAnalyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    visualizerIsActive = true;
+    function draw() {
+      if (!visualizerIsActive) return;
+      visualizerAnimationFrame = requestAnimationFrame(draw);
+      visualizerAnalyser.getByteFrequencyData(dataArray);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const barWidth = (canvas.width / bufferLength) * 0.95;
+      let barHeight;
+      let x = 0;
+      for (let i = 0; i < bufferLength; i++) {
+        const factor = i > 3 && i < 15 ? 1.4 : 1.0;
+        barHeight = (dataArray[i] / 255) * canvas.height * 0.85 * factor;
+        barHeight = Math.max(3, Math.min(canvas.height, barHeight));
+        const grad = ctx.createLinearGradient(0, canvas.height, 0, 0);
+        grad.addColorStop(0, "rgba(8, 126, 164, 0.25)");
+        grad.addColorStop(0.5, "#67d4f5");
+        grad.addColorStop(1, "#d8ff5f");
+        ctx.fillStyle = grad;
+        const y = (canvas.height - barHeight) / 2;
+        if (typeof ctx.roundRect === "function") {
+          ctx.beginPath();
+          ctx.roundRect(x, y, barWidth - 1.5, barHeight, 2);
+          ctx.fill();
+        } else {
+          ctx.fillRect(x, y, barWidth - 1.5, barHeight);
+        }
+        x += barWidth;
+      }
+    }
+    draw();
+  } catch (e) {
+    console.error("Audio visualizer failed to start", e);
+    stopAudioVisualizer();
+  }
+}
+
+function stopAudioVisualizer() {
+  visualizerIsActive = false;
+  if (visualizerAnimationFrame) {
+    cancelAnimationFrame(visualizerAnimationFrame);
+    visualizerAnimationFrame = null;
+  }
+  if (visualizerAudioCtx) {
+    if (visualizerAudioCtx.state !== "closed") {
+      visualizerAudioCtx.close();
+    }
+    visualizerAudioCtx = null;
+  }
+  visualizerSource = null;
+  visualizerAnalyser = null;
+  const canvas = el("interviewerVisualizer");
+  const wave = document.querySelector(".interviewer-wave");
+  if (canvas) canvas.classList.add("hidden");
+  if (wave) wave.classList.remove("hidden");
+}
+
 async function startHighAccuracyRecording() {
   if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) return false;
   try {
@@ -528,6 +609,7 @@ async function startHighAccuracyRecording() {
     interviewAudioChunks = [];
     interviewMediaRecorder.ondataavailable = (event) => { if (event.data.size) interviewAudioChunks.push(event.data); };
     interviewMediaRecorder.onstop = () => {
+      stopAudioVisualizer();
       const blob = new Blob(interviewAudioChunks, { type: interviewMediaRecorder?.mimeType || "audio/webm" });
       interviewMediaStream?.getTracks().forEach((track) => track.stop());
       interviewMediaStream = null;
@@ -537,6 +619,7 @@ async function startHighAccuracyRecording() {
     };
     interviewRecordingStartedAt = Date.now();
     interviewMediaRecorder.start(1000);
+    startAudioVisualizer(interviewMediaStream);
     return true;
   } catch {
     interviewMediaStream?.getTracks().forEach((track) => track.stop());
@@ -547,6 +630,7 @@ async function startHighAccuracyRecording() {
 }
 
 function stopHighAccuracyRecording() {
+  stopAudioVisualizer();
   if (interviewMediaRecorder?.state === "recording") interviewMediaRecorder.stop();
   else interviewMediaStream?.getTracks().forEach((track) => track.stop());
 }
