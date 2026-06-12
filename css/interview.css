@@ -2176,3 +2176,88 @@ body.interview-page {
     animation-duration: 0.01ms !important;
   }
 }
+
+/* Site-Header Redesign for Dark Mode Sync */
+body.interview-page .site-header {
+  background: rgba(3, 22, 30, 0.75) !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+body.interview-page .site-brand,
+body.interview-page .site-navigation a,
+body.interview-page .site-nav-group summary {
+  color: var(--color-text) !important;
+}
+
+body.interview-page .site-brand strong {
+  color: #ffffff !important;
+}
+
+body.interview-page .site-brand small {
+  color: var(--color-text-muted) !important;
+}
+
+body.interview-page .site-navigation a:hover,
+body.interview-page .site-navigation a[aria-current="page"],
+body.interview-page .site-nav-group summary:hover,
+body.interview-page .site-nav-group[open] summary {
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: var(--color-brand-lime) !important;
+}
+
+body.interview-page .site-navigation a[aria-current="page"] {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+}
+
+body.interview-page .site-nav-menu {
+  background: rgba(3, 22, 30, 0.95) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(20px);
+}
+
+body.interview-page .site-nav-menu a strong {
+  color: #ffffff !important;
+}
+
+body.interview-page .site-nav-menu a small {
+  color: var(--color-text-muted) !important;
+}
+
+body.interview-page .site-nav-menu a:hover strong {
+  color: var(--color-brand-lime) !important;
+}
+
+body.interview-page .site-login-link {
+  background: var(--color-brand-cyan) !important;
+  color: #ffffff !important;
+  border-radius: 0.5rem !important;
+}
+
+body.interview-page .site-login-link:hover {
+  background: var(--color-brand-cyan-hover) !important;
+  box-shadow: 0 0 10px rgba(8, 126, 164, 0.3);
+}
+
+body.interview-page .site-menu-toggle {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--color-text) !important;
+}
+
+body.interview-page .site-menu-toggle span {
+  background: var(--color-text) !important;
+}
+
+/* Mobile responsive menu dropdown in dark mode */
+@media (max-width: 1120px) {
+  body.interview-page .site-navigation {
+    background: rgba(3, 22, 30, 0.95) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(14px);
+  }
+}
