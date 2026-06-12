@@ -352,6 +352,33 @@ html[data-theme="dark"] .bg-slate-50 {
   background-color: var(--clr-bg-2) !important;
 }
 
+/* ── Navigation dropdown menus (Certification Prep, Learn, AI Lab, etc.) ── */
+html[data-theme="dark"] .site-nav-menu {
+  background: var(--clr-menu-bg) !important;
+  border-color: var(--clr-menu-border) !important;
+  box-shadow: 0 18px 48px rgba(0,0,0,0.7) !important;
+}
+html[data-theme="dark"] .site-nav-menu a {
+  color: var(--clr-text-2) !important;
+}
+html[data-theme="dark"] .site-nav-menu a:hover {
+  background: var(--clr-row-hover) !important;
+}
+html[data-theme="dark"] .site-nav-menu strong {
+  color: var(--clr-menu-strong) !important;
+}
+html[data-theme="dark"] .site-nav-menu small {
+  color: var(--clr-menu-small) !important;
+}
+html[data-theme="dark"] .site-account-menu {
+  background: var(--clr-menu-bg) !important;
+  border-color: var(--clr-menu-border) !important;
+}
+html[data-theme="dark"] .site-nav-plan-badge {
+  border-color: var(--clr-border) !important;
+  color: var(--clr-text-3) !important;
+}
+
 /* ── Theme toggle button ── */
 .tc-theme-toggle {
   display: inline-flex;

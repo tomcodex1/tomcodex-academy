@@ -108,7 +108,7 @@
           <details class="site-nav-group site-account-group">
             <summary class="site-login-link">${accountLabel}<span aria-hidden="true">&#9662;</span></summary>
             <div class="site-nav-menu site-account-menu">
-              ${isStudent ? `<div class="site-nav-plan-badge" style="padding: .65rem; border-bottom: 1px solid #e2e8f0; font-size: .7rem; font-weight: 850; color: #526276; text-transform: uppercase; letter-spacing: .05em;">Plan: ${authIdentity.tier === 'founder' ? '<span style="color:#087ea4">★ Founder Access</span>' : '<span style="color:#64748b">Free Starter</span>'}</div>` : ''}
+              ${isStudent ? `<div class="site-nav-plan-badge" style="padding: .65rem; border-bottom: 1px solid var(--clr-border); font-size: .7rem; font-weight: 850; color: var(--clr-text-3); text-transform: uppercase; letter-spacing: .05em;">Plan: ${authIdentity.tier === 'founder' ? '<span style="color:var(--clr-brand-text)">★ Founder Access</span>' : '<span style="color:var(--clr-text-3)">Free Starter</span>'}</div>` : ''}
               ${isStudent && authIdentity.tier !== 'founder' ? `<a href="pricing.html" style="background: linear-gradient(135deg, #d8ff5f, #a6ff00); color: #062c3a; text-align: center; font-weight: 800; border-radius: .4rem; padding: .5rem; margin: .5rem; display: block; box-shadow: 0 4px 12px rgba(166,255,0,.3);">Upgrade to Founder</a>` : ''}
               <a href="${dashboardHref}"><strong>Open dashboard</strong><small>${accountDetail}</small></a>
               ${isStudent ? `<a href="dashboard.html?tab=settings"><strong>Account Settings</strong><small>API Keys & Profile</small></a>` : ''}
