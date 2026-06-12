@@ -674,3 +674,8 @@
   font-size: 85%;
 }
 
+/* Fix sidebar overlap on desktop scroll by disabling sticky panel */
+.sticky-panel {
+  position: static !important;
+}
+
