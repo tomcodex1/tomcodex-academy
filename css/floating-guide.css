@@ -52,9 +52,9 @@
   transform: rotate(360deg);
 }
 .tc-guide-button span img {
-  width: 75%;
-  height: 75%;
-  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 .tc-guide-button strong {
   font-weight: 700;
@@ -126,10 +126,8 @@
 .tc-guide-brand img {
   width: 2.5rem;
   height: 2.5rem;
-  padding: 0.2rem;
-  background: rgba(255, 255, 255, 0.1);
   border-radius: 999px;
-  object-fit: contain;
+  object-fit: cover;
 }
 .tc-guide-brand h2 {
   margin: 0;
@@ -232,7 +230,6 @@
   width: 4rem;
   height: 4rem;
   margin-bottom: 1rem;
-  padding: 0.5rem;
   background: #f1f5f9;
   border-radius: 999px;
   animation: float 3s ease-in-out infinite;
@@ -240,7 +237,8 @@
 .tc-empty-avatar img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  border-radius: 999px;
+  object-fit: cover;
 }
 .tc-empty-state h3 {
   margin: 0 0 0.5rem;

@@ -18,7 +18,7 @@
 
   document.body.insertAdjacentHTML("beforeend", `
     <button id="tcGlobalGuideButton" class="tc-guide-button" type="button" aria-expanded="false" aria-controls="tcGlobalGuidePanel" title="Ask Zentom AI">
-      <span><img src="assets/zentom-ai-logo.svg" alt=""></span>
+      <span><img src="assets/zentom-mascot.jpg" alt=""></span>
       <strong>Ask Zentom</strong>
       <em><i></i>Live</em>
     </button>
@@ -26,7 +26,7 @@
     <aside id="tcGlobalGuidePanel" class="tc-guide-panel" aria-label="Zentom AI guide" hidden>
       <div class="tc-guide-header">
         <div class="tc-guide-brand">
-          <img src="assets/zentom-ai-logo.svg" alt="Zentom AI">
+          <img src="assets/zentom-mascot.jpg" alt="Zentom AI">
           <div>
             <h2>Zentom AI Tutor</h2>
             <small id="tcGlobalGuideStatus"><i></i>Checking AI status</small>
@@ -129,7 +129,7 @@
       const emptyState = document.createElement("div");
       emptyState.className = "tc-empty-state";
       emptyState.innerHTML = `
-        <div class="tc-empty-avatar"><img src="assets/zentom-ai-logo.svg" alt="Zentom"></div>
+        <div class="tc-empty-avatar"><img src="assets/zentom-mascot.jpg" alt="Zentom"></div>
         <h3>Hi, I'm Zentom</h3>
         <p>I am your dedicated Salesforce AI tutor. Ask me any conceptual questions, debugging doubts, or request guidance on the current topic.</p>
         <div class="tc-empty-suggestions">
