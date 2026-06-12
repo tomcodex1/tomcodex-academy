@@ -234,7 +234,8 @@ class AIEngine {
       const parts = item.parts || [];
       const textParts = parts.filter(p => p.text).map(p => p.text).join("\n");
       if (textParts) {
-        messages.push({ role: item.role || "user", content: textParts });
+        const role = item.role === "model" ? "assistant" : (item.role || "user");
+        messages.push({ role, content: textParts });
       }
     }
     if (messages.length === 0) {
@@ -256,16 +257,42 @@ class AIEngine {
   // ─────────────────────────────────────────────────────────────────────────
 
   // ── 1. AI Trainer ─────────────────────────────────────────────────────────
-  async handleTrain({ topic, doubt, answerMode, speedMode }, key) {
+  async handleTrain({ topic, doubt, answerMode, speedMode, history }, key) {
     const resolvedMode = speedMode === "auto" || !speedMode
       ? chooseEfficientMode(doubt)
       : speedMode;
     const promptFn = SPEED_PROMPTS[resolvedMode] || SPEED_PROMPTS.normal;
     const prompt = promptFn(topic, doubt);
 
+    const contents = [];
+    if (history && Array.isArray(history) && history.length > 0) {
+      history.forEach((msg, idx) => {
+        if (idx === 0 && msg.role === "user") {
+          contents.push({
+            role: "user",
+            parts: [{ text: promptFn(topic, msg.text) }]
+          });
+        } else {
+          contents.push({
+            role: msg.role === "assistant" ? "model" : (msg.role || "user"),
+            parts: [{ text: msg.text || "" }]
+          });
+        }
+      });
+      contents.push({
+        role: "user",
+        parts: [{ text: `Follow-up question on the topic '${topic}': ${doubt}` }]
+      });
+    } else {
+      contents.push({
+        role: "user",
+        parts: [{ text: prompt }]
+      });
+    }
+
     const { text, model } = await this.callGemini({
       key,
-      contents: [{ parts: [{ text: prompt }] }],
+      contents,
       jsonMode: false
     });
     if (!text) throw new Error("Zentom AI returned an empty response.");

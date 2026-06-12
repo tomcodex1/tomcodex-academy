@@ -155,6 +155,8 @@
     } catch (err) {
       return evaluateScreenshotLocally(payload);
     }
+  }
+
   function parseMarkdownToHTML(markdown) {
     if (!markdown) return "";
 

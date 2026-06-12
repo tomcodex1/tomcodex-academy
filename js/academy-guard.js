@@ -1,4 +1,7 @@
 (function () {
+  // Hide page immediately to prevent flash of protected content before auth check
+  document.documentElement.style.visibility = "hidden";
+
   fetch("/api/auth-session")
     .then((response) => {
       if (!response.ok) throw new Error("Authentication required");
@@ -16,11 +19,13 @@
           upgradedAt: result.identity.upgradedAt || null
         }));
       }
+      // Auth confirmed — reveal page
+      document.documentElement.style.visibility = "";
     })
     .catch(() => {
       localStorage.removeItem("tomcodex.authSession.v1");
       localStorage.removeItem("tomcodex.authIdentity.v1");
       localStorage.removeItem("tomcodex.auth.user.v1");
-      window.location.replace("index.html");
+      window.location.replace("access.html");
     });
 })();

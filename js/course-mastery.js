@@ -45,12 +45,15 @@
       return { state: "unlocked", label: "Admin access", canOpen: true };
     }
 
-    const moduleId = `admin-${index + 1}`;
+    const moduleId = `${COURSE_KEY_MAP[courseName] || "admin"}-${index + 1}`;
     
-    // Check if verified
-    const attempts = loadJson("tomcodex.adminLabAttempts.v1", {});
-    const legacyId = `admin-module-${index + 1}`;
-    const bestScore = attempts[`${moduleId}:summary`]?.bestScore || attempts[`${legacyId}:summary`]?.bestScore || 0;
+    // Check if verified - use course-specific attempts key
+    const attemptsKey = `tomcodex.${COURSE_KEY_MAP[courseName] || "admin"}LabAttempts.v1`;
+    const attempts = loadJson(attemptsKey, {});
+    // Also check legacy admin key for backward compat
+    const legacyAttempts = loadJson("tomcodex.adminLabAttempts.v1", {});
+    const legacyId = `${COURSE_KEY_MAP[courseName] || "admin"}-module-${index + 1}`;
+    const bestScore = attempts[`${moduleId}:summary`]?.bestScore || legacyAttempts[`${moduleId}:summary`]?.bestScore || attempts[`${legacyId}:summary`]?.bestScore || 0;
     const isModuleVerified = bestScore >= 80;
 
     if (isModuleVerified) {
@@ -63,9 +66,12 @@
 
     // Check prerequisite (previous module must be verified)
     if (index > 0) {
-      const prevModuleId = `admin-${index}`;
-      const prevModuleIdLegacy = `admin-module-${index}`;
-      const prevBestScore = attempts[`${prevModuleId}:summary`]?.bestScore || attempts[`${prevModuleIdLegacy}:summary`]?.bestScore || 0;
+    const prevModuleId = `${COURSE_KEY_MAP[courseName] || "admin"}-${index}`;
+    const prevModuleIdLegacy = `${COURSE_KEY_MAP[courseName] || "admin"}-module-${index}`;
+    const prevAttemptsKey = `tomcodex.${COURSE_KEY_MAP[courseName] || "admin"}LabAttempts.v1`;
+    const prevAttempts = loadJson(prevAttemptsKey, {});
+    const prevLegacyAttempts = loadJson("tomcodex.adminLabAttempts.v1", {});
+    const prevBestScore = prevAttempts[`${prevModuleId}:summary`]?.bestScore || prevLegacyAttempts[`${prevModuleId}:summary`]?.bestScore || prevAttempts[`${prevModuleIdLegacy}:summary`]?.bestScore || 0;
       const isPrevVerified = prevBestScore >= 80;
 
       if (!isPrevVerified) {
@@ -592,8 +598,10 @@
     } catch {}
 
     const module = modules[currentModule];
-    const moduleId = `admin-${currentModule + 1}`;
-    const labId = `admin-${currentModule + 1}-lab-1`;
+    const courseKey = COURSE_KEY_MAP[courseName] || "admin";
+    const moduleId = `${courseKey}-${currentModule + 1}`;
+    const labId = `${courseKey}-${currentModule + 1}-lab-1`;
+    const labCriteria = module.labCriteria || window.TomCodexLabCriteria?.[`${courseKey}-${currentModule}`]?.criteria || [];
 
     try {
       const res = await fetch("/api/academy/verify-lab", {
@@ -606,6 +614,10 @@
           params: {
             moduleId,
             labId,
+            courseKey,
+            moduleName: module.title,
+            courseName,
+            criteria: labCriteria,
             studentAnswers
           }
         })
@@ -885,7 +897,7 @@
   el("nextModuleBtn").addEventListener("click", () => {
     if (currentModule === modules.length - 1) {
       if (!isAdmin && !passed(currentModule)) return;
-      el("finalExamSection").scrollIntoView({ behavior: "smooth", block: "start" });
+      el("finalExamSection")?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
     if (!isAdmin && !passed(currentModule)) return;

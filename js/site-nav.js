@@ -3,7 +3,7 @@
   const IDENTITY_KEY = "tomcodex.authIdentity.v1";
   const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
   const pages = {
-    "index.html": "Login",
+    "index.html": "Academy Home",
     "academy-home.html": "Academy Home",
     "dashboard.html": "Student Dashboard",
     "tutor-dashboard.html": "Tutor Dashboard",
@@ -35,7 +35,7 @@
     { label: "Learn", items: learnItems },
     { label: "AI Lab", items: [
       ["dashboard.html?tab=trainer", "AI Learning Mentor", "Explain doubts and concepts"],
-      ["course-admin.html", "Screenshot Practice Review", "Upload screenshots for AI review"],
+      ["course-admin.html", "Check My Work", "Answer lab questions to verify your Salesforce setup"],
       ["course-admin.html", "AI Mastery Test", "15-question module evaluation"],
       ["interview.html", "AI Interviewer", "Technical and behavioral mock interviews"],
       ["code-review-ai.html", "Code Review AI", "Review Apex/LWC code and flows"],
