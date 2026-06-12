@@ -25,18 +25,19 @@
 }
 
 .control-button {
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
   border: 1px solid var(--clr-border-2);
   background-color: var(--clr-surface);
-  color: var(--clr-brand-text);
+  color: var(--clr-text);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .control-button:hover {
-  background-color: var(--clr-link-active-bg);
+  background-color: var(--clr-border-2);
+  transform: scale(1.02);
 }
 
 /* Charts Section */
@@ -51,14 +52,14 @@
   background-color: var(--clr-card-bg);
   border: 1px solid var(--clr-card-border);
   box-shadow: 0 1px 3px var(--clr-shadow);
-  border-radius: 0.5rem;
-  padding: 1.5rem;
+  border-radius: 1.5rem;
+  padding: 1.75rem;
   color: var(--clr-text);
   transition: background-color 0.25s, border-color 0.25s, color 0.25s;
 }
 
 .chart-title {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 600;
   margin-bottom: 1rem;
   color: var(--clr-text);
@@ -75,15 +76,15 @@
   background-color: var(--clr-card-bg);
   border: 1px solid var(--clr-card-border);
   box-shadow: 0 1px 3px var(--clr-shadow);
-  border-radius: 0.5rem;
-  padding: 1.5rem;
+  border-radius: 1.5rem;
+  padding: 1.75rem;
   margin-bottom: 2rem;
   color: var(--clr-text);
   transition: background-color 0.25s, border-color 0.25s, color 0.25s;
 }
 
 .skill-gaps-title {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
   color: var(--clr-text);
@@ -132,14 +133,14 @@
   background-color: var(--clr-card-bg);
   border: 1px solid var(--clr-card-border);
   box-shadow: 0 1px 3px var(--clr-shadow);
-  border-radius: 0.5rem;
-  padding: 1.5rem;
+  border-radius: 1.5rem;
+  padding: 1.75rem;
   color: var(--clr-text);
   transition: background-color 0.25s, border-color 0.25s, color 0.25s;
 }
 
 .recommendations-title {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
   color: var(--clr-text);
@@ -153,6 +154,7 @@
 
 .recommendation-item {
   border-left: 4px solid var(--clr-brand);
+  border-radius: 4px;
   padding-left: 1rem;
 }
 
@@ -169,26 +171,27 @@
 
 .recommendation-priority {
   display: inline-block;
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  font-size: 0.75rem;
-  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
   margin-top: 0.5rem;
+  text-transform: uppercase;
 }
 
 .priority-high {
-  background-color: #fee2e2;
-  color: #991b1b;
+  background-color: rgba(255, 69, 58, 0.15);
+  color: #ff453a;
 }
 
 .priority-medium {
-  background-color: #fef3c7;
-  color: #92400e;
+  background-color: rgba(255, 159, 10, 0.15);
+  color: #ff9f0a;
 }
 
 .priority-low {
-  background-color: #dbeafe;
-  color: #1e40af;
+  background-color: rgba(10, 132, 255, 0.15);
+  color: #0a84ff;
 }
 
 /* Stats Cards */
@@ -203,15 +206,15 @@
   background-color: var(--clr-card-bg);
   border: 1px solid var(--clr-card-border);
   box-shadow: 0 1px 3px var(--clr-shadow);
-  border-radius: 0.5rem;
-  padding: 1.5rem;
+  border-radius: 1.5rem;
+  padding: 1.75rem;
   text-align: center;
   color: var(--clr-text);
   transition: background-color 0.25s, border-color 0.25s, color 0.25s;
 }
 
 .stat-value {
-  font-size: 2rem;
+  font-size: 2.2rem;
   font-weight: bold;
   color: var(--clr-brand);
 }
@@ -219,6 +222,7 @@
 .stat-label {
   font-size: 0.875rem;
   color: var(--clr-text-3);
+  margin-top: 0.25rem;
 }
 
 /* Responsive Design */

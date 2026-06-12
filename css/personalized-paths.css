@@ -7,6 +7,15 @@
   --path-lime: #d8ff5f;
 }
 
+html[data-theme="dark"] {
+  --path-brand: var(--clr-brand);
+  --path-brand-dark: var(--clr-bg-2);
+  --path-ink: var(--clr-text);
+  --path-muted: var(--clr-text-2);
+  --path-line: var(--clr-border);
+  --path-lime: var(--clr-lime);
+}
+
 .path-header-inner { overflow-x: auto; }
 .path-main-nav a { color: #64748b; white-space: nowrap; }
 .path-main-nav a:hover, .path-main-nav a.active { color: var(--path-brand); }
@@ -80,6 +89,53 @@
 .milestone-meta span { background: #f1f5f9; border-radius: 99px; color: #475569; font-size: .68rem; font-weight: 700; padding: .3rem .55rem; }
 .milestone-action { align-self: center; color: var(--path-brand); font-size: .75rem; font-weight: 800; white-space: nowrap; }
 .milestone-card.done .milestone-action { color: #15803d; }
+
+/* ── Dark Mode overrides ── */
+html[data-theme="dark"] .path-builder-card,
+html[data-theme="dark"] .path-results {
+  background: var(--clr-card-bg) !important;
+  border-color: var(--clr-border) !important;
+  box-shadow: 0 16px 44px var(--clr-shadow) !important;
+}
+
+html[data-theme="dark"] .path-builder-card label,
+html[data-theme="dark"] .path-builder-card legend {
+  color: var(--clr-text-2) !important;
+}
+
+html[data-theme="dark"] .path-builder-card select {
+  background: var(--clr-input-bg) !important;
+  color: var(--clr-text) !important;
+  border-color: var(--clr-border-2) !important;
+}
+
+html[data-theme="dark"] .path-choice-grid label:has(input:checked) {
+  background: var(--clr-brand-light) !important;
+  border-color: var(--clr-brand) !important;
+}
+
+html[data-theme="dark"] .path-progress-card {
+  background: var(--clr-surface) !important;
+  border-color: var(--clr-border) !important;
+}
+
+html[data-theme="dark"] .path-progress-track {
+  background: var(--clr-border) !important;
+}
+
+html[data-theme="dark"] .milestone-meta span {
+  background: var(--clr-surface) !important;
+  color: var(--clr-text-2) !important;
+}
+
+html[data-theme="dark"] .path-stat-strip {
+  background: var(--clr-bg-2) !important;
+  border-color: var(--clr-border) !important;
+}
+
+html[data-theme="dark"] .milestone-card.current {
+  box-shadow: 0 0 0 3px var(--clr-brand-light) !important;
+}
 
 @media (max-width: 900px) {
   .path-builder-card { position: static; }

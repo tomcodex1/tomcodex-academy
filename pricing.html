@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>!function(){var t=localStorage.getItem("tomcodex.theme")||((window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches)?"light":"dark");document.documentElement.dataset.theme=t}()</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="View plans and pricing for TomCodeX Academy. Choose between Free Starter and Founder Access." />
@@ -39,6 +40,7 @@
         <a href="dashboard.html" class="hover:text-brand-600">Dashboard</a>
       </nav>
       <div id="navAuthGroup" class="flex items-center gap-3">
+        <button class="tc-theme-toggle" type="button" aria-label="Switch to light mode" title="Light mode">☀️</button>
         <a href="access.html" class="rounded-lg border border-brand-600 px-4 py-2 text-sm font-bold text-brand-700 hover:bg-brand-50">Sign In</a>
       </div>
     </div>
@@ -282,5 +284,6 @@
       await checkSession();
     })();
   </script>
+  <script src="js/theme-toggle.js"></script>
 </body>
 </html>

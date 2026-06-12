@@ -17,22 +17,27 @@
 .forums-title {
   font-size: 2rem;
   font-weight: bold;
-  color: var(--ink, #172b4d);
+  color: var(--clr-text);
 }
 
 .create-discussion-btn {
-  background-color: var(--brand-600, #056b8d);
-  color: white;
+  background-color: var(--clr-brand);
+  color: #fff;
   border: none;
-  border-radius: 0.375rem;
+  border-radius: 999px; /* One UI capsule pill */
   padding: 0.75rem 1.5rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.15s;
 }
 
 .create-discussion-btn:hover {
-  background-color: var(--brand-700, #075875);
+  background-color: var(--clr-brand-hover);
+  transform: scale(1.02);
+}
+
+.create-discussion-btn:active {
+  transform: scale(0.98);
 }
 
 /* Forums Grid */
@@ -45,22 +50,23 @@
 
 /* Forum Card */
 .forum-card {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: var(--clr-card-bg);
+  border: 1px solid var(--clr-card-border);
+  border-radius: 1.5rem; /* One UI rounding */
+  box-shadow: 0 4px 18px var(--clr-shadow);
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.25s, box-shadow 0.25s;
 }
 
 .forum-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px var(--clr-shadow);
 }
 
 .forum-header {
   display: flex;
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--clr-border);
 }
 
 .forum-icon {
@@ -76,12 +82,12 @@
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: var(--ink, #172b4d);
+  color: var(--clr-text);
 }
 
 .forum-description {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--clr-text-2);
   line-height: 1.5;
 }
 
@@ -90,23 +96,24 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  background-color: #f9fafb;
+  background-color: var(--clr-bg-2);
   flex-wrap: wrap;
+  border-top: 1px solid var(--clr-border);
 }
 
 .forum-threads {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--clr-text-2);
 }
 
 .forum-topics {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--clr-text-2);
 }
 
 .forum-activity {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--clr-text-2);
 }
 
 .forum-actions {
@@ -124,7 +131,7 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
-  color: var(--ink, #172b4d);
+  color: var(--clr-text);
 }
 
 .recent-discussions-list {
@@ -135,16 +142,17 @@
 
 /* Discussion Card */
 .discussion-card {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: var(--clr-card-bg);
+  border: 1px solid var(--clr-card-border);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 18px var(--clr-shadow);
   padding: 1.5rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.25s, box-shadow 0.25s;
 }
 
 .discussion-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px var(--clr-shadow);
 }
 
 .discussion-header {
@@ -158,13 +166,13 @@
 }
 
 .discussion-link {
-  color: var(--brand-600, #056b8d);
+  color: var(--clr-brand-text);
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .discussion-link:hover {
-  color: var(--brand-700, #075875);
+  color: var(--clr-brand);
   text-decoration: underline;
 }
 
@@ -173,12 +181,12 @@
   flex-wrap: wrap;
   gap: 1rem;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--clr-text-3);
 }
 
 .discussion-preview {
   margin-bottom: 1rem;
-  color: #4b5563;
+  color: var(--clr-text-2);
   line-height: 1.5;
 }
 
@@ -186,7 +194,7 @@
   display: flex;
   gap: 1rem;
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--clr-text-3);
 }
 
 /* Create Discussion Modal */
@@ -197,7 +205,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
   z-index: 1000;
   justify-content: center;
   align-items: center;
@@ -208,14 +217,16 @@
 }
 
 .modal-content {
-  background-color: white;
-  border-radius: 0.5rem;
+  background-color: var(--clr-card-bg);
+  border: 1px solid var(--clr-card-border);
+  border-radius: 1.5rem;
   width: 90%;
   max-width: 600px;
   padding: 2rem;
   position: relative;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 24px 60px var(--clr-shadow);
 }
 
 .modal-close {
@@ -224,14 +235,19 @@
   right: 1rem;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--clr-text-3);
+  transition: color 0.2s;
+}
+
+.modal-close:hover {
+  color: var(--clr-text);
 }
 
 .modal-title {
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
-  color: var(--ink, #172b4d);
+  color: var(--clr-text);
 }
 
 .form-group {
@@ -242,7 +258,7 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--clr-text-2);
 }
 
 .form-input,
@@ -250,9 +266,20 @@
 .form-select {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
+  border: 1px solid var(--clr-input-border);
+  border-radius: 1rem;
+  background-color: var(--clr-input-bg);
+  color: var(--clr-text);
   font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  border-color: var(--clr-brand);
+  box-shadow: 0 0 0 3px var(--clr-brand-light);
 }
 
 .form-textarea {
@@ -269,33 +296,44 @@
 
 /* Buttons */
 .btn-primary {
-  background-color: var(--brand-600, #056b8d);
-  color: white;
+  background-color: var(--clr-brand);
+  color: #fff;
   border: none;
-  border-radius: 0.375rem;
+  border-radius: 999px;
   padding: 0.75rem 1.5rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.15s;
 }
 
 .btn-primary:hover {
-  background-color: var(--brand-700, #075875);
+  background-color: var(--clr-brand-hover);
+  transform: scale(1.02);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
 }
 
 .btn-secondary {
-  background-color: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
+  background-color: var(--clr-surface);
+  color: var(--clr-text);
+  border: 1px solid var(--clr-border);
+  border-radius: 999px;
   padding: 0.75rem 1.5rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, border-color 0.2s, transform 0.15s;
 }
 
 .btn-secondary:hover {
-  background-color: #e5e7eb;
+  background-color: var(--clr-border);
+  border-color: var(--clr-border-2);
+  transform: scale(1.02);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
 }
 
 /* Responsive Design */

@@ -1,17 +1,17 @@
 /* Premium Tutor Dashboard - Dark Glassmorphism Styling */
 
 :root {
-  --color-bg: #03161e;
-  --color-text: #f8fafc;
-  --color-text-muted: #94a3b8;
-  --color-brand-cyan: #087ea4;
-  --color-brand-cyan-hover: #056b8d;
-  --color-brand-lime: #d8ff5f;
-  --color-brand-lime-hover: #baf300;
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.07);
-  --glass-bg-hover: rgba(255, 255, 255, 0.06);
-  --glass-border-hover: rgba(255, 255, 255, 0.15);
+  --color-bg: var(--clr-bg);
+  --color-text: var(--clr-text);
+  --color-text-muted: var(--clr-text-2);
+  --color-brand-cyan: var(--clr-brand);
+  --color-brand-cyan-hover: var(--clr-brand-hover);
+  --color-brand-lime: var(--clr-lime);
+  --color-brand-lime-hover: var(--clr-brand-hover);
+  --glass-bg: var(--clr-card-bg);
+  --glass-border: var(--clr-border);
+  --glass-bg-hover: var(--clr-surface);
+  --glass-border-hover: var(--clr-border-2);
 }
 
 body {

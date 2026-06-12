@@ -17,7 +17,7 @@
 .reviews-title {
   font-size: 2rem;
   font-weight: bold;
-  color: var(--ink, #172b4d);
+  color: var(--clr-text);
 }
 
 .review-header-actions {
@@ -26,18 +26,23 @@
 }
 
 .create-review-btn {
-  background-color: var(--brand-600, #056b8d);
-  color: white;
+  background-color: var(--clr-brand);
+  color: #fff;
   border: none;
-  border-radius: 0.375rem;
+  border-radius: 999px; /* One UI capsule pill */
   padding: 0.75rem 1.5rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.15s;
 }
 
 .create-review-btn:hover {
-  background-color: var(--brand-700, #075875);
+  background-color: var(--clr-brand-hover);
+  transform: scale(1.02);
+}
+
+.create-review-btn:active {
+  transform: scale(0.98);
 }
 
 /* Reviews Grid */
@@ -50,22 +55,23 @@
 
 /* Review Card */
 .review-card {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: var(--clr-card-bg);
+  border: 1px solid var(--clr-card-border);
+  border-radius: 1.5rem; /* One UI rounding */
+  box-shadow: 0 4px 18px var(--clr-shadow);
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.25s, box-shadow 0.25s;
 }
 
 .review-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px var(--clr-shadow);
 }
 
 .review-header {
   display: flex;
   padding: 1.5rem;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--clr-border);
 }
 
 .review-icon {
@@ -81,12 +87,12 @@
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
-  color: var(--ink, #172b4d);
+  color: var(--clr-text);
 }
 
 .review-description {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--clr-text-2);
   line-height: 1.5;
 }
 
@@ -95,39 +101,40 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  background-color: #f9fafb;
+  background-color: var(--clr-bg-2);
+  border-top: 1px solid var(--clr-border);
 }
 
 .review-author {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--clr-text-2);
 }
 
 .review-time {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--clr-text-2);
 }
 
 .review-status {
   font-size: 0.75rem;
   padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
-  font-weight: 600;
+  border-radius: 0.5rem;
+  font-weight: 700;
 }
 
 .status-pending {
-  background-color: #dbeafe;
-  color: #1e40af;
+  background-color: var(--clr-brand-light);
+  color: var(--clr-brand-text);
 }
 
 .status-in-progress {
-  background-color: #fef3c7;
-  color: #92400e;
+  background-color: rgba(255, 159, 10, 0.15);
+  color: var(--clr-brand-text);
 }
 
 .status-completed {
-  background-color: #d1fae5;
-  color: #065f46;
+  background-color: rgba(48, 209, 88, 0.15);
+  color: var(--clr-lime);
 }
 
 .review-actions {
@@ -145,7 +152,7 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
-  color: var(--ink, #172b4d);
+  color: var(--clr-text);
 }
 
 .user-reviews-grid {
@@ -155,11 +162,11 @@
 }
 
 .user-review-card {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: var(--clr-card-bg);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 18px var(--clr-shadow);
   overflow: hidden;
-  border: 2px solid var(--brand-100, #d9f0ff);
+  border: 2px solid var(--clr-brand-light);
 }
 
 /* Review Requests Section */
@@ -171,7 +178,7 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
-  color: var(--ink, #172b4d);
+  color: var(--clr-text);
 }
 
 .requests-grid {
@@ -181,11 +188,11 @@
 }
 
 .request-card {
-  background-color: white;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  background-color: var(--clr-card-bg);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 18px var(--clr-shadow);
   overflow: hidden;
-  border: 2px solid var(--lime, #d8ff5f);
+  border: 2px solid var(--clr-lime);
 }
 
 /* Modals */
@@ -196,7 +203,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
   z-index: 1000;
   justify-content: center;
   align-items: center;
@@ -207,14 +215,16 @@
 }
 
 .modal-content {
-  background-color: white;
-  border-radius: 0.5rem;
+  background-color: var(--clr-card-bg);
+  border: 1px solid var(--clr-card-border);
+  border-radius: 1.5rem;
   width: 90%;
   max-width: 700px;
   padding: 2rem;
   position: relative;
   max-height: 90vh;
   overflow-y: auto;
+  box-shadow: 0 24px 60px var(--clr-shadow);
 }
 
 .modal-close {
@@ -223,14 +233,19 @@
   right: 1rem;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--clr-text-3);
+  transition: color 0.2s;
+}
+
+.modal-close:hover {
+  color: var(--clr-text);
 }
 
 .modal-title {
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
-  color: var(--ink, #172b4d);
+  color: var(--clr-text);
 }
 
 .form-group {
@@ -241,7 +256,7 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--clr-text-2);
 }
 
 .form-input,
@@ -249,9 +264,20 @@
 .form-select {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
+  border: 1px solid var(--clr-input-border);
+  border-radius: 1rem;
+  background-color: var(--clr-input-bg);
+  color: var(--clr-text);
   font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  border-color: var(--clr-brand);
+  box-shadow: 0 0 0 3px var(--clr-brand-light);
 }
 
 .form-textarea {
@@ -268,10 +294,11 @@
 
 /* Code Display */
 .code-display {
-  background-color: #1e293b;
-  color: #f8fafc;
+  background-color: var(--clr-bg-2);
+  color: var(--clr-text);
+  border: 1px solid var(--clr-border);
   padding: 1rem;
-  border-radius: 0.375rem;
+  border-radius: 1rem;
   font-family: monospace;
   font-size: 0.875rem;
   overflow-x: auto;
@@ -282,14 +309,14 @@
 .feedback-section {
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--clr-border);
 }
 
 .feedback-title {
   font-size: 1.125rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: var(--ink, #172b4d);
+  color: var(--clr-text);
 }
 
 .feedback-list {
@@ -299,8 +326,9 @@
 }
 
 .feedback-item {
-  background-color: #f9fafb;
-  border-radius: 0.375rem;
+  background-color: var(--clr-bg-2);
+  border: 1px solid var(--clr-border);
+  border-radius: 1rem;
   padding: 1rem;
 }
 
@@ -313,6 +341,7 @@
 
 .feedback-reviewer {
   font-weight: 600;
+  color: var(--clr-text);
 }
 
 .feedback-rating {
@@ -321,21 +350,21 @@
 }
 
 .star {
-  color: #fbbf24;
+  color: var(--clr-border-2);
 }
 
 .star.filled {
-  color: #f59e0b;
+  color: var(--clr-lime);
 }
 
 .feedback-comment {
   margin-bottom: 0.5rem;
-  color: #4b5563;
+  color: var(--clr-text-2);
 }
 
 .feedback-time {
   font-size: 0.75rem;
-  color: #6b7280;
+  color: var(--clr-text-3);
 }
 
 /* Create Review Form */
@@ -347,48 +376,64 @@
 
 /* Buttons */
 .btn-primary {
-  background-color: var(--brand-600, #056b8d);
-  color: white;
+  background-color: var(--clr-brand);
+  color: #fff;
   border: none;
-  border-radius: 0.375rem;
+  border-radius: 999px;
   padding: 0.75rem 1.5rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.15s;
 }
 
 .btn-primary:hover {
-  background-color: var(--brand-700, #075875);
+  background-color: var(--clr-brand-hover);
+  transform: scale(1.02);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
 }
 
 .btn-secondary {
-  background-color: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
+  background-color: var(--clr-surface);
+  color: var(--clr-text);
+  border: 1px solid var(--clr-border);
+  border-radius: 999px;
   padding: 0.75rem 1.5rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, border-color 0.2s, transform 0.15s;
 }
 
 .btn-secondary:hover {
-  background-color: #e5e7eb;
+  background-color: var(--clr-border);
+  border-color: var(--clr-border-2);
+  transform: scale(1.02);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
 }
 
 .btn-outline {
   background-color: transparent;
-  color: var(--brand-600, #056b8d);
-  border: 1px solid var(--brand-600, #056b8d);
-  border-radius: 0.375rem;
+  color: var(--clr-brand-text);
+  border: 1px solid var(--clr-brand);
+  border-radius: 999px;
   padding: 0.75rem 1.5rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, color 0.2s, transform 0.15s;
 }
 
 .btn-outline:hover {
-  background-color: var(--brand-50, #eef8ff);
+  background-color: var(--clr-brand-light);
+  transform: scale(1.02);
+}
+
+.btn-outline:active {
+  transform: scale(0.98);
 }
 
 /* Notifications */
@@ -397,9 +442,9 @@
   top: 20px;
   right: 20px;
   padding: 1rem 1.5rem;
-  border-radius: 0.375rem;
+  border-radius: 1rem;
   color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px var(--clr-shadow);
   transform: translateX(400px);
   transition: transform 0.3s ease-out;
   z-index: 1001;
@@ -410,15 +455,19 @@
 }
 
 .notification.success {
-  background-color: #10b981;
+  background-color: var(--clr-lime);
+  color: var(--clr-bg);
+  font-weight: 700;
 }
 
 .notification.error {
   background-color: #ef4444;
+  font-weight: 700;
 }
 
 .notification.info {
-  background-color: #3b82f6;
+  background-color: var(--clr-brand);
+  font-weight: 700;
 }
 
 /* Responsive Design */
