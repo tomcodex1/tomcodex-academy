@@ -90,6 +90,7 @@
         <img src="assets/tomcodex-logo.svg" alt="Tom Codex">
         <span><strong>TomCodeX</strong><small>${pageLabel}</small></span>
       </a>
+      <button class="tc-theme-toggle" type="button" aria-label="Switch to light mode" title="Light mode" style="margin-left:auto">☀️</button>
       <button class="site-menu-toggle" type="button" aria-expanded="false" aria-controls="siteNavigation">
         <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span><b>Menu</b>
       </button>
@@ -118,6 +119,9 @@
     </div>
   `;
   document.body.prepend(header);
+
+  // Init theme toggle after header is in DOM
+  if (window.tcTheme) window.tcTheme.init();
 
   const navigation = header.querySelector(".site-navigation");
   const toggle = header.querySelector(".site-menu-toggle");

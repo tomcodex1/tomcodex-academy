@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>!function(){var t=localStorage.getItem("tomcodex.theme")||((window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches)?"light":"dark");document.documentElement.dataset.theme=t}()</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Practice Salesforce interviews with the TomCodex AI Interviewer." />
@@ -27,6 +28,7 @@
 </head>
 <body class="interview-page text-slate-100 antialiased">
   <header class="interview-topbar">
+  <script>!function(){var t=localStorage.getItem("tomcodex.theme")||((window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches)?"light":"dark");document.documentElement.dataset.theme=t}()</script>
     <div class="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 lg:px-8">
       <a href="index.html" class="flex items-center gap-2"><img src="assets/tomcodex-logo.svg" alt="Tom Codex" class="h-12 w-auto sm:h-14"><span class="hidden border-l border-white/20 pl-3 text-sm font-bold sm:inline">AI Interviewer</span></a>
       <nav class="ml-auto flex items-center gap-3 text-sm font-bold"><a href="analytics.html" class="hidden sm:block">Analytics</a><a href="dashboard.html" class="rounded-lg border px-4 py-2">Dashboard</a><a href="index.html" class="hidden sm:block">Home</a></nav>
@@ -37,7 +39,7 @@
     <section class="interview-hero">
       <div class="mx-auto grid max-w-7xl items-center gap-8 px-5 py-12 lg:grid-cols-[1fr_.55fr] lg:px-8">
         <div><span class="interview-eyebrow inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-cyan-200">AI-powered Salesforce practice</span><h1 class="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl">Build interview confidence, one answer at a time.</h1><p class="mt-4 max-w-2xl text-lg leading-8 text-slate-300">Practice realistic questions, speak naturally, and receive focused feedback that shows exactly what to improve next.</p><div class="hero-proof"><span>Role-based sessions</span><span>Instant scoring</span><span>Private practice</span></div></div>
-        <div class="grid grid-cols-3 gap-3 text-center"><div class="interview-hero-stat"><strong id="heroSessionCount">0</strong><span>Sessions</span></div><div class="interview-hero-stat"><strong id="heroBestScore">0%</strong><span>Best score</span></div><div class="interview-hero-stat"><strong>24/7</strong><span>Available</span></div></div>
+        <div class="grid grid-cols-3 gap-3 text-center"><div class="interview-hero-stat"><strong id="heroSessionCountBanner">0</strong><span>Sessions</span></div><div class="interview-hero-stat"><strong id="heroBestScoreBanner">0%</strong><span>Best score</span></div><div class="interview-hero-stat"><strong>24/7</strong><span>Available</span></div></div>
       </div>
     </section>
 
@@ -71,8 +73,82 @@
 
       <section class="interview-card interview-stage" aria-label="AI interview workspace">
         <div id="welcomeState" class="stage-welcome">
-          <div class="ai-orb">AI</div><span class="course-tag">TomCodex AI Interviewer</span><h2>Ready when you are.</h2><p>Select your role and difficulty. The AI interviewer will ask one question at a time and evaluate your answer for clarity, technical accuracy, examples, and confidence.</p>
-          <div class="grid gap-3 sm:grid-cols-3"><div><strong>Realistic</strong><span>Role-based questions</span></div><div><strong>Instant</strong><span>Detailed evaluation</span></div><div><strong>Repeatable</strong><span>Unlimited practice</span></div></div>
+          <!-- Header: AI Orb + Intro -->
+          <div class="stage-welcome-header">
+            <div class="ai-orb">AI</div>
+            <div class="welcome-title-block">
+              <span>TomCodex AI Interviewer</span>
+              <h2>Ready when you are.</h2>
+              <p>Select your role and difficulty on the left. The AI will ask one question at a time and score your answer for clarity, technical accuracy, examples, and confidence.</p>
+            </div>
+          </div>
+
+          <!-- Session stats -->
+          <div class="welcome-mini-stats">
+            <div class="welcome-mini-stat">
+              <strong id="heroSessionCount">0</strong>
+              <span>Sessions</span>
+            </div>
+            <div class="welcome-mini-stat">
+              <strong id="heroBestScore">—</strong>
+              <span>Best score</span>
+            </div>
+            <div class="welcome-mini-stat">
+              <strong>24/7</strong>
+              <span>Available</span>
+            </div>
+          </div>
+
+          <!-- How it works: 3 steps -->
+          <div class="welcome-steps">
+            <div class="welcome-step">
+              <span class="welcome-step-num">1</span>
+              <strong>Configure &amp; Start</strong>
+              <p>Choose your Salesforce role, difficulty, and session length in the left panel, then press Start.</p>
+            </div>
+            <div class="welcome-step">
+              <span class="welcome-step-num">2</span>
+              <strong>Speak or Write</strong>
+              <p>Read the AI's question and answer by voice (with live transcription) or by typing into the answer box.</p>
+            </div>
+            <div class="welcome-step">
+              <span class="welcome-step-num">3</span>
+              <strong>Analyse &amp; Improve</strong>
+              <p>Get instant scoring on accuracy, clarity, examples, and pacing plus an improved answer model and follow-up coach.</p>
+            </div>
+          </div>
+
+          <!-- Feature tips -->
+          <div class="welcome-tips-row">
+            <div class="welcome-tip">
+              <span class="welcome-tip-icon">🎙️</span>
+              <div>
+                <strong>Neural Voice Interviewer</strong>
+                <p>Azure Neural Voice reads every question aloud. Browser speech recognition captures your spoken answer in real time.</p>
+              </div>
+            </div>
+            <div class="welcome-tip">
+              <span class="welcome-tip-icon">📊</span>
+              <div>
+                <strong>Adaptive Follow-ups</strong>
+                <p>When enabled, the AI targets your weakest scoring dimensions across the session so you improve faster.</p>
+              </div>
+            </div>
+            <div class="welcome-tip">
+              <span class="welcome-tip-icon">🗂️</span>
+              <div>
+                <strong>500+ Question Library</strong>
+                <p>Browse, filter and rate Admin &amp; Developer questions below. Use spaced repetition to master weak topics.</p>
+              </div>
+            </div>
+            <div class="welcome-tip">
+              <span class="welcome-tip-icon">🏆</span>
+              <div>
+                <strong>Readiness Dashboard</strong>
+                <p>Track answer dimensions, topic mastery and role readiness across every session — all stored privately in your browser.</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div id="questionState" class="hidden">
@@ -204,6 +280,6 @@
   <script src="js/interview.js"></script>
   <script src="js/floating-guide.js"></script>
   <script src="js/voice-input.js"></script>
-  <script src="js/site-nav.js"></script>
+  <script src="js/theme-toggle.js"></script><script src="js/site-nav.js"></script>
 </body>
 </html>

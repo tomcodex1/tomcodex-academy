@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>!function(){var t=localStorage.getItem("tomcodex.theme")||((window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches)?"light":"dark");document.documentElement.dataset.theme=t}()</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="TomCodex student learning analytics, activity heatmap, and progress curves." />
@@ -20,7 +21,8 @@
   <script src="js/academy-guard.js"></script>
 </head>
 <body class="bg-slate-50 font-sans text-ink antialiased">
-  <header class="border-b border-slate-200 bg-white"><div class="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 lg:px-8"><a href="index.html" class="flex items-center gap-2"><img src="assets/tomcodex-logo.svg" alt="Tom Codex" class="h-12 w-auto sm:h-14"><span class="hidden border-l border-slate-300 pl-3 text-sm font-bold sm:inline">Learning Analytics</span></a><nav class="ml-auto flex items-center gap-3 text-sm font-bold"><a href="dashboard.html" class="rounded-lg border border-brand-600 px-4 py-2 text-brand-700 hover:bg-brand-50">Dashboard</a><a href="interview.html" class="hidden text-slate-500 hover:text-brand-600 sm:block">AI Interviewer</a></nav></div></header>
+  <header class="border-b border-slate-200 bg-white">
+  <script>!function(){var t=localStorage.getItem("tomcodex.theme")||((window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches)?"light":"dark");document.documentElement.dataset.theme=t}()</script><div class="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 lg:px-8"><a href="index.html" class="flex items-center gap-2"><img src="assets/tomcodex-logo.svg" alt="Tom Codex" class="h-12 w-auto sm:h-14"><span class="hidden border-l border-slate-300 pl-3 text-sm font-bold sm:inline">Learning Analytics</span></a><nav class="ml-auto flex items-center gap-3 text-sm font-bold"><a href="dashboard.html" class="rounded-lg border border-brand-600 px-4 py-2 text-brand-700 hover:bg-brand-50">Dashboard</a><a href="interview.html" class="hidden text-slate-500 hover:text-brand-600 sm:block">AI Interviewer</a></nav></div></header>
 
   <main>
     <section class="bg-brand-950 text-white"><div class="mx-auto max-w-7xl px-5 py-12 lg:px-8"><span class="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-widest text-cyan-200">Continuous growth record</span><h1 class="mt-5 text-4xl font-extrabold tracking-tight sm:text-5xl">Your learning activity and growth curve.</h1><p class="mt-4 max-w-2xl text-lg leading-8 text-slate-300">Track consistency, completed work, interview improvement, and career-long Salesforce progress.</p></div></section>
@@ -50,6 +52,6 @@
   <script src="js/analytics.js"></script>
   <script src="js/floating-guide.js"></script>
   <script src="js/voice-input.js"></script>
-  <script src="js/site-nav.js"></script>
+  <script src="js/theme-toggle.js"></script><script src="js/site-nav.js"></script>
 </body>
 </html>
