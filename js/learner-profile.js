@@ -40,7 +40,17 @@
   let isGuestMode = false;
   let loggedInUser = null;
 
+  let isTutor = false;
   // Check if there is an active session
+  try {
+    const tutorSession = JSON.parse(localStorage.getItem("tomcodex.authSession.v1"));
+    if (tutorSession && tutorSession.role === "tutor") {
+      isTutor = true;
+    }
+  } catch (e) {
+    // Ignore
+  }
+
   try {
     loggedInUser = JSON.parse(localStorage.getItem("tomcodex.auth.user.v1")) || 
                    JSON.parse(localStorage.getItem("tomcodex.authIdentity.v1"));
@@ -49,7 +59,16 @@
   }
 
   // Inject header links based on session
-  if (loggedInUser) {
+  if (isTutor) {
+    headerActions.innerHTML = `
+      <a href="tutor-dashboard.html" class="btn-secondary px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        Back to Tutor Dashboard
+      </a>
+    `;
+  } else if (loggedInUser) {
     headerActions.innerHTML = `
       <a href="/learner-dashboard" class="btn-secondary px-5 py-2.5 rounded-xl font-bold text-xs flex items-center gap-1.5">
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

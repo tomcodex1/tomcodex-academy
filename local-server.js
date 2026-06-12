@@ -706,6 +706,27 @@ app.get("/api/auth-session", async (request, response) => {
   return response.status(401).json({ authenticated: false });
 });
 
+app.get("/api/public-profile", async (request, response) => {
+  try {
+    const id = String(request.query.id || "").trim();
+    if (!id) return response.status(400).json({ error: "Student ID is required." });
+    
+    const students = await loadStudents();
+    const student = students.find((candidate) => candidate.id === id);
+    if (!student) return response.status(404).json({ error: "Student account not found." });
+    
+    return response.json({
+      id: student.id,
+      name: student.name,
+      createdAt: student.createdAt,
+      tier: student.tier || "free",
+      progress: student.progress || {}
+    });
+  } catch (error) {
+    return response.status(503).json({ error: error.message });
+  }
+});
+
 // Rate Limit Middleware
 async function checkAiQuota(request, response, next) {
   const session = authenticatedStudent(request);
