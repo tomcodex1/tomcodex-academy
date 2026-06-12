@@ -34,7 +34,7 @@ function createFetchMock() {
             }
           }]
         };
-      } else if (promptText.includes("Review the Salesforce artifact")) {
+      } else if (promptText.includes("Review the Salesforce artifact") || promptText.includes("Code Reviewer")) {
         mockResponse = {
           candidates: [{
             content: {

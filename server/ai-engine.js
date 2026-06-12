@@ -497,6 +497,14 @@ Generate exactly ${safeCount} questions. Return ONLY valid JSON array:
 
   // ── 7. Transcription (Multimodal Audio) ───────────────────────────────────
   async handleTranscribe({ audio, mimeType, language = "en-IN", question = "" }, key) {
+    let geminiKey = key;
+    if (geminiKey && typeof geminiKey === "string" && !geminiKey.startsWith("AIza") && !geminiKey.startsWith("AQ.")) {
+      geminiKey = process.env.GEMINI_API_KEY || null;
+    } else if (!geminiKey) {
+      geminiKey = process.env.GEMINI_API_KEY || null;
+    }
+    if (!geminiKey) throw new Error("High-accuracy transcription requires a configured Gemini API key.");
+
     const VALID_TYPES = ["audio/webm", "audio/ogg", "audio/mp4", "audio/wav", "audio/mpeg"];
     if (!VALID_TYPES.includes(mimeType)) throw new Error(`Invalid audio mimeType.`);
     if (!audio || audio.length < 100) throw new Error("Audio data too short.");
@@ -506,13 +514,13 @@ ${question ? `Question asked: "${question.slice(0, 2000)}"` : ""}
 Return only the transcription text, no labels or metadata.`;
 
     const { text } = await this.callGemini({
-      key,
+      key: geminiKey,
       contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType, data: audio } }] }],
       jsonMode: false,
       generationConfig: { temperature: 0, maxOutputTokens: 2048 }
     });
     if (!text || text.trim().length < 2) throw new Error("Transcription returned empty.");
-    return { transcript: text.trim(), source: "centralized-ai-engine", provider: "gemini", model: this.getModel() };
+    return { transcript: text.trim(), source: "centralized-ai-engine", provider: "gemini", model: "gemini-2.5-flash" };
   }
 
   // ── 8. Main run() entry point ─────────────────────────────────────────────
