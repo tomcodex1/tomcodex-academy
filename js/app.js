@@ -1106,7 +1106,7 @@ async function renderSkillPassport() {
     if (evaluationHistory.length === 0) {
       const emptyItem = document.createElement("div");
       emptyItem.className = "text-center py-8 text-slate-400 text-xs";
-      emptyItem.textContent = "No screenshot lab proofs uploaded yet. Go to your courses to submit your first lab screenshot.";
+      emptyItem.textContent = "No lab verifications recorded yet. Go to your courses to verify your first lab.";
       historyList.appendChild(emptyItem);
     } else {
       evaluationHistory.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));

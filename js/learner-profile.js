@@ -291,7 +291,7 @@
     if (evaluationHistory.length === 0) {
       activityLog.innerHTML = `
         <div class="text-center py-6 text-slate-500 text-xs">
-          No lab history or screenshot reviews recorded yet.
+          No lab history or verifications recorded yet.
         </div>
       `;
     } else {

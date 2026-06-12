@@ -139,7 +139,7 @@
           <span class="text-xs bg-lime/20 text-lime px-3 py-1 rounded-full font-bold uppercase tracking-wider">Founder Access Required</span>
           <h2 class="mt-6 text-3xl font-extrabold text-white">Unlock all modules in the program</h2>
           <p class="mt-4 text-slate-300 text-sm leading-6">
-            You are currently on the <strong>Free Starter Access</strong> tier. Complete all 14 Salesforce Admin modules, get unlimited screenshot proof AI reviews, certification simulators, and verified completion credentials.
+            You are currently on the <strong>Free Starter Access</strong> tier. Complete all 14 Salesforce Admin modules, get unlimited Check My Work AI reviews, certification simulators, and verified completion credentials.
           </p>
           
           <div class="mt-8 p-4 bg-white/5 rounded-xl border border-white/10 text-left text-xs space-y-2">
