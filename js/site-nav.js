@@ -28,7 +28,7 @@
     ["course-apex.html", "Apex Development", "Code, triggers, testing, and integrations"],
     ["course-lwc.html", "Lightning Web Components", "Modern Salesforce user interfaces"],
     ["#", "Salesforce Integration", "REST APIs, Named Credentials, OAuth (Coming Soon)"],
-    ["#", "Zentom AI and Copilots", "Agents, Topics, Prompt engineering (Coming Soon)"],
+    ["#", "Salesforce Agentforce", "Agents, Topics, Prompt engineering (Coming Soon)"],
     ["#", "Final POC Project", "Build the Student Success CRM project (Coming Soon)"]
   ];
   const studentGroups = [
