@@ -588,9 +588,12 @@ function setupTabs() {
 function renderLearningTracks() {
   const definitions = [
     ["admin", "course-admin.html", 10],
-    ["apex", "course-apex.html", 13],
+    ["apex", "course-apex.html", 12],
     ["flow", "course-flow.html", 12],
-    ["lwc", "course-lwc.html", 12]
+    ["lwc", "course-lwc.html", 12],
+    ["integration", "course-integration.html", 8],
+    ["agentforce", "course-agentforce.html", 6],
+    ["poc", "course-poc.html", 4]
   ];
   let enrollments = {};
   try { enrollments = JSON.parse(localStorage.getItem(ENROLLMENTS_KEY)) || {}; } catch {}
@@ -654,7 +657,7 @@ function renderLearningTracks() {
       }
     });
     card.innerHTML = `<div class="track-summary">
-      <div class="track-summary-heading"><span class="track-course-icon">${track === "admin" ? "SF" : track === "apex" ? "&lt;/&gt;" : track === "flow" ? "FL" : "UI"}</span><div><span class="course-tag">${percent === 100 ? "Completed" : completed ? "In progress" : enrolled ? "Enrolled" : "Available"}</span><h3>${title}</h3></div><strong>${percent}%</strong></div>
+      <div class="track-summary-heading"><span class="track-course-icon">${track === "admin" ? "SF" : track === "apex" ? "&lt;/&gt;" : track === "flow" ? "FL" : track === "lwc" ? "UI" : track === "integration" ? "API" : track === "agentforce" ? "AI" : "POC"}</span><div><span class="course-tag">${percent === 100 ? "Completed" : completed ? "In progress" : enrolled ? "Enrolled" : "Available"}</span><h3>${title}</h3></div><strong>${percent}%</strong></div>
       <div class="track-progress-bar"><span style="width:${percent}%"></span></div>
       <div class="track-metrics"><div><strong>${completed}</strong><span>${track === 'admin' ? 'Verified' : 'Mastered'}</span></div><div><strong>${remaining}</strong><span>Remaining</span></div><div><strong>${total}</strong><span>Total modules</span></div></div>
       <div class="track-next-action"><div><span>Current status</span><strong>${status}</strong></div><b>${action}</b></div>
@@ -858,13 +861,89 @@ const crmStages = [
     moduleIndex: 0,
     moduleName: "POC Module 1",
     url: "course-poc.html?module=0"
+ const pocProjects = {
+  student: {
+    title: "Student Success CRM",
+    desc: "One continuous Enterprise CRM architecture built step-by-step in your own Salesforce Developer Org.",
+    stages: [
+      { name: "Platform & Core Objects", desc: "Provision a Salesforce Developer Org and create the Student custom object to track learners." },
+      { name: "Data Modeling & Relationships", desc: "Build Master-Detail relationships to track Course Enrollments and relate Students to Accounts." },
+      { name: "Access Control & Security", desc: "Create Profiles, OWD, and Permission Sets to restrict access to sensitive student profile details." },
+      { name: "Flow Process Automation", desc: "Design screen flows and record-triggered flows to automate student onboarding and email alerts." },
+      { name: "Apex Trigger Logic", desc: "Build trigger handlers to calculate student completion metrics and auto-grade screenshot labs." },
+      { name: "LWC Student Dashboard", desc: "Implement a responsive Lightning Web Component that queries student progress and displays earned skills." },
+      { name: "Agentforce Copilot Integration", desc: "Configure a Salesforce Agentforce Agent to serve as an autonomous curriculum copilot." },
+      { name: "Final Capstone POC Project", desc: "Design, build, and deploy the complete Student Success CRM project in your org." }
+    ]
+  },
+  realestate: {
+    title: "Real Estate CRM",
+    desc: "One continuous property sales and listings CRM built step-by-step in your own Salesforce Developer Org.",
+    stages: [
+      { name: "Platform & Core Objects", desc: "Provision a Salesforce Developer Org and create the Property Listing custom object to track real estate listings." },
+      { name: "Data Modeling & Relationships", desc: "Build Master-Detail relationships to track Property Offers and relate Listings to Accounts." },
+      { name: "Access Control & Security", desc: "Create Profiles, OWD, and Permission Sets to restrict access to sensitive client financial details." },
+      { name: "Flow Process Automation", desc: "Design screen flows and record-triggered flows to automate listing approvals and client email alerts." },
+      { name: "Apex Trigger Logic", desc: "Build trigger handlers to calculate listing commission rates and auto-grade listing checklist verify." },
+      { name: "LWC Agent Dashboard", desc: "Implement a responsive Lightning Web Component that queries active property listings and displays price trends." },
+      { name: "Agentforce Real Estate Copilot", desc: "Configure a Salesforce Agentforce Agent to serve as an autonomous listing assistant." },
+      { name: "Final Capstone POC Project", desc: "Design, build, and deploy the complete Real Estate Listings CRM project in your org." }
+    ]
+  },
+  healthcare: {
+    title: "Healthcare Patient CRM",
+    desc: "One continuous medical patient tracking and clinic CRM built step-by-step in your own Salesforce Developer Org.",
+    stages: [
+      { name: "Platform & Core Objects", desc: "Provision a Salesforce Developer Org and create the Patient Intake custom object to track patients." },
+      { name: "Data Modeling & Relationships", desc: "Build Master-Detail relationships to track Medical Appointments and relate Patients to Accounts." },
+      { name: "Access Control & Security", desc: "Create Profiles, OWD, and Permission Sets to restrict access to sensitive medical records (HIPAA compliance)." },
+      { name: "Flow Process Automation", desc: "Design screen flows and record-triggered flows to automate patient booking checkins and doctor notifications." },
+      { name: "Apex Trigger Logic", desc: "Build trigger handlers to calculate appointment conflict checks and auto-grade checklist verify." },
+      { name: "LWC Doctor Portal", desc: "Implement a responsive Lightning Web Component that queries patient metrics and displays diagnostic history." },
+      { name: "Agentforce Clinic Copilot", desc: "Configure a Salesforce Agentforce Agent to serve as an autonomous medical scheduling assistant." },
+      { name: "Final Capstone POC Project", desc: "Design, build, and deploy the complete Healthcare Patient CRM project in your org." }
+    ]
+  },
+  custom: {
+    title: "Custom Project Idea",
+    desc: "A custom project idea adapted from the curriculum rules and designed in your own Salesforce Developer Org.",
+    stages: [
+      { name: "Platform & Core Objects", desc: "Provision a Salesforce Developer Org and create your custom primary and secondary objects." },
+      { name: "Data Modeling & Relationships", desc: "Build Master-Detail relationships to track records and link custom objects to Accounts/Contacts." },
+      { name: "Access Control & Security", desc: "Create Profiles, OWD, and Permission Sets to restrict access to sensitive custom record fields." },
+      { name: "Flow Process Automation", desc: "Design screen flows and record-triggered flows to automate custom email notifications and updates." },
+      { name: "Apex Trigger Logic", desc: "Build trigger handlers to calculate records, metrics, and handle custom business calculations." },
+      { name: "LWC Developer Dashboard", desc: "Implement a responsive Lightning Web Component that queries your custom records and displays interactive statistics." },
+      { name: "Agentforce Custom Copilot", desc: "Configure a Salesforce Agentforce Agent to serve as an autonomous assistant for your custom workspace." },
+      { name: "Final Capstone POC Project", desc: "Design, build, and deploy your complete custom Salesforce project in your org." }
+    ]
   }
-];
+};
 
 function renderPocTracker() {
   const grid = document.getElementById("pocStagesGrid");
   if (!grid) return;
   grid.replaceChildren();
+
+  const selectedPoc = localStorage.getItem("tomcodex.selectedPocProject.v1") || "student";
+  const projectConfig = pocProjects[selectedPoc] || pocProjects.student;
+
+  const selector = document.getElementById("pocProjectSelector");
+  if (selector) {
+    selector.value = selectedPoc;
+    if (!selector.dataset.bound) {
+      selector.dataset.bound = "true";
+      selector.addEventListener("change", (event) => {
+        localStorage.setItem("tomcodex.selectedPocProject.v1", event.target.value);
+        renderPocTracker();
+      });
+    }
+  }
+
+  const headerTitle = document.getElementById("pocProjectTitle");
+  const headerDesc = document.getElementById("pocProjectDesc");
+  if (headerTitle) headerTitle.textContent = projectConfig.title;
+  if (headerDesc) headerDesc.textContent = projectConfig.desc;
 
   let foundInProgress = false;
   let completedCount = 0;
@@ -875,7 +954,7 @@ function renderPocTracker() {
   } catch {}
   const isFree = (authUser.tier || "free") === "free";
 
-  crmStages.forEach((stage) => {
+  crmStages.forEach((stage, idx) => {
     let isCompleted = false;
     let score = 0;
 
@@ -945,15 +1024,18 @@ function renderPocTracker() {
       badgeHtml = `<span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 border border-slate-200 flex items-center gap-1">🔒 Locked</span>`;
     }
 
+    const resolvedName = projectConfig.stages[idx]?.name || stage.name;
+    const resolvedDesc = projectConfig.stages[idx]?.desc || stage.desc;
+
     card.innerHTML = `
       <div class="flex items-start justify-between gap-2">
         <div>
           <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Stage ${stage.stage}</span>
-          <h4 class="font-extrabold text-sm text-slate-800 mt-1">${stage.name}</h4>
+          <h4 class="font-extrabold text-sm text-slate-800 mt-1">${resolvedName}</h4>
         </div>
         ${badgeHtml}
       </div>
-      <p class="text-slate-500 text-xs leading-relaxed">${stage.desc}</p>
+      <p class="text-slate-500 text-xs leading-relaxed">${resolvedDesc}</p>
       <div class="border-t border-slate-100 pt-3 flex items-center justify-between text-[11px] font-semibold">
         <span class="text-slate-400">${stage.moduleName}</span>
         ${status !== "locked" 

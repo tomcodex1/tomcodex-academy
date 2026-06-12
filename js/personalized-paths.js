@@ -4,7 +4,10 @@
     admin: "tomcodex.adminMasteryScores.v1",
     apex: "tomcodex.apexMasteryScores.v1",
     flow: "tomcodex.flowMasteryScores.v1",
-    lwc: "tomcodex.lwcMasteryScores.v1"
+    lwc: "tomcodex.lwcMasteryScores.v1",
+    integration: "tomcodex.integrationMasteryScores.v1",
+    agentforce: "tomcodex.agentforceMasteryScores.v1",
+    poc: "tomcodex.pocMasteryScores.v1"
   };
   const goalLabels = {
     admin: "Salesforce Admin",
@@ -20,18 +23,19 @@
     flow: { title: "Deliver reliable Flow automation", description: "Build record-triggered and screen flows with tests and fault paths.", hours: 10, skill: "Flow", href: "course-flow.html" },
     apex: { title: "Master scalable Apex", description: "Develop bulk-safe classes, triggers, tests, and asynchronous processing.", hours: 14, skill: "Apex", href: "course-apex.html" },
     lwc: { title: "Build a production-ready LWC", description: "Connect a responsive component to Salesforce data and Apex.", hours: 12, skill: "LWC", href: "course-lwc.html" },
-    integration: { title: "Connect Salesforce securely", description: "Practice REST, Named Credentials, callouts, and resilient error handling.", hours: 10, skill: "Integration", href: "dashboard.html" },
+    integration: { title: "Connect Salesforce securely", description: "Practice REST, Named Credentials, callouts, and resilient error handling.", hours: 10, skill: "Integration", href: "course-integration.html" },
+    agentforce: { title: "Configure Salesforce Agentforce", description: "Design autonomous AI agents, actions, system prompts, and custom topics.", hours: 10, skill: "Agentforce", href: "course-agentforce.html" },
     architecture: { title: "Defend a solution architecture", description: "Document tradeoffs across data, security, automation, scale, and integration.", hours: 12, skill: "Architecture", href: "dashboard.html" },
-    project: { title: "Ship a portfolio capstone", description: "Combine your strongest skills in a complete Salesforce delivery.", hours: 16, skill: "Project", href: "peer-review.html" },
+    project: { title: "Ship a portfolio capstone", description: "Combine your strongest skills in a complete Salesforce delivery.", hours: 16, skill: "Project", href: "course-poc.html" },
     interview: { title: "Prove your knowledge in interviews", description: "Practice scenario answers and turn weak responses into concise explanations.", hours: 6, skill: "Career", href: "interview.html" },
     review: { title: "Get implementation feedback", description: "Request a structured peer review and improve the solution from feedback.", hours: 4, skill: "Quality", href: "peer-review.html" }
   };
   const paths = {
     admin: ["foundations", "security", "flow", "reporting", "project", "interview"],
-    developer: ["foundations", "apex", "lwc", "integration", "review", "project", "interview"],
-    automation: ["foundations", "security", "flow", "apex", "review", "project"],
-    architect: ["security", "flow", "apex", "integration", "architecture", "review", "interview"],
-    career: ["foundations", "project", "review", "interview", "architecture"]
+    developer: ["foundations", "apex", "lwc", "integration", "agentforce", "review", "project", "interview"],
+    automation: ["foundations", "security", "flow", "apex", "agentforce", "review", "project"],
+    architect: ["security", "flow", "apex", "integration", "agentforce", "architecture", "review", "interview"],
+    career: ["foundations", "agentforce", "project", "review", "interview", "architecture"]
   };
 
   let state = loadState();

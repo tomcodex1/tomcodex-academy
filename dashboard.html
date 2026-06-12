@@ -102,7 +102,10 @@
         <article class="course-card"><div class="course-cover course-cover-illustration"><img src="assets/course-admin.svg" alt="Connected Salesforce administration tools"></div><div class="p-5"><span class="course-tag">Beginner</span><h3>Salesforce Admin Foundations</h3><p>Learn objects, data modeling, security, and automation.</p><div class="course-meta">10 modules · 30 hours</div></div></article>
         <article class="course-card"><div class="course-cover course-cover-illustration"><img src="assets/course-apex.svg" alt="Apex code editor and development tools"></div><div class="p-5"><span class="course-tag">Intermediate</span><h3>Apex Developer Path</h3><p>Build scalable logic with SOQL, Apex, triggers, and tests.</p><div class="course-meta">6 modules · 16 hours</div></div></article>
         <article class="course-card"><div class="course-cover course-cover-illustration"><img src="assets/course-flow.svg" alt="Connected Salesforce automation flow"></div><div class="p-5"><span class="course-tag">Project</span><h3>Flow Automation Lab</h3><p>Automate real business processes without writing code.</p><div class="course-meta">5 modules · 8 hours</div></div></article>
-        <article class="course-card"><div class="course-cover course-cover-illustration"><img src="assets/course-lwc.svg" alt="Reusable Lightning Web Component interface"></div><div class="p-5"><span class="course-tag">Advanced</span><h3>Lightning Web Components</h3><p>Create modern Salesforce interfaces connected to Apex.</p><div class="course-meta">5 modules · 14 hours</div></div></article>
+        <article class="course-card"><div class="course-cover course-cover-illustration"><img src="assets/course-lwc.svg" alt="Reusable Lightning Web Component interface"></div><div class="p-5"><span class="course-tag">Advanced</span><h3>Lightning Web Components</h3><p>Create modern Salesforce interfaces connected to Apex.</p><div class="course-meta">12 modules · 36 hours</div></div></article>
+        <article class="course-card"><div class="course-cover course-cover-illustration"><img src="assets/course-integration.svg" alt="Salesforce Integration and APIs"></div><div class="p-5"><span class="course-tag">Advanced</span><h3>Salesforce Integration</h3><p>Practice APIs, Named Credentials, and event-driven patterns.</p><div class="course-meta">8 modules · 24 hours</div></div></article>
+        <article class="course-card"><div class="course-cover course-cover-illustration"><img src="assets/course-agentforce.svg" alt="Salesforce Agentforce AI configuration"></div><div class="p-5"><span class="course-tag">Advanced</span><h3>Salesforce Agentforce</h3><p>Build autonomous AI agents, prompt templates, and custom topics.</p><div class="course-meta">6 modules · 18 hours</div></div></article>
+        <article class="course-card"><div class="course-cover course-cover-illustration"><img src="assets/course-poc.svg" alt="Final Capstone POC Project"></div><div class="p-5"><span class="course-tag">Capstone</span><h3>Final POC Project</h3><p>Ship the Student Success CRM project as a portfolio capstone.</p><div class="course-meta">4 modules · 12 hours</div></div></article>
       </div>
       </div>
     </section>
@@ -130,10 +133,18 @@
         <section id="pocPanel" class="tab-panel" role="tabpanel" aria-labelledby="pocTab" data-tab-panel="poc" hidden>
           <div class="academy-card">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-5 mb-6">
-              <div>
+              <div class="flex-1">
                 <span class="course-tag">Hands-on Portfolio POC</span>
-                <h2 class="mt-2 text-2xl font-extrabold tracking-tight">Student Success CRM</h2>
-                <p class="text-slate-500 text-sm mt-1">One continuous Enterprise CRM architecture built step-by-step in your own Salesforce Developer Org.</p>
+                <div class="flex flex-wrap items-center gap-3 mt-2">
+                  <h2 id="pocProjectTitle" class="text-2xl font-extrabold tracking-tight">Student Success CRM</h2>
+                  <select id="pocProjectSelector" class="text-xs bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1 font-bold text-slate-700 focus:outline-none focus:ring-1 focus:ring-brand-500">
+                    <option value="student">Student Success CRM (Default)</option>
+                    <option value="realestate">Real Estate CRM (Alternative)</option>
+                    <option value="healthcare">Healthcare CRM (Alternative)</option>
+                    <option value="custom">Custom Project Idea</option>
+                  </select>
+                </div>
+                <p id="pocProjectDesc" class="text-slate-500 text-sm mt-1">One continuous Enterprise CRM architecture built step-by-step in your own Salesforce Developer Org.</p>
               </div>
               <div class="flex items-center gap-3 bg-brand-950 text-white px-4 py-3 rounded-2xl">
                 <span class="text-xs font-semibold text-cyan-300">Overall Progress</span>

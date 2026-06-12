@@ -393,7 +393,10 @@ export class LearningService {
       ["admin", "course-admin.html", 14],
       ["apex", "course-apex.html", 12],
       ["flow", "course-flow.html", 12],
-      ["lwc", "course-lwc.html", 12]
+      ["lwc", "course-lwc.html", 12],
+      ["integration", "course-integration.html", 8],
+      ["agentforce", "course-agentforce.html", 6],
+      ["poc", "course-poc.html", 4]
     ];
 
     let enrollments = {};
