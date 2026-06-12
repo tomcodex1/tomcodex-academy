@@ -598,7 +598,6 @@
     } catch {}
 
     const module = modules[currentModule];
-    const courseKey = COURSE_KEY_MAP[courseName] || "admin";
     const moduleId = `${courseKey}-${currentModule + 1}`;
     const labId = `${courseKey}-${currentModule + 1}-lab-1`;
     const labCriteria = module.labCriteria || window.TomCodexLabCriteria?.[`${courseKey}-${currentModule}`]?.criteria || [];
