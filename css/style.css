@@ -177,6 +177,180 @@ html[data-theme="dark"] .text-brand-950 {
   color: var(--clr-brand-text) !important;
 }
 
+/* ── Custom Tailwind colour: mist ── */
+html[data-theme="dark"] .bg-mist {
+  background-color: var(--clr-bg) !important;
+}
+
+/* ── border-slate-150 (custom non-standard Tailwind class) ── */
+html[data-theme="dark"] .border-slate-150 {
+  border-color: var(--clr-border) !important;
+}
+
+/* ── Dashboard header ── */
+html[data-theme="dark"] .dashboard-header {
+  background-color: var(--clr-nav-bg) !important;
+  border-color: var(--clr-nav-border) !important;
+  backdrop-filter: blur(14px);
+}
+
+/* ── Hero inner white card (Salesforce Lifelong Learning Path box) ── */
+html[data-theme="dark"] .rounded-2xl.bg-white.p-6.text-ink {
+  background-color: var(--clr-card-bg) !important;
+  color: var(--clr-text) !important;
+}
+html[data-theme="dark"] .rounded-2xl.bg-white.p-6.text-ink h2,
+html[data-theme="dark"] .rounded-2xl.bg-white.p-6.text-ink strong {
+  color: var(--clr-text) !important;
+}
+html[data-theme="dark"] .rounded-2xl.bg-white.p-6.text-ink .bg-slate-100,
+html[data-theme="dark"] .rounded-2xl.bg-white.p-6.text-ink .h-3.overflow-hidden {
+  background-color: var(--clr-surface) !important;
+}
+
+/* ── Passport / Settings stat boxes ── */
+html[data-theme="dark"] .bg-white.p-3.rounded-2xl {
+  background-color: var(--clr-bg-2) !important;
+}
+
+/* ── Skill Passport Stats card and Certificate Eligibility card ── */
+html[data-theme="dark"] .bg-slate-50.border.border-slate-200 {
+  background-color: var(--clr-bg-2) !important;
+  border-color: var(--clr-border) !important;
+}
+
+/* ── Lab history right column ── */
+html[data-theme="dark"] .bg-white.border.border-slate-200.rounded-3xl {
+  background-color: var(--clr-card-bg) !important;
+  border-color: var(--clr-border) !important;
+}
+html[data-theme="dark"] .bg-white.border.border-slate-200.rounded-3xl h3 {
+  color: var(--clr-text) !important;
+}
+
+/* ── Settings quota section ── */
+html[data-theme="dark"] .bg-slate-50.border.border-slate-200.rounded-xl {
+  background-color: var(--clr-bg-2) !important;
+  border-color: var(--clr-border) !important;
+}
+
+/* ── Progress bars with bg-slate-200 track ── */
+html[data-theme="dark"] .bg-slate-200.h-2,
+html[data-theme="dark"] .w-full.bg-slate-200 {
+  background-color: var(--clr-surface) !important;
+}
+
+/* ── Status badges / eligibility badges ── */
+html[data-theme="dark"] .bg-slate-100.text-slate-400 {
+  background-color: var(--clr-surface) !important;
+  color: var(--clr-text-3) !important;
+}
+
+/* ── POC selector dropdown ── */
+html[data-theme="dark"] .bg-slate-100.border.border-slate-300 {
+  background-color: var(--clr-input-bg) !important;
+  border-color: var(--clr-input-border) !important;
+  color: var(--clr-text) !important;
+}
+
+/* ── Disabled inputs (e.g. email field in settings) ── */
+html[data-theme="dark"] input:disabled,
+html[data-theme="dark"] .bg-slate-100.cursor-not-allowed {
+  background-color: var(--clr-surface) !important;
+  border-color: var(--clr-border) !important;
+  color: var(--clr-text-3) !important;
+}
+
+/* ── Emerald buttons (Download Certificate) ── */
+html[data-theme="dark"] .bg-emerald-50 {
+  background-color: rgba(52, 211, 153, 0.1) !important;
+  border-color: rgba(52, 211, 153, 0.25) !important;
+}
+html[data-theme="dark"] .text-emerald-700 {
+  color: #6ee7b7 !important;
+}
+html[data-theme="dark"] .border-emerald-300 {
+  border-color: rgba(52, 211, 153, 0.25) !important;
+}
+html[data-theme="dark"] .hover\:bg-emerald-100:hover {
+  background-color: rgba(52, 211, 153, 0.18) !important;
+}
+
+/* ── Brand-50 light blue chip ── */
+html[data-theme="dark"] .bg-brand-50 {
+  background-color: var(--clr-brand-light) !important;
+}
+
+/* ── Explore courses button dark mode ── */
+html[data-theme="dark"] .dashboard-explore {
+  border-color: var(--clr-brand) !important;
+  color: var(--clr-brand-text) !important;
+}
+html[data-theme="dark"] .dashboard-explore:hover {
+  background-color: var(--clr-brand-light) !important;
+}
+
+/* ── View AI roadmap button and similar outline buttons ── */
+html[data-theme="dark"] .border.border-brand-600 {
+  border-color: var(--clr-brand) !important;
+}
+
+/* ── Catch-all for remaining text-slate classes ── */
+html[data-theme="dark"] .text-slate-800 {
+  color: var(--clr-text) !important;
+}
+html[data-theme="dark"] .text-slate-400,
+html[data-theme="dark"] .text-slate-300 {
+  color: var(--clr-text-2) !important;
+}
+
+
+/* ── Dashboard header direct colour ── */
+html[data-theme="dark"] .dashboard-header.bg-white,
+html[data-theme="dark"] header.dashboard-header {
+  background-color: var(--clr-nav-bg) !important;
+  border-color: var(--clr-nav-border) !important;
+}
+
+/* ── Settings form label text colours ── */
+html[data-theme="dark"] .text-slate-700 label,
+html[data-theme="dark"] label.text-slate-700 {
+  color: var(--clr-text-2) !important;
+}
+
+/* ── Settings borders ── */
+html[data-theme="dark"] .border-slate-350 {
+  border-color: var(--clr-border-2) !important;
+}
+html[data-theme="dark"] .border-slate-150 {
+  border-color: var(--clr-border) !important;
+}
+
+/* ── Fallback: any remaining bg-slate-100 ── */
+html[data-theme="dark"] .bg-slate-100 {
+  background-color: var(--clr-bg-2) !important;
+}
+
+/* ── bg-white/95 academy-home sticky header ── */
+html[data-theme="dark"] .bg-white\/95 {
+  background-color: var(--clr-nav-bg) !important;
+}
+
+/* ── bg-brand-50 CTA section ── */
+html[data-theme="dark"] .bg-brand-50 {
+  background-color: var(--clr-bg-2) !important;
+}
+
+/* ── Rounded white cards inside dark hero sections ── */
+html[data-theme="dark"] .rounded-2xl.bg-white {
+  background-color: var(--clr-card-bg) !important;
+  color: var(--clr-text) !important;
+}
+
+/* ── Gamification dashboard bg overrides ── */
+html[data-theme="dark"] .bg-slate-50 {
+  background-color: var(--clr-bg-2) !important;
+}
 
 /* ── Theme toggle button ── */
 .tc-theme-toggle {
