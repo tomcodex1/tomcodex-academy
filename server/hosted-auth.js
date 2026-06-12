@@ -692,6 +692,7 @@ export function registerHostedAuthRoutes(app) {
         id: student.id,
         name: student.name,
         email: student.email,
+        tier: student.tier || "free",
         joinedAt: student.createdAt,
         lastActiveAt: student.progressUpdatedAt || student.lastLoginAt || student.createdAt,
         phase: Object.keys(student.progress || {}).length ? "Learning in progress" : "Registered",

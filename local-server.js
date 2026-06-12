@@ -397,6 +397,7 @@ function tutorStudentSummary(student) {
     id: student.id,
     name: student.name,
     email: student.email,
+    tier: student.tier || "free",
     joinedAt: student.createdAt,
     lastActiveAt: activityTimes.at(-1) || student.progressUpdatedAt || student.createdAt,
     phase,

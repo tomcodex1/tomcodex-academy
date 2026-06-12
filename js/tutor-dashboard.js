@@ -45,8 +45,11 @@
       const trackLabels = enrolledTracks.length
         ? enrolledTracks.map((track) => `<span class="${track.complete ? "complete" : ""}">${escapeHtml(track.name)} ${track.completed}/${track.total}</span>`).join("")
         : "<span>Not enrolled</span>";
+      const tierBadge = student.tier === "founder"
+        ? `<span class="student-tier-badge founder">Founder Access</span>`
+        : `<span class="student-tier-badge free">Free Starter</span>`;
       return `<tr>
-        <td><div class="student-name"><strong>${escapeHtml(student.name)}</strong><small>${escapeHtml(student.email)}</small></div></td>
+        <td><div class="student-name"><strong>${escapeHtml(student.name)}</strong><small>${escapeHtml(student.email)}</small>${tierBadge}</div></td>
         <td><span class="student-phase">${escapeHtml(student.phase)}</span><div class="student-track-list"><span>${escapeHtml(student.currentCourse)}</span></div></td>
         <td><div class="student-progress-line"><span>${student.completedModules}/${student.totalModules || 0} modules</span><strong>${student.progressPercent}%</strong></div><div class="student-progress-track"><div class="student-progress-fill" style="width:${student.progressPercent}%"></div></div><div class="student-track-list">${trackLabels}</div></td>
         <td><div class="student-activity"><strong>${student.activityCount} activities</strong><span>Last active ${escapeHtml(formatActivity(student.lastActiveAt))}</span></div></td>
@@ -75,7 +78,7 @@
 
   search.addEventListener("input", () => {
     const query = search.value.trim().toLowerCase();
-    renderRows(students.filter((student) => [student.name, student.email, student.phase, student.currentCourse].some((value) => String(value).toLowerCase().includes(query))));
+    renderRows(students.filter((student) => [student.name, student.email, student.phase, student.currentCourse, student.tier].some((value) => String(value).toLowerCase().includes(query))));
   });
 
   loadStudents();
