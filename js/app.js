@@ -843,8 +843,8 @@ const crmStages = [
   },
   {
     stage: 7,
-    name: "Agentforce Copilot Integration",
-    desc: "Configure an Agentforce Agent to serve as a curriculum copilot for live students.",
+    name: "Zentom AI Copilot Integration",
+    desc: "Configure a Zentom AI Agent to serve as a curriculum copilot for live students.",
     course: "lwc",
     moduleIndex: 4,
     moduleName: "Final Capstone POC",
