@@ -27,9 +27,9 @@
     ["course-flow.html", "Flow Automation", "Low-code automation and delivery"],
     ["course-apex.html", "Apex Development", "Code, triggers, testing, and integrations"],
     ["course-lwc.html", "Lightning Web Components", "Modern Salesforce user interfaces"],
-    ["#", "Salesforce Integration", "REST APIs, Named Credentials, OAuth (Coming Soon)"],
-    ["#", "Salesforce Agentforce", "Agents, Topics, Prompt engineering (Coming Soon)"],
-    ["#", "Final POC Project", "Build the Student Success CRM project (Coming Soon)"]
+    ["course-integration.html", "Salesforce Integration", "REST APIs, Named Credentials, and OAuth setups"],
+    ["course-agentforce.html", "Salesforce Agentforce", "Agents, Topics, and Prompt engineering configurations"],
+    ["course-poc.html", "Final POC Project", "Design, build, and deploy the Student Success CRM"]
   ];
   const studentGroups = [
     { label: "Learn", items: learnItems },

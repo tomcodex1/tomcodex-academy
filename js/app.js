@@ -843,12 +843,21 @@ const crmStages = [
   },
   {
     stage: 7,
-    name: "Zentom AI Copilot Integration",
-    desc: "Configure a Zentom AI Agent to serve as a curriculum copilot for live students.",
-    course: "lwc",
-    moduleIndex: 4,
-    moduleName: "Final Capstone POC",
-    url: "course-lwc.html?module=4"
+    name: "Agentforce Copilot Integration",
+    desc: "Configure a Salesforce Agentforce Agent to serve as an autonomous curriculum copilot.",
+    course: "agentforce",
+    moduleIndex: 0,
+    moduleName: "Agentforce Module 1",
+    url: "course-agentforce.html?module=0"
+  },
+  {
+    stage: 8,
+    name: "Final Capstone POC Project",
+    desc: "Design, build, and deploy the complete Student Success CRM project in your org.",
+    course: "poc",
+    moduleIndex: 0,
+    moduleName: "POC Module 1",
+    url: "course-poc.html?module=0"
   }
 ];
 
@@ -974,7 +983,7 @@ async function renderSkillPassport() {
   let totalQuizzes = 0;
   const evaluationHistory = [];
 
-  const courses = ["admin", "apex", "flow", "lwc"];
+  const courses = ["admin", "apex", "flow", "lwc", "integration", "agentforce", "poc"];
   
   courses.forEach((course) => {
     let quizScores = {};

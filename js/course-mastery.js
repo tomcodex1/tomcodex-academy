@@ -472,7 +472,10 @@
     "Salesforce Administrator": "admin",
     "Apex Development": "apex",
     "Salesforce Flow": "flow",
-    "Lightning Web Components": "lwc"
+    "Lightning Web Components": "lwc",
+    "Salesforce Integration": "integration",
+    "Salesforce Agentforce": "agentforce",
+    "Final POC Project": "poc"
   };
 
   function loadLabResults() {

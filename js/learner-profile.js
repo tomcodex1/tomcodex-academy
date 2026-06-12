@@ -163,7 +163,7 @@
     const evaluationHistory = [];
 
     // Process structured courses (Legacy format)
-    const courses = ["admin", "apex", "flow", "lwc"];
+    const courses = ["admin", "apex", "flow", "lwc", "integration", "agentforce", "poc"];
     courses.forEach((course) => {
       const quizScores = getProgressValue(`tomcodex.${course}MasteryScores.v1`, {});
       const screenshotScores = getProgressValue(`tomcodex.${course}MasteryScores.v1.screenshots`, {});

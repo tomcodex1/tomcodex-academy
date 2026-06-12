@@ -179,7 +179,7 @@ function supportedProgressKey(key) {
     || key === ADMIN_LAB_ATTEMPTS_KEY
     || key === SKILL_PASSPORT_KEY
     || key === MODULE_UNLOCKS_KEY
-    || /^tomcodex\.(admin|apex|flow|lwc)MasteryScores\.v1(\.finalExam)?$/.test(key);
+    || /^tomcodex\.(admin|apex|flow|lwc|integration|agentforce|poc)MasteryScores\.v1(\.finalExam)?$/.test(key);
 }
 
 function parseStudentProgress(student, key, fallback) {
