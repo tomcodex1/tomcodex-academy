@@ -232,52 +232,185 @@ body.interview-page {
 
 /* Workspace Stage Views */
 .interview-stage {
-  min-height: 42rem;
   display: flex;
   flex-direction: column;
-  justify-content: stretch;
+  /* No forced min-height — content fills naturally */
 }
 
 .stage-welcome {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  gap: 1.25rem;
+  padding: 1.75rem;
+  width: 100%;
+}
+
+/* Welcome header row: orb + title */
+.stage-welcome-header {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+.stage-welcome-header .ai-orb {
+  flex-shrink: 0;
+}
+.stage-welcome-header .welcome-title-block span {
+  display: block;
+  color: #67d4f5;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.stage-welcome-header .welcome-title-block h2 {
+  margin-top: 0.3rem;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+.stage-welcome-header .welcome-title-block p {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  max-width: 36rem;
+}
+
+/* 3-stat mini cards */
+.welcome-mini-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+.welcome-mini-stat {
+  border: 1px solid var(--glass-border);
+  border-radius: 0.85rem;
+  background: rgba(255,255,255,0.02);
+  padding: 1rem;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+.welcome-mini-stat:hover {
+  border-color: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+}
+.welcome-mini-stat strong {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #67d4f5;
+}
+.welcome-mini-stat span {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.67rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* How-it-works steps */
+.welcome-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+@media (max-width: 700px) {
+  .welcome-steps { grid-template-columns: 1fr; }
+  .welcome-mini-stats { grid-template-columns: repeat(3, 1fr); }
+}
+.welcome-step {
+  border: 1px solid var(--glass-border);
+  border-radius: 0.85rem;
+  background: rgba(255,255,255,0.015);
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+.welcome-step:hover {
+  border-color: rgba(8,126,164,0.3);
+  background: rgba(8,126,164,0.04);
+}
+.welcome-step-num {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 1;
-  text-align: center;
-  gap: 1.5rem;
-  padding: 2.5rem 1.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.45rem;
+  background: rgba(8,126,164,0.18);
+  color: #67d4f5;
+  font-size: 0.72rem;
+  font-weight: 900;
+  flex-shrink: 0;
 }
-.stage-welcome > p {
-  max-width: 38rem;
-  color: var(--color-text-muted);
-  font-size: 0.95rem;
-  line-height: 1.7;
-}
-.stage-welcome > div.grid div {
-  border: 1px solid var(--glass-border);
-  border-radius: 0.75rem;
-  background: rgba(255, 255, 255, 0.01);
-  padding: 1.2rem;
-  min-width: 9.5rem;
-  backdrop-filter: blur(4px);
-  transition: background 0.2s, border-color 0.2s;
-}
-.stage-welcome > div.grid div:hover {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: var(--glass-border-hover);
-}
-.stage-welcome strong {
+.welcome-step strong {
   display: block;
-  font-size: 0.85rem;
-  color: #ffffff;
+  font-size: 0.8rem;
   font-weight: 700;
+  color: #ffffff;
 }
-.stage-welcome span {
-  display: block;
-  margin-top: 0.3rem;
+.welcome-step p {
+  font-size: 0.72rem;
   color: var(--color-text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Tips/feature highlight row */
+.welcome-tips-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+@media (max-width: 700px) {
+  .welcome-tips-row { grid-template-columns: 1fr; }
+}
+.welcome-tip {
+  border: 1px solid var(--glass-border);
+  border-radius: 0.85rem;
+  background: rgba(255,255,255,0.01);
+  padding: 1rem 1.1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  transition: border-color 0.2s;
+}
+.welcome-tip:hover {
+  border-color: rgba(255,255,255,0.1);
+}
+.welcome-tip-icon {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  line-height: 1;
+}
+.welcome-tip strong {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+.welcome-tip p {
+  margin: 0.2rem 0 0;
   font-size: 0.7rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* Result state still uses a centered layout */
+#resultState.stage-welcome {
+  align-items: center;
+  text-align: center;
+  justify-content: flex-start;
+  padding: 2.5rem 1.5rem;
 }
 
 /* AI Orb */

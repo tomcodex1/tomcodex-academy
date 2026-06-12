@@ -751,7 +751,12 @@ function saveHistory(item) {
 function renderHistory() {
   const history = loadHistory();
   el("heroSessionCount").textContent = history.length;
-  el("heroBestScore").textContent = `${history.reduce((best, item) => Math.max(best, item.score), 0)}%`;
+  el("heroBestScore").textContent = history.length ? `${history.reduce((best, item) => Math.max(best, item.score), 0)}%` : "—";
+  // Sync hero banner (separate DOM IDs, same data)
+  const bannerSession = document.getElementById("heroSessionCountBanner");
+  const bannerBest = document.getElementById("heroBestScoreBanner");
+  if (bannerSession) bannerSession.textContent = history.length;
+  if (bannerBest) bannerBest.textContent = history.length ? `${history.reduce((best, item) => Math.max(best, item.score), 0)}%` : "0%";
   el("historyList").innerHTML = history.length ? history.map((item) => `<div class="history-item"><div><strong>${item.role}</strong><span>${item.score}%</span></div><p>${item.difficulty} · ${item.format || "mixed"} · ${item.questions} questions · ${item.date}</p></div>`).join("") : '<p class="empty-state">Complete an interview to see your history.</p>';
 }
 

@@ -90,7 +90,6 @@
         <img src="assets/tomcodex-logo.svg" alt="Tom Codex">
         <span><strong>TomCodeX</strong><small>${pageLabel}</small></span>
       </a>
-      <button class="tc-theme-toggle" type="button" aria-label="Switch to light mode" title="Light mode" style="margin-left:auto">☀️</button>
       <button class="site-menu-toggle" type="button" aria-expanded="false" aria-controls="siteNavigation">
         <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span><b>Menu</b>
       </button>
@@ -104,6 +103,7 @@
               ${group.items.map(([href, label, detail]) => `<a href="${href}"><strong>${label}</strong><small>${detail}</small></a>`).join("")}
             </div>
           </details>`).join("")}
+        <button class="tc-theme-toggle" type="button" aria-label="Switch to light mode" title="Light mode">☀️</button>
         ${role ? `
           <details class="site-nav-group site-account-group">
             <summary class="site-login-link">${accountLabel}<span aria-hidden="true">&#9662;</span></summary>
