@@ -174,11 +174,10 @@ body.interview-page {
   color: var(--color-text-muted);
 }
 
-/* Sidebar & Sticky */
+/* Sidebar & Natural Flow */
 @media (min-width: 1024px) {
   .interview-sidebar {
-    position: sticky;
-    top: 6rem;
+    position: relative;
   }
   .interview-workspace {
     grid-template-columns: minmax(20rem, 24rem) minmax(0, 1fr) !important;
