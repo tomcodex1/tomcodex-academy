@@ -16,7 +16,7 @@
 .dashboard-title {
   font-size: 2rem;
   font-weight: bold;
-  color: var(--ink, #172b4d);
+  color: var(--clr-text);
 }
 
 .dashboard-controls {
@@ -27,16 +27,16 @@
 .control-button {
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
-  border: 1px solid var(--brand-600, #056b8d);
-  background-color: white;
-  color: var(--brand-700, #056b8d);
+  border: 1px solid var(--clr-border-2);
+  background-color: var(--clr-surface);
+  color: var(--clr-brand-text);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .control-button:hover {
-  background-color: var(--brand-50, #eef8ff);
+  background-color: var(--clr-link-active-bg);
 }
 
 /* Charts Section */
@@ -48,17 +48,20 @@
 }
 
 .chart-container {
-  background-color: white;
+  background-color: var(--clr-card-bg);
+  border: 1px solid var(--clr-card-border);
+  box-shadow: 0 1px 3px var(--clr-shadow);
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
+  color: var(--clr-text);
+  transition: background-color 0.25s, border-color 0.25s, color 0.25s;
 }
 
 .chart-title {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: var(--ink, #172b4d);
+  color: var(--clr-text);
 }
 
 .chart-canvas {
@@ -69,18 +72,21 @@
 
 /* Skill Gaps Section */
 .skill-gaps-section {
-  background-color: white;
+  background-color: var(--clr-card-bg);
+  border: 1px solid var(--clr-card-border);
+  box-shadow: 0 1px 3px var(--clr-shadow);
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
   margin-bottom: 2rem;
+  color: var(--clr-text);
+  transition: background-color 0.25s, border-color 0.25s, color 0.25s;
 }
 
 .skill-gaps-title {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
-  color: var(--ink, #172b4d);
+  color: var(--clr-text);
 }
 
 .skill-gaps-container {
@@ -97,19 +103,19 @@
 
 .skill-name {
   font-weight: 600;
-  color: var(--ink, #172b4d);
+  color: var(--clr-text);
 }
 
 .skill-bar-container {
   height: 10px;
-  background-color: #e5e7eb;
+  background-color: var(--clr-bg-3);
   border-radius: 5px;
   overflow: hidden;
 }
 
 .skill-bar {
   height: 100%;
-  background-color: var(--brand-500, #087ea4);
+  background-color: var(--clr-brand);
   border-radius: 5px;
   transition: width 0.5s ease;
 }
@@ -117,23 +123,26 @@
 .skill-level {
   text-align: right;
   font-size: 0.875rem;
-  color: var(--brand-600, #056b8d);
+  color: var(--clr-brand-text);
   font-weight: 600;
 }
 
 /* Learning Recommendations */
 .recommendations-section {
-  background-color: white;
+  background-color: var(--clr-card-bg);
+  border: 1px solid var(--clr-card-border);
+  box-shadow: 0 1px 3px var(--clr-shadow);
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
+  color: var(--clr-text);
+  transition: background-color 0.25s, border-color 0.25s, color 0.25s;
 }
 
 .recommendations-title {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 1.5rem;
-  color: var(--ink, #172b4d);
+  color: var(--clr-text);
 }
 
 .recommendations-list {
@@ -143,18 +152,19 @@
 }
 
 .recommendation-item {
-  border-left: 4px solid var(--brand-500, #087ea4);
+  border-left: 4px solid var(--clr-brand);
   padding-left: 1rem;
 }
 
 .recommendation-title {
   font-weight: 600;
   margin-bottom: 0.25rem;
+  color: var(--clr-text);
 }
 
 .recommendation-description {
   font-size: 0.875rem;
-  color: #4b5563;
+  color: var(--clr-text-2);
 }
 
 .recommendation-priority {
@@ -190,22 +200,25 @@
 }
 
 .stat-card {
-  background-color: white;
+  background-color: var(--clr-card-bg);
+  border: 1px solid var(--clr-card-border);
+  box-shadow: 0 1px 3px var(--clr-shadow);
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 1.5rem;
   text-align: center;
+  color: var(--clr-text);
+  transition: background-color 0.25s, border-color 0.25s, color 0.25s;
 }
 
 .stat-value {
   font-size: 2rem;
   font-weight: bold;
-  color: var(--brand-600, #056b8d);
+  color: var(--clr-brand);
 }
 
 .stat-label {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--clr-text-3);
 }
 
 /* Responsive Design */
