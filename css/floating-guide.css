@@ -411,19 +411,22 @@
 }
 .tc-guide-input-wrapper textarea {
   flex: 1;
-  border: 0;
-  background: transparent;
-  padding: 0.3rem 0;
-  color: var(--clr-text);
+  border: none !important;
+  background: transparent !important;
+  padding: 0.3rem 0 !important;
+  color: var(--clr-text) !important;
   font-family: inherit;
   font-size: 0.82rem;
   line-height: 1.4;
   resize: none;
+  min-height: unset !important;
   max-height: 120px;
-  outline: none;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
 }
 .tc-guide-input-wrapper textarea::placeholder {
-  color: var(--clr-text-3);
+  color: var(--clr-text-3) !important;
 }
 .tc-guide-send {
   display: flex;

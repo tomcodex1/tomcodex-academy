@@ -128,7 +128,14 @@
     const control = document.createElement("div");
     control.className = "voice-input-control";
     control.innerHTML = `<button class="voice-input-button" type="button" aria-pressed="false" aria-label="Speak in English India"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a4 4 0 0 0 4-4V5a4 4 0 1 0-8 0v6a4 4 0 0 0 4 4Zm-2-10a2 2 0 1 1 4 0v6a2 2 0 1 1-4 0V5Zm9 6a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 0 6 6.92V20H8a1 1 0 0 0 0 2h8a1 1 0 0 0 0-2h-3v-2.08A7 7 0 0 0 19 11Z"/></svg><span>Voice input</span></button><small class="voice-input-status">English (India)</small>`;
-    textarea.insertAdjacentElement("afterend", control);
+    
+    const wrapper = textarea.closest(".tc-guide-input-wrapper") || textarea.closest(".input-wrapper") || textarea.closest(".chat-input-container");
+    if (wrapper) {
+      wrapper.insertAdjacentElement("afterend", control);
+    } else {
+      textarea.insertAdjacentElement("afterend", control);
+    }
+    
     control.querySelector("button").addEventListener("click", () => startListening(textarea, control.querySelector("button")));
   }
 
