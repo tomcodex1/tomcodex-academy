@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="css/floating-guide.css" />
   <link rel="stylesheet" href="css/floating-guide-auto.css" />
   <script src="js/academy-guard.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body class="bg-slate-50 font-sans text-ink antialiased">
   <header class="border-b border-slate-200 bg-white">
@@ -59,10 +60,6 @@
       </button>
       <button id="tabTemplatesBtn" type="button" class="px-6 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition focus:outline-none">
         Resume Maker Templates
-      </button>
-      <button id="tabATSBtn" type="button" class="px-6 py-3 border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition focus:outline-none flex items-center gap-1.5">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-        ATS Checker
       </button>
     </div>
 
@@ -281,6 +278,14 @@
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
                   <span>Copy HTML</span>
                 </button>
+                <button id="downloadPdfBtn" class="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition focus:outline-none">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  <span>Download PDF</span>
+                </button>
+                <button id="downloadWordBtn" class="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition focus:outline-none">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                  <span>Download Word</span>
+                </button>
               </div>
             </div>
 
@@ -293,151 +298,143 @@
           </div>
         </section>
       </div>
-    </div>
+      <!-- ATS Checker Section -->
+      <div class="border-t border-slate-200 pt-8 mt-8">
+        <div class="rounded-2xl bg-slate-900 p-6 text-white mb-6">
+          <h3 class="text-lg font-bold flex items-center gap-2">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            ATS Compatibility Audit
+          </h3>
+          <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">
+            Audit your compiled resume against typical Applicant Tracking System rules. You can optionally paste a Job Description below to compare against specific Salesforce and target role keywords.
+          </p>
+        </div>
 
-    <!-- Tab 3: ATS Checker -->
-    <div id="atsTabContent" class="hidden space-y-8">
-      <div class="grid gap-8 lg:grid-cols-[1fr_1.1fr]">
-
-        <!-- Input Panel -->
-        <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col gap-5">
-          <div>
-            <h2 class="text-xl font-bold text-brand-950 border-b border-slate-100 pb-3">Paste Your Resume</h2>
-            <p class="text-xs text-slate-400 mt-2 leading-relaxed">Copy and paste your full resume text below. For best results, include all sections: Summary, Skills, Experience, and Certifications.</p>
-          </div>
-
-          <div>
-            <label for="atsResumeInput" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Resume Text <span class="text-rose-500">*</span></label>
-            <textarea id="atsResumeInput" class="ats-textarea" placeholder="Paste your full resume text here..."></textarea>
-            <div class="flex justify-end mt-1">
-              <span id="atsCharCount" class="text-[10px] text-slate-400 font-medium">0 characters</span>
+        <div class="grid gap-8 lg:grid-cols-[1fr_1.1fr]">
+          <!-- Input/Control Panel -->
+          <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col gap-5 justify-between">
+            <div>
+              <label for="atsJobInput" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Target Job Description (Optional)</label>
+              <textarea id="atsJobInput" class="ats-textarea jd-input h-56" placeholder="Paste the job description here to extract keywords and verify match rate..."></textarea>
             </div>
-          </div>
 
-          <div>
-            <label for="atsJobInput" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Job Description <span class="text-slate-400 font-normal">(Optional — improves keyword matching)</span></label>
-            <textarea id="atsJobInput" class="ats-textarea jd-input" placeholder="Paste the job description to compare against specific role keywords..."></textarea>
-          </div>
+            <button id="atsAnalyseBtn" type="button" class="w-full rounded-xl bg-brand-600 py-4 text-center font-extrabold text-white hover:bg-brand-700 transition flex items-center justify-center gap-2">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              Analyse Resume Compatibility
+            </button>
+          </section>
 
-          <button id="atsAnalyseBtn" type="button" class="w-full rounded-xl bg-brand-600 py-4 text-center font-extrabold text-white hover:bg-brand-700 transition flex items-center justify-center gap-2">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            Analyse Resume
-          </button>
-        </section>
-
-        <!-- Results Panel -->
-        <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col min-h-[560px]">
-
-          <!-- Empty state -->
-          <div id="atsEmptyState" class="ats-empty-state">
-            <div class="ats-empty-icon">
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <!-- Results Panel -->
+          <section class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex flex-col min-h-[500px]">
+            <!-- Empty state -->
+            <div id="atsEmptyState" class="ats-empty-state">
+              <div class="ats-empty-icon">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              </div>
+              <strong class="text-slate-700 font-bold text-sm">ATS score will appear here</strong>
+              <p class="text-slate-400 text-xs max-w-xs">Click Analyse to get your ATS compatibility score and recommendations for the current previewed resume.</p>
             </div>
-            <strong class="text-slate-700 font-bold text-sm">ATS score will appear here</strong>
-            <p class="text-slate-400 text-xs max-w-xs">Paste your resume and click Analyse to get your ATS compatibility score and recommendations.</p>
-          </div>
 
-          <!-- Loading state -->
-          <div id="atsLoadingState" class="ats-empty-state hidden">
-            <div class="ats-loading-dots">
-              <span></span><span></span><span></span>
+            <!-- Loading state -->
+            <div id="atsLoadingState" class="ats-empty-state hidden">
+              <div class="ats-loading-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <strong class="text-slate-600 text-sm font-bold">Analysing your resume…</strong>
+              <p class="text-slate-400 text-xs">Checking keywords, formatting, impact and completeness</p>
             </div>
-            <strong class="text-slate-600 text-sm font-bold">Analysing your resume…</strong>
-            <p class="text-slate-400 text-xs">Checking keywords, formatting, impact and completeness</p>
-          </div>
 
-          <!-- Results state -->
-          <div id="atsResultState" class="hidden space-y-6">
-
-            <!-- Header row: score ring + grade + engine label -->
-            <div class="flex items-center gap-6 border-b border-slate-100 pb-5">
-              <div class="ats-score-ring">
-                <svg viewBox="0 0 120 120">
-                  <circle class="ring-bg" cx="60" cy="60" r="55"/>
-                  <circle id="atsRingFill" class="ring-fill" cx="60" cy="60" r="55"/>
-                </svg>
-                <div class="ring-text">
-                  <span id="atsScoreNum" class="ring-number">0</span>
-                  <span class="ring-label">ATS Score</span>
+            <!-- Results state -->
+            <div id="atsResultState" class="hidden space-y-6">
+              <!-- Header row: score ring + grade + engine label -->
+              <div class="flex items-center gap-6 border-b border-slate-100 pb-5">
+                <div class="ats-score-ring">
+                  <svg viewBox="0 0 120 120">
+                    <circle class="ring-bg" cx="60" cy="60" r="55"/>
+                    <circle id="atsRingFill" class="ring-fill" cx="60" cy="60" r="55"/>
+                  </svg>
+                  <div class="ring-text">
+                    <span id="atsScoreNum" class="ring-number">0</span>
+                    <span class="ring-label">ATS Score</span>
+                  </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <span id="atsEngineLabel" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">AI Analysis</span>
+                  <h2 class="text-lg font-extrabold text-brand-950 leading-tight">ATS Report</h2>
+                  <span id="atsGradeBadge" class="ats-grade-badge good">Good</span>
                 </div>
               </div>
-              <div class="flex flex-col gap-2">
-                <span id="atsEngineLabel" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">AI Analysis</span>
-                <h2 class="text-lg font-extrabold text-brand-950 leading-tight">ATS Report</h2>
-                <span id="atsGradeBadge" class="ats-grade-badge good">Good</span>
+
+              <!-- Category bars -->
+              <div>
+                <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-3">Score Breakdown</span>
+                <div class="ats-category-bar-wrap">
+
+                  <div class="ats-category-bar">
+                    <div class="cat-header">
+                      <span class="cat-name">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        Keywords
+                      </span>
+                      <span id="atsKwScore" class="cat-score">—</span>
+                    </div>
+                    <div class="ats-bar-track"><div id="atsKwBar" class="ats-bar-fill"></div></div>
+                    <div id="atsKwChips" class="ats-chip-list"></div>
+                  </div>
+
+                  <div class="ats-category-bar">
+                    <div class="cat-header">
+                      <span class="cat-name">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        Formatting
+                      </span>
+                      <span id="atsFmtScore" class="cat-score">—</span>
+                    </div>
+                    <div class="ats-bar-track"><div id="atsFmtBar" class="ats-bar-fill"></div></div>
+                    <div id="atsFmtChips" class="ats-chip-list"></div>
+                  </div>
+
+                  <div class="ats-category-bar">
+                    <div class="cat-header">
+                      <span class="cat-name">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        Impact
+                      </span>
+                      <span id="atsImpScore" class="cat-score">—</span>
+                    </div>
+                    <div class="ats-bar-track"><div id="atsImpBar" class="ats-bar-fill"></div></div>
+                    <div id="atsImpChips" class="ats-chip-list"></div>
+                  </div>
+
+                  <div class="ats-category-bar">
+                    <div class="cat-header">
+                      <span class="cat-name">
+                        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                        Completeness
+                      </span>
+                      <span id="atsCmpScore" class="cat-score">—</span>
+                    </div>
+                    <div class="ats-bar-track"><div id="atsCmpBar" class="ats-bar-fill"></div></div>
+                    <div id="atsCmpChips" class="ats-chip-list"></div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Recommendations -->
+              <div>
+                <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-3">Top Recommendations</span>
+                <div id="atsRecList" class="space-y-2"></div>
+              </div>
+
+              <!-- Strengths -->
+              <div>
+                <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-3">Strengths Detected</span>
+                <div id="atsStrengthList" class="space-y-2"></div>
               </div>
             </div>
-
-            <!-- Category bars -->
-            <div>
-              <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-3">Score Breakdown</span>
-              <div class="ats-category-bar-wrap">
-
-                <div class="ats-category-bar">
-                  <div class="cat-header">
-                    <span class="cat-name">
-                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                      Keywords
-                    </span>
-                    <span id="atsKwScore" class="cat-score">—</span>
-                  </div>
-                  <div class="ats-bar-track"><div id="atsKwBar" class="ats-bar-fill"></div></div>
-                  <div id="atsKwChips" class="ats-chip-list"></div>
-                </div>
-
-                <div class="ats-category-bar">
-                  <div class="cat-header">
-                    <span class="cat-name">
-                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                      Formatting
-                    </span>
-                    <span id="atsFmtScore" class="cat-score">—</span>
-                  </div>
-                  <div class="ats-bar-track"><div id="atsFmtBar" class="ats-bar-fill"></div></div>
-                  <div id="atsFmtChips" class="ats-chip-list"></div>
-                </div>
-
-                <div class="ats-category-bar">
-                  <div class="cat-header">
-                    <span class="cat-name">
-                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                      Impact
-                    </span>
-                    <span id="atsImpScore" class="cat-score">—</span>
-                  </div>
-                  <div class="ats-bar-track"><div id="atsImpBar" class="ats-bar-fill"></div></div>
-                  <div id="atsImpChips" class="ats-chip-list"></div>
-                </div>
-
-                <div class="ats-category-bar">
-                  <div class="cat-header">
-                    <span class="cat-name">
-                      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                      Completeness
-                    </span>
-                    <span id="atsCmpScore" class="cat-score">—</span>
-                  </div>
-                  <div class="ats-bar-track"><div id="atsCmpBar" class="ats-bar-fill"></div></div>
-                  <div id="atsCmpChips" class="ats-chip-list"></div>
-                </div>
-
-              </div>
-            </div>
-
-            <!-- Recommendations -->
-            <div>
-              <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-3">Top Recommendations</span>
-              <div id="atsRecList" class="space-y-2"></div>
-            </div>
-
-            <!-- Strengths -->
-            <div>
-              <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-3">Strengths Detected</span>
-              <div id="atsStrengthList" class="space-y-2"></div>
-            </div>
-
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
     </div>
   </main>

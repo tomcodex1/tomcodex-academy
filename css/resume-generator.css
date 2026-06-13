@@ -136,3 +136,48 @@
 @keyframes blink {
   50% { opacity: 0; }
 }
+
+/* Paper Sheet Mockup Container */
+#liveResumePreview {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  min-height: 500px;
+}
+
+#liveResumePreview h1 {
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.025em;
+}
+
+#liveResumePreview h2 {
+  font-family: 'Inter', sans-serif;
+  border-bottom: 1.5px solid #475569;
+  padding-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 11px;
+}
+
+#liveResumePreview a {
+  text-decoration: underline;
+  color: #0f172a;
+}
+
+/* Active State for Template Buttons */
+.border-brand-500 {
+  border-color: #087ea4 !important;
+  box-shadow: 0 4px 12px rgba(8, 126, 164, 0.06);
+  background-color: #f0f9ff;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease forwards;
+}
+

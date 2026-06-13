@@ -50,7 +50,8 @@
     { label: "Progress", items: [
       ["analytics.html", "Learning Analytics", "Consistency heatmap & metrics"],
       ["dashboard.html?tab=passport", "Skill Passport", "Verified credentials and passport portfolio"],
-      ["gamification-dashboard.html", "Achievements", "Streaks, badges, and leaderboards"]
+      ["gamification-dashboard.html", "Achievements", "Streaks, badges, and leaderboards"],
+      ["resume-generator.html?tab=templates", "Resume Maker Templates", "Salesforce resume layouts & structures"]
     ] }
   ];
   const tutorGroups = [

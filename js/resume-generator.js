@@ -619,15 +619,13 @@
   function setupTabListeners() {
     const tabPointsBtn = el("tabPointsBtn");
     const tabTemplatesBtn = el("tabTemplatesBtn");
-    const tabATSBtn = el("tabATSBtn");
     const pointsTabContent = el("pointsTabContent");
     const templatesTabContent = el("templatesTabContent");
-    const atsTabContent = el("atsTabContent");
 
     if (!tabPointsBtn || !tabTemplatesBtn) return;
 
-    const ALL_TABS = [tabPointsBtn, tabTemplatesBtn, tabATSBtn].filter(Boolean);
-    const ALL_CONTENTS = [pointsTabContent, templatesTabContent, atsTabContent].filter(Boolean);
+    const ALL_TABS = [tabPointsBtn, tabTemplatesBtn];
+    const ALL_CONTENTS = [pointsTabContent, templatesTabContent];
 
     function deactivateAll() {
       ALL_TABS.forEach(btn => {
@@ -652,10 +650,6 @@
       renderLiveResume();
     });
 
-    if (tabATSBtn) {
-      tabATSBtn.addEventListener("click", () => activateTab(tabATSBtn, atsTabContent));
-    }
-
     // Check query params on load
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get("tab") === "templates") {
@@ -663,7 +657,12 @@
       updateTplHistoryDropdown();
       renderLiveResume();
     } else if (urlParams.get("tab") === "ats") {
-      if (tabATSBtn) activateTab(tabATSBtn, atsTabContent);
+      activateTab(tabTemplatesBtn, templatesTabContent);
+      updateTplHistoryDropdown();
+      renderLiveResume();
+      setTimeout(() => {
+        el("atsAnalyseBtn")?.scrollIntoView({ behavior: "smooth" });
+      }, 500);
     }
   }
 
@@ -775,6 +774,16 @@
           copyText(preview.innerHTML.trim(), copyHtmlBtn);
         }
       });
+    }
+
+    const downloadPdfBtn = el("downloadPdfBtn");
+    if (downloadPdfBtn) {
+      downloadPdfBtn.addEventListener("click", downloadPDF);
+    }
+
+    const downloadWordBtn = el("downloadWordBtn");
+    if (downloadWordBtn) {
+      downloadWordBtn.addEventListener("click", downloadWord);
     }
   }
 
@@ -914,6 +923,77 @@
     `;
   }
 
+  // Download Resume as PDF using html2pdf.js
+  function downloadPDF() {
+    const element = el("liveResumePreview");
+    if (!element) return;
+    const name = el("tplName")?.value || "Vijay Kumar";
+    const title = el("tplTitle")?.value || "Resume";
+    const opt = {
+      margin:       [0.3, 0.4, 0.3, 0.4],
+      filename:     `${name.replace(/\s+/g, '_')}_${title.replace(/\s+/g, '_')}_Resume.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2.5, useCORS: true, letterRendering: true },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    
+    html2pdf().set(opt).from(element).save();
+    window.TomCodexLearning?.record("task", 5, "Downloaded Resume as PDF");
+  }
+
+  // Download Resume as Word Document (.doc)
+  function downloadWord() {
+    const preview = el("liveResumePreview");
+    if (!preview) return;
+
+    const name = el("tplName")?.value || "Vijay Kumar";
+    const title = el("tplTitle")?.value || "Resume";
+    const filename = `${name.replace(/\s+/g, '_')}_${title.replace(/\s+/g, '_')}_Resume.doc`;
+
+    const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' 
+          xmlns:w='urn:schemas-microsoft-com:office:word' 
+          xmlns='http://www.w3.org/TR/REC-html40'>
+          <head>
+            <title>Resume - ${name}</title>
+            <style>
+              @page {
+                size: 8.5in 11.0in;
+                margin: 0.5in 0.5in 0.5in 0.5in;
+              }
+              body {
+                font-family: 'Times New Roman', Times, serif;
+                font-size: 10.5pt;
+                color: #333333;
+                line-height: 1.4;
+              }
+              a {
+                color: #0f172a;
+                text-decoration: underline;
+              }
+            </style>
+          </head>
+          <body>`;
+    const footer = "</body></html>";
+    
+    const resumeHtml = preview.innerHTML;
+    const sourceHTML = header + resumeHtml + footer;
+
+    const blob = new Blob(['\ufeff' + sourceHTML], {
+      type: 'application/msword'
+    });
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    window.TomCodexLearning?.record("task", 5, "Downloaded Resume as Word File");
+  }
+
   // On DOM Load
   document.addEventListener("DOMContentLoaded", init);
 
@@ -943,29 +1023,25 @@
 
   function setupATSTab() {
     const analyseBtn = el("atsAnalyseBtn");
-    const resumeInput = el("atsResumeInput");
-    const charCountEl = el("atsCharCount");
-
-    if (resumeInput && charCountEl) {
-      resumeInput.addEventListener("input", () => {
-        const len = resumeInput.value.length;
-        charCountEl.textContent = `${len.toLocaleString()} character${len !== 1 ? "s" : ""}`;
-      });
-    }
-
     if (analyseBtn) {
       analyseBtn.addEventListener("click", handleATSAnalyse);
     }
   }
 
   async function handleATSAnalyse() {
-    const resumeText = (el("atsResumeInput")?.value || "").trim();
+    const name = el("tplName")?.value || "";
+    const title = el("tplTitle")?.value || "";
+    const email = el("tplEmail")?.value || "";
+    const phone = el("tplPhone")?.value || "";
+    const locationVal = el("tplLocation")?.value || "";
+    const linkedin = el("tplLinkedIn")?.value || "";
+    const projects = getCompiledProjects();
+    const resumeText = compileResumeToText(name, title, email, phone, locationVal, linkedin, projects, activeTemplate);
+
     const jobDescription = (el("atsJobInput")?.value || "").trim();
 
     if (resumeText.length < 50) {
-      el("atsResumeInput")?.focus();
-      el("atsResumeInput")?.classList.add("border-rose-400");
-      setTimeout(() => el("atsResumeInput")?.classList.remove("border-rose-400"), 2000);
+      alert("Please ensure your resume preview is populated before running the ATS analysis.");
       return;
     }
 
@@ -994,7 +1070,10 @@
     el("atsLoadingState")?.classList.add("hidden");
     renderATSResults(result);
 
-    if (btn) { btn.disabled = false; btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Analyse Resume`; }
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Analyse Resume Compatibility`;
+    }
 
     window.TomCodexLearning?.record("task", 5, "Used ATS Resume Checker");
   }
