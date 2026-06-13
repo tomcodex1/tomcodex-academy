@@ -52,7 +52,7 @@ Vanilla HTML, CSS, and JavaScript version of tom's Salesforce learning dashboard
 ```text
 salesforce-master-dashboard/
 |-- index.html
-|-- analytics-enhanced.html
+|-- analytics.html
 |-- gamification-dashboard.html
 |-- study-groups.html
 |-- discussion-forums.html
@@ -61,7 +61,7 @@ salesforce-master-dashboard/
 |-- code-review-ai.html
 |-- css/
 |   |-- style.css
-|   |-- analytics-enhanced.css
+|   |-- analytics.css
 |   |-- gamification.css
 |   |-- study-groups.css
 |   |-- discussion-forums.css
@@ -78,7 +78,7 @@ salesforce-master-dashboard/
 |   |-- interview.css
 `-- js/
     |-- app.js
-    |-- analytics-enhanced.js
+    |-- analytics.js
     |-- gamification.js
     |-- study-groups.js
     |-- discussion-forums.js

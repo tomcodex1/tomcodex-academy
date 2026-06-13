@@ -21,7 +21,6 @@
     "discussion-forums.html": "Forums",
     "peer-review.html": "Peer Review",
     "analytics.html": "Analytics",
-    "analytics-enhanced.html": "Enhanced Analytics",
     "gamification-dashboard.html": "Achievements",
     "access.html": "Login"
   };
@@ -51,7 +50,7 @@
     ] },
     { label: "Progress", items: [
       ["analytics.html", "Learning Analytics", "Consistency heatmap & metrics"],
-      ["dashboard.html?tab=roadmap", "Skill Passport", "Verified credentials and passport portfolio"],
+      ["dashboard.html?tab=passport", "Skill Passport", "Verified credentials and passport portfolio"],
       ["gamification-dashboard.html", "Achievements", "Streaks, badges, and leaderboards"]
     ] }
   ];

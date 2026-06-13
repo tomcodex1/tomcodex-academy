@@ -19,7 +19,7 @@
   const catalog = {
     foundations: { title: "Confirm Salesforce foundations", description: "Strengthen org navigation, data modeling, access, and platform vocabulary.", hours: 6, skill: "Admin", href: "course-admin.html" },
     security: { title: "Design secure user access", description: "Practice profiles, permission sets, sharing, CRUD, and field access.", hours: 8, skill: "Security", href: "course-admin.html" },
-    reporting: { title: "Build decision-ready analytics", description: "Create reports and dashboards that prove business outcomes.", hours: 5, skill: "Analytics", href: "analytics-enhanced.html" },
+    reporting: { title: "Build decision-ready analytics", description: "Create reports and dashboards that prove business outcomes.", hours: 5, skill: "Analytics", href: "analytics.html" },
     flow: { title: "Deliver reliable Flow automation", description: "Build record-triggered and screen flows with tests and fault paths.", hours: 10, skill: "Flow", href: "course-flow.html" },
     apex: { title: "Master scalable Apex", description: "Develop bulk-safe classes, triggers, tests, and asynchronous processing.", hours: 14, skill: "Apex", href: "course-apex.html" },
     lwc: { title: "Build a production-ready LWC", description: "Connect a responsive component to Salesforce data and Apex.", hours: 12, skill: "LWC", href: "course-lwc.html" },

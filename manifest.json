@@ -85,7 +85,7 @@
       "name": "Analytics",
       "short_name": "Analytics",
       "description": "View learning analytics",
-      "url": "/analytics-enhanced.html",
+      "url": "/analytics.html",
       "icons": [{ "src": "assets/icons/analytics.png", "sizes": "192x192" }]
     },
     {

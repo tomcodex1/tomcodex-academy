@@ -921,7 +921,6 @@ const protectedAcademyPages = [
   "discussion-forums.html",
   "peer-review.html",
   "analytics.html",
-  "analytics-enhanced.html",
   "gamification-dashboard.html"
 ];
 

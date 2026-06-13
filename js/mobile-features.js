@@ -158,7 +158,7 @@ class MobileFeatures {
 
       const navItems = [
         { icon: '📚', label: 'Learn', href: 'dashboard.html' },
-        { icon: '📊', label: 'Analytics', href: 'analytics-enhanced.html' },
+        { icon: '📊', label: 'Analytics', href: 'analytics.html' },
         { icon: '🏆', label: 'Gamify', href: 'gamification-dashboard.html' },
         { icon: '❓', label: 'Help', href: 'help.html' }
       ];
