@@ -454,7 +454,7 @@
 }
 
 /* Voice Input integration */
-.tc-guide-footer .voice-input-control {
+.voice-input-control {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -463,7 +463,7 @@
   border-top: 1px solid var(--clr-border);
   padding-top: 0.5rem;
 }
-.tc-guide-footer .voice-input-button {
+.voice-input-button {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -477,27 +477,27 @@
   cursor: pointer;
   transition: all 0.2s ease;
 }
-.tc-guide-footer .voice-input-button:hover {
+.voice-input-button:hover {
   background: var(--clr-surface);
   border-color: var(--clr-border-2);
 }
-.tc-guide-footer .voice-input-button svg {
+.voice-input-button svg {
   width: 0.8rem;
   height: 0.8rem;
   fill: currentColor;
 }
-.tc-guide-footer .voice-input-button[data-state="listening"] {
+.voice-input-button[data-state="listening"] {
   border-color: #ff453a;
   background: rgba(255, 69, 58, 0.1);
   color: #ff453a;
   animation: voice-listening 1.2s infinite;
 }
-.tc-guide-footer .voice-input-status {
+.voice-input-status {
   color: var(--clr-text-3);
   font-size: 0.6rem;
   font-weight: 500;
 }
-.tc-guide-footer .voice-input-button[data-state="listening"] + .voice-input-status {
+.voice-input-button[data-state="listening"] + .voice-input-status {
   color: #ff453a;
   font-weight: 600;
 }

@@ -667,3 +667,38 @@
 .sticky-panel {
   position: static !important;
 }
+
+/* Premium Styling for Ask Zentom AI Card Elements */
+.doubt-guide-card label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--clr-text-3);
+  margin-top: 0.95rem;
+  margin-bottom: 0.35rem;
+}
+
+.doubt-guide-card select,
+.doubt-guide-card textarea {
+  width: 100%;
+  background: var(--clr-bg);
+  border: 1px solid var(--clr-border);
+  border-radius: 0.65rem;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.82rem;
+  color: var(--clr-text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.doubt-guide-card select:focus,
+.doubt-guide-card textarea:focus {
+  border-color: var(--clr-brand);
+  box-shadow: 0 0 0 3px var(--clr-brand-light);
+  outline: none;
+}
+
