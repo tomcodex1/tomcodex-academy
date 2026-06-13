@@ -32,6 +32,87 @@
     }
   };
 
+  const RECOMMENDED_MODULES = {
+    "Salesforce Certified Administrator": [
+      {
+        title: "Trailhead: Prepare for Your Salesforce Administrator Credential",
+        url: "https://trailhead.salesforce.com/en/content/learn/trailmixes/prepare-for-your-salesforce-administrator-credential",
+        type: "Trailmix"
+      },
+      {
+        title: "Salesforce Platform Basics",
+        url: "https://trailhead.salesforce.com/content/learn/modules/starting_force_com",
+        type: "Module"
+      },
+      {
+        title: "Data Security",
+        url: "https://trailhead.salesforce.com/content/learn/modules/data_security",
+        type: "Module"
+      },
+      {
+        title: "Data Modeling",
+        url: "https://trailhead.salesforce.com/content/learn/modules/data_modeling",
+        type: "Module"
+      }
+    ],
+    "Salesforce Platform Developer I": [
+      {
+        title: "Trailhead: Prepare for Your Salesforce Platform Developer I Credential",
+        url: "https://trailhead.salesforce.com/en/content/learn/trailmixes/prepare-for-your-salesforce-platform-developer-i-credential",
+        type: "Trailmix"
+      },
+      {
+        title: "Apex Basics & Database",
+        url: "https://trailhead.salesforce.com/content/learn/modules/apex_database",
+        type: "Module"
+      },
+      {
+        title: "Apex Triggers",
+        url: "https://trailhead.salesforce.com/content/learn/modules/apex_triggers",
+        type: "Module"
+      },
+      {
+        title: "Lightning Web Components Basics",
+        url: "https://trailhead.salesforce.com/content/learn/modules/lightning_web_components_basics",
+        type: "Module"
+      }
+    ],
+    "Salesforce AI Associate": [
+      {
+        title: "Trailhead: Prepare for Your Salesforce AI Associate Credential",
+        url: "https://trailhead.salesforce.com/en/content/learn/trailmixes/prepare-for-your-salesforce-ai-associate-credential",
+        type: "Trailmix"
+      },
+      {
+        title: "Artificial Intelligence Fundamentals",
+        url: "https://trailhead.salesforce.com/content/learn/modules/artificial-intelligence-fundamentals",
+        type: "Module"
+      },
+      {
+        title: "Generative AI Basics",
+        url: "https://trailhead.salesforce.com/content/learn/modules/generative-ai-basics",
+        type: "Module"
+      }
+    ],
+    "Salesforce Agentforce Specialist": [
+      {
+        title: "Trailhead: Prepare for Your Salesforce Agentforce Specialist Credential",
+        url: "https://trailhead.salesforce.com/en/content/learn/trailmixes/prepare-for-your-salesforce-agentforce-specialist-credential",
+        type: "Trailmix"
+      },
+      {
+        title: "Agentforce Basics",
+        url: "https://trailhead.salesforce.com/content/learn/modules/agentforce-basics",
+        type: "Module"
+      },
+      {
+        title: "Agentforce Agents for Admins",
+        url: "https://trailhead.salesforce.com/content/learn/modules/agentforce-agents-for-admins",
+        type: "Module"
+      }
+    ]
+  };
+
   // State Variables
   let sessionQuestions = [];
   let userAnswers = []; // holds selected option indices (-1 for unanswered)
@@ -514,6 +595,37 @@
       `;
       container.appendChild(item);
     });
+
+    // Render official modules recommendations
+    const modules = RECOMMENDED_MODULES[currentCertName] || RECOMMENDED_MODULES["Salesforce Certified Administrator"];
+    const modulesContainer = el("officialModulesContainer");
+    if (modulesContainer) {
+      modulesContainer.innerHTML = modules
+        .map(
+          (mod) => `
+          <a href="${mod.url}" target="_blank" class="block p-3 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200/60 transition group flex items-start gap-2.5">
+            <span class="p-1.5 rounded-lg bg-brand-50 text-brand-600 shrink-0 group-hover:bg-brand-100 transition">
+              ${mod.type === "Trailmix" 
+                ? `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>`
+                : `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5V5A2.5 2.5 0 0 1 6.5 2.5H20v14.5H6.5a2.5 2.5 0 0 0-2.5 2.5z"/></svg>`
+              }
+            </span>
+            <div class="flex-1 min-w-0 text-left">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[9px] font-bold uppercase tracking-wider ${mod.type === 'Trailmix' ? 'text-purple-600 bg-purple-50' : 'text-cyan-700 bg-cyan-50'} px-1.5 py-0.5 rounded">
+                  ${mod.type}
+                </span>
+              </div>
+              <strong class="block text-xs font-bold text-slate-800 mt-1 leading-snug group-hover:text-brand-600 transition truncate-two-lines">
+                ${mod.title}
+              </strong>
+            </div>
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 group-hover:text-brand-600 group-hover:translate-x-0.5 transition shrink-0 self-center"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+          </a>
+        `
+        )
+        .join("");
+    }
 
     // Reset review list container
     el("reviewContainer").classList.add("hidden");
