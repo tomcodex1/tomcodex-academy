@@ -1,37 +1,36 @@
-/* AI Interviewer - Premium Dark Glassmorphism Styling */
+/* AI Interviewer - Premium Light Theme Styling */
 
 :root {
-  --color-bg: #03161e;
-  --color-text: #f8fafc;
-  --color-text-muted: #94a3b8;
+  --color-bg: #f8fafc;
+  --color-text: #0f172a;
+  --color-text-muted: #475569;
   --color-brand-cyan: #087ea4;
   --color-brand-cyan-hover: #056b8d;
-  --color-brand-lime: #d8ff5f;
-  --color-brand-lime-hover: #baf300;
-  --glass-bg: rgba(255, 255, 255, 0.02);
-  --glass-border: rgba(255, 255, 255, 0.07);
-  --glass-bg-hover: rgba(255, 255, 255, 0.05);
-  --glass-border-hover: rgba(255, 255, 255, 0.15);
-  --glass-glow: rgba(8, 126, 164, 0.18);
+  --color-brand-lime: #087ea4;
+  --color-brand-lime-hover: #056b8d;
+  --glass-bg: #ffffff;
+  --glass-border: #e2e8f0;
+  --glass-bg-hover: #f1f5f9;
+  --glass-border-hover: #cbd5e1;
+  --glass-glow: rgba(8, 126, 164, 0.05);
   
   --score-green-bg: rgba(16, 185, 129, 0.05);
   --score-green-border: rgba(16, 185, 129, 0.25);
-  --score-green-text: #34d399;
+  --score-green-text: #10b981;
   
   --score-yellow-bg: rgba(245, 158, 11, 0.05);
   --score-yellow-border: rgba(245, 158, 11, 0.25);
-  --score-yellow-text: #fbbf24;
+  --score-yellow-text: #d97706;
   
   --score-red-bg: rgba(239, 68, 68, 0.05);
   --score-red-border: rgba(239, 68, 68, 0.25);
-  --score-red-text: #f87171;
+  --score-red-text: #dc2626;
 }
 
 /* Base Body Override */
 body.interview-page {
-  background: radial-gradient(circle at 80% 10%, rgba(8, 126, 164, 0.15) 0%, transparent 45%),
-              radial-gradient(circle at 10% 70%, rgba(216, 255, 95, 0.04) 0%, transparent 40%),
-              var(--color-bg) !important;
+  background: radial-gradient(circle at 80% 10%, rgba(8, 126, 164, 0.04) 0%, transparent 45%),
+              #f1f5f9 !important;
   color: var(--color-text) !important;
   font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   margin: 0;
@@ -2310,87 +2309,282 @@ body.interview-page {
   }
 }
 
-/* Site-Header Redesign for Dark Mode Sync */
-body.interview-page .site-header {
-  background: rgba(3, 22, 30, 0.75) !important;
-  border-bottom: 1px solid var(--glass-border) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-}
-
-body.interview-page .site-brand,
-body.interview-page .site-navigation a,
-body.interview-page .site-nav-group summary {
+/* Light Mode Overrides for Hardcoded Dark Mode Elements */
+h1, h2, h3, h4, h5, h6,
+.interview-card h2,
+.welcome-title-block h2,
+.setup-section-heading strong,
+.interview-hero-stat strong,
+.dialog-speaker,
+.history-item strong,
+.interviewer-name,
+.score-large,
+.metric-number,
+.evaluation-summary h3,
+.feedback-section h3,
+.library-heading h2,
+.study-mode-heading strong,
+.weakness-heading h2,
+.result-breakdown h3,
+.concept-chip-list h4,
+.model-answer h3,
+.answer-comparison-heading h3,
+.answer-structure-grid h4,
+.setup-heading h2,
+#overallReadinessScore,
+#adminLibraryQuestionCount,
+#overallConfidenceScore,
+.study-question-card h3,
+.study-question-header h3,
+.welcome-title-block span {
   color: var(--color-text) !important;
 }
 
-body.interview-page .site-brand strong {
-  color: #ffffff !important;
+.setup-section-heading span {
+  color: var(--color-brand-cyan) !important;
+  background: rgba(8, 126, 164, 0.08) !important;
 }
 
-body.interview-page .site-brand small {
-  color: var(--color-text-muted) !important;
+.interview-eyebrow {
+  background: rgba(8, 126, 164, 0.08) !important;
+  border: 1px solid rgba(8, 126, 164, 0.2) !important;
+  color: #056b8d !important;
 }
 
-body.interview-page .site-navigation a:hover,
-body.interview-page .site-navigation a[aria-current="page"],
-body.interview-page .site-nav-group summary:hover,
-body.interview-page .site-nav-group[open] summary {
-  background: rgba(255, 255, 255, 0.04) !important;
-  color: var(--color-brand-lime) !important;
+.interview-topbar a {
+  color: var(--color-text) !important;
 }
 
-body.interview-page .site-navigation a[aria-current="page"] {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12) !important;
+.interview-topbar a.rounded-lg {
+  border-color: var(--color-brand-cyan) !important;
+  color: var(--color-brand-cyan) !important;
+  background: transparent !important;
 }
 
-body.interview-page .site-nav-menu {
-  background: rgba(3, 22, 30, 0.95) !important;
-  border: 1px solid var(--glass-border) !important;
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.6) !important;
-  backdrop-filter: blur(20px);
+.interview-topbar a.rounded-lg:hover {
+  background: rgba(8, 126, 164, 0.08) !important;
+  color: var(--color-brand-cyan-hover) !important;
 }
 
-body.interview-page .site-nav-menu a strong {
-  color: #ffffff !important;
-}
-
-body.interview-page .site-nav-menu a small {
-  color: var(--color-text-muted) !important;
-}
-
-body.interview-page .site-nav-menu a:hover strong {
-  color: var(--color-brand-lime) !important;
-}
-
-body.interview-page .site-login-link {
-  background: var(--color-brand-cyan) !important;
-  color: #ffffff !important;
-  border-radius: 0.5rem !important;
-}
-
-body.interview-page .site-login-link:hover {
-  background: var(--color-brand-cyan-hover) !important;
-  box-shadow: 0 0 10px rgba(8, 126, 164, 0.3);
-}
-
-body.interview-page .site-menu-toggle {
-  background: rgba(255, 255, 255, 0.02) !important;
+/* Translucent Inputs & Selects Light Mode Styling */
+.interview-setup-card select, 
+.interview-setup-card textarea, 
+.answer-input, 
+.voice-controls select,
+.study-filter-grid select,
+.study-filter-grid input,
+.coding-exercise-panel select {
+  background: #ffffff !important;
+  color: var(--color-text) !important;
   border-color: var(--glass-border) !important;
+}
+
+.interview-setup-card select option,
+.study-filter-grid select option,
+.coding-exercise-panel select option,
+.voice-controls select option {
+  background-color: #ffffff !important;
   color: var(--color-text) !important;
 }
 
-body.interview-page .site-menu-toggle span {
-  background: var(--color-text) !important;
+.interview-setup-card select:focus, 
+.interview-setup-card textarea:focus, 
+.answer-input:focus, 
+.voice-controls select:focus,
+.study-filter-grid select:focus,
+.study-filter-grid input:focus,
+.coding-exercise-panel select:focus {
+  border-color: var(--color-brand-cyan) !important;
+  box-shadow: 0 0 12px rgba(8, 126, 164, 0.2), inset 0 0 4px rgba(0, 0, 0, 0.05) !important;
+  background: #ffffff !important;
 }
 
-/* Mobile responsive menu dropdown in dark mode */
-@media (max-width: 1120px) {
-  body.interview-page .site-navigation {
-    background: rgba(3, 22, 30, 0.95) !important;
-    border-bottom: 1px solid var(--glass-border) !important;
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5) !important;
-    backdrop-filter: blur(14px);
-  }
+.timer {
+  background: #ffffff !important;
+  border-color: rgba(8, 126, 164, 0.3) !important;
+  color: #087ea4 !important;
+  box-shadow: 0 4px 12px rgba(8, 126, 164, 0.08) !important;
+}
+
+.timer.warning {
+  background: rgba(239, 68, 68, 0.08) !important;
+  border-color: rgba(239, 68, 68, 0.2) !important;
+  color: #dc2626 !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Box shadows and cards in light mode */
+/* Box shadows and cards in light mode */
+.interview-card {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04) !important;
+}
+.interview-card:hover {
+  border-color: var(--glass-border-hover) !important;
+}
+
+.interview-hero-stat {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04) !important;
+}
+.interview-hero-stat:hover {
+  border-color: var(--glass-border-hover) !important;
+  box-shadow: 0 12px 35px rgba(8, 126, 164, 0.08) !important;
+}
+
+/* Additional Light Mode Overrides */
+.welcome-mini-stat strong {
+  color: var(--color-brand-cyan) !important;
+}
+
+.welcome-step-num {
+  color: var(--color-brand-cyan) !important;
+  background: rgba(8, 126, 164, 0.08) !important;
+}
+
+.welcome-step strong,
+.welcome-tip strong,
+.question-box h2,
+.star-coach h3,
+.star-score-grid strong,
+.follow-up-coach strong,
+.answer-comparison-heading h3,
+.answer-comparison h4,
+.next-session-card strong,
+.admin-topic-group > summary strong,
+.admin-topic-questions summary,
+.admin-topic-answer aside b,
+.round-report-card strong,
+.coding-prompt h3 {
+  color: var(--color-text) !important;
+}
+
+.welcome-mini-stat {
+  background: #ffffff !important;
+  border-color: var(--glass-border) !important;
+}
+.welcome-mini-stat:hover {
+  border-color: var(--glass-border-hover) !important;
+  background: var(--glass-bg-hover) !important;
+}
+
+.welcome-step {
+  background: #ffffff !important;
+  border-color: var(--glass-border) !important;
+}
+.welcome-step:hover {
+  border-color: rgba(8, 126, 164, 0.4) !important;
+  background: rgba(8, 126, 164, 0.04) !important;
+}
+
+.welcome-tip {
+  background: #ffffff !important;
+  border-color: var(--glass-border) !important;
+}
+.welcome-tip:hover {
+  border-color: var(--glass-border-hover) !important;
+}
+
+.interview-secondary:hover {
+  background: rgba(8, 126, 164, 0.08) !important;
+  border-color: var(--color-brand-cyan) !important;
+  color: var(--color-brand-cyan-hover) !important;
+}
+
+.voice-button {
+  border-color: rgba(8, 126, 164, 0.3) !important;
+  background: rgba(8, 126, 164, 0.04) !important;
+  color: var(--color-brand-cyan) !important;
+}
+.voice-button:hover {
+  background: rgba(8, 126, 164, 0.1) !important;
+  border-color: var(--color-brand-cyan) !important;
+  color: var(--color-brand-cyan-hover) !important;
+}
+
+.star-score-grid div,
+.answer-comparison-grid > div,
+.answer-structure-grid > div,
+.admin-topic-questions,
+.admin-topic-questions details,
+.coding-prompt {
+  background: #f8fafc !important;
+  border-color: var(--glass-border) !important;
+}
+
+.admin-topic-answer {
+  background: #f1f5f9 !important;
+  border-color: var(--glass-border) !important;
+}
+
+.admin-topic-group {
+  background: #ffffff !important;
+  border-color: var(--glass-border) !important;
+}
+.admin-topic-group:hover {
+  border-color: var(--glass-border-hover) !important;
+}
+.admin-topic-group[open] {
+  border-color: rgba(8, 126, 164, 0.3) !important;
+  background: rgba(8, 126, 164, 0.02) !important;
+}
+
+.admin-topic-group > summary b {
+  color: var(--color-brand-cyan) !important;
+  background: rgba(8, 126, 164, 0.08) !important;
+}
+
+.admin-topic-answer strong {
+  color: var(--color-brand-cyan) !important;
+}
+
+.guideline-links a {
+  border-color: rgba(8, 126, 164, 0.3) !important;
+  background: rgba(8, 126, 164, 0.04) !important;
+  color: var(--color-brand-cyan) !important;
+}
+.guideline-links a:hover {
+  background: rgba(8, 126, 164, 0.1) !important;
+  border-color: var(--color-brand-cyan) !important;
+  color: var(--color-brand-cyan-hover) !important;
+}
+
+.official-source-link:hover {
+  color: var(--color-brand-cyan-hover) !important;
+  background: rgba(8, 126, 164, 0.08) !important;
+}
+
+.next-session-card button {
+  color: #ffffff !important;
+}
+
+.review-controls button:hover, 
+.review-controls button.saved {
+  border-color: var(--color-brand-cyan) !important;
+  background: rgba(8, 126, 164, 0.08) !important;
+  color: var(--color-brand-cyan-hover) !important;
+}
+
+.review-controls .rate-hard {
+  border-color: var(--score-red-border) !important;
+  color: var(--score-red-text) !important;
+}
+.review-controls .rate-hard:hover {
+  background: var(--score-red-bg) !important;
+}
+.review-controls .rate-good {
+  border-color: var(--score-yellow-border) !important;
+  color: var(--score-yellow-text) !important;
+}
+.review-controls .rate-good:hover {
+  background: var(--score-yellow-bg) !important;
+}
+.review-controls .rate-easy {
+  border-color: var(--score-green-border) !important;
+  color: var(--score-green-text) !important;
+}
+.review-controls .rate-easy:hover {
+  background: var(--score-green-bg) !important;
+}
+
+.interview-topbar {
+  background: rgba(255, 255, 255, 0.95) !important;
 }
