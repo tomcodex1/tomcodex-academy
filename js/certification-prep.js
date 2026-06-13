@@ -9,6 +9,29 @@
   const HISTORY_KEY = "tomcodex.adminPrepHistory.v1";
   const PASS_SCORE = 65; // Official passing score is 65%
 
+  const CERT_DETAILS = {
+    admin: {
+      badge: "Salesforce Certified Administrator (SU26)",
+      title: "Certification Exam Practice Simulator",
+      desc: "Prepare for the official Salesforce Admin Exam with our premium 60-question multiple choice simulator. Track your accuracy by exam domains, analyze explanations, and build real test consistency."
+    },
+    pdi: {
+      badge: "Salesforce Platform Developer I",
+      title: "Platform Developer I Practice Simulator",
+      desc: "Prepare for the official Salesforce Platform Developer I (PDI) certification. Practice programmatic development, Apex coding, Lightning Web Components, and integration concepts."
+    },
+    ai: {
+      badge: "Salesforce AI Associate",
+      title: "Salesforce AI Associate Practice Simulator",
+      desc: "Prepare for the official Salesforce AI Associate certification. Practice core artificial intelligence concepts, ethical AI usage, CRM data requirements, and generative AI features."
+    },
+    agentforce: {
+      badge: "Salesforce Agentforce Specialist",
+      title: "Agentforce Specialist Practice Simulator",
+      desc: "Prepare for the official Salesforce Agentforce Specialist certification. Practice configuring topics, actions, prompts, and autonomous agent systems within the Salesforce platform."
+    }
+  };
+
   // State Variables
   let sessionQuestions = [];
   let userAnswers = []; // holds selected option indices (-1 for unanswered)
@@ -20,13 +43,28 @@
   let examMode = "standard"; // 'standard' or 'quick'
   let feedbackStyle = "exam"; // 'exam' or 'instant'
   let attemptsHistory = [];
+  let currentCertName = "Salesforce Certified Administrator";
+
+  // Update Setup Banner based on selected certification
+  function updateSetupBanner() {
+    const certSelect = el("certSelect");
+    if (!certSelect) return;
+    const certValue = certSelect.value;
+    const details = CERT_DETAILS[certValue] || CERT_DETAILS.admin;
+
+    if (el("setupCertBadge")) el("setupCertBadge").textContent = details.badge;
+    if (el("setupCertTitle")) el("setupCertTitle").textContent = details.title;
+    if (el("setupCertDesc")) el("setupCertDesc").textContent = details.desc;
+  }
 
   // Initialize
   function init() {
     loadHistory();
     renderSetupStats();
+    updateSetupBanner();
 
     // Event Listeners
+    if (el("certSelect")) el("certSelect").addEventListener("change", updateSetupBanner);
     if (el("startExamBtn")) el("startExamBtn").addEventListener("click", startExam);
     if (el("prevBtn")) el("prevBtn").addEventListener("click", goPrev);
     if (el("nextBtn")) el("nextBtn").addEventListener("click", goNext);
@@ -75,18 +113,22 @@
     if (el("historyList")) {
       el("historyList").innerHTML = attemptsHistory
         .map(
-          (attempt, idx) => `
-          <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs">
-            <div>
-              <strong class="text-slate-800">${attempt.mode === "standard" ? "Standard Exam" : "Quick Practice"}</strong>
-              <span class="block text-[10px] text-slate-400">${attempt.date}</span>
-            </div>
-            <div class="text-right">
-              <span class="font-black ${attempt.score >= PASS_SCORE ? "text-emerald-600" : "text-rose-600"}">${attempt.score}%</span>
-              <span class="block text-[9px] text-slate-400">${attempt.score >= PASS_SCORE ? "PASSED" : "FAILED"}</span>
-            </div>
-          </div>
-        `
+          (attempt, idx) => {
+            const certLabel = attempt.certName || "Salesforce Certified Administrator";
+            const modeLabel = attempt.mode === "standard" ? "Standard Exam" : "Quick Practice";
+            return `
+              <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs">
+                <div>
+                  <strong class="text-slate-800 block">${certLabel}</strong>
+                  <span class="block text-[10px] text-slate-400 mt-0.5">${attempt.date} · ${modeLabel}</span>
+                </div>
+                <div class="text-right shrink-0">
+                  <span class="font-black ${attempt.score >= PASS_SCORE ? "text-emerald-600" : "text-rose-600"}">${attempt.score}%</span>
+                  <span class="block text-[9px] text-slate-400">${attempt.score >= PASS_SCORE ? "PASSED" : "FAILED"}</span>
+                </div>
+              </div>
+            `;
+          }
         )
         .join("");
     }
@@ -123,8 +165,28 @@
       if (r.checked) feedbackStyle = r.value;
     }
 
+    // Determine target certification bank & label
+    const certSelect = el("certSelect");
+    const certValue = certSelect ? certSelect.value : "admin";
+    const certText = certSelect ? certSelect.options[certSelect.selectedIndex].text.split(" (")[0] : "Salesforce Certified Administrator";
+    currentCertName = certText;
+
+    // Set label in test view
+    if (el("activeExamLabel")) el("activeExamLabel").textContent = certText;
+
+    let bank = [];
+    if (certValue === "admin") {
+      bank = window.ADMIN_PREP_QUESTIONS || [];
+    } else if (certValue === "pdi") {
+      bank = window.PDI_PREP_QUESTIONS || [];
+    } else if (certValue === "ai") {
+      bank = window.AI_PREP_QUESTIONS || [];
+    } else if (certValue === "agentforce") {
+      bank = window.AGENTFORCE_PREP_QUESTIONS || [];
+    }
+
     // Prepare questions
-    const shuffledBank = shuffle(window.ADMIN_PREP_QUESTIONS || []);
+    const shuffledBank = shuffle(bank);
     const questionLimit = examMode === "standard" ? 60 : 15;
     
     if (shuffledBank.length === 0) {
@@ -395,7 +457,8 @@
       correctAnswers: correctCount,
       totalQuestions: sessionQuestions.length,
       mode: examMode,
-      passed: finalScore >= PASS_SCORE
+      passed: finalScore >= PASS_SCORE,
+      certName: currentCertName
     };
     
     attemptsHistory.unshift(attempt);
