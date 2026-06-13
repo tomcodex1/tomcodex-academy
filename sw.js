@@ -4,6 +4,7 @@ const urlsToCache = [
   '/',
   '/index.html',
   '/css/style.css',
+  '/css/trainer-panel-enhanced.css',
   '/css/analytics.css',
   '/css/gamification.css',
   '/css/personalized-paths.css',

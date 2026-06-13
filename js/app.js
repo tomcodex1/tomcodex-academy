@@ -400,8 +400,38 @@ function renderProjectOutputs() {
 function renderModes() {
   const wrap = document.getElementById("answerModes");
   wrap.innerHTML = "";
+  
+  const modeSelect = document.getElementById("modeSelect");
+  const activeMode = modeSelect ? modeSelect.value : "Simple Mode";
+
+  const modeIcons = {
+    "Simple Mode": `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`,
+    "Interview Mode": `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`,
+    "Project Mode": `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>`,
+    "Code Mode": `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>`,
+    "Quiz Mode": `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
+    "Correction Mode": `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`
+  };
+
   answerModes.forEach((mode) => {
-    wrap.innerHTML += `<div class="mode-item">${mode}</div>`;
+    const isActive = mode === activeMode;
+    const icon = modeIcons[mode] || "";
+    wrap.innerHTML += `
+      <button class="mode-item ${isActive ? 'active' : ''}" type="button" data-mode="${mode}">
+        <span class="mode-icon">${icon}</span>
+        <span class="mode-text">${mode}</span>
+      </button>
+    `;
+  });
+
+  wrap.querySelectorAll(".mode-item").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const selectedMode = btn.getAttribute("data-mode");
+      if (modeSelect) {
+        modeSelect.value = selectedMode;
+        renderModes();
+      }
+    });
   });
 }
 
@@ -446,6 +476,13 @@ function setupDoubtBox() {
   speedModeSelect.addEventListener("change", () => {
     speedModeDescription.textContent = speedDescriptions[speedModeSelect.value];
   });
+
+  const modeSelect = document.getElementById("modeSelect");
+  if (modeSelect) {
+    modeSelect.addEventListener("change", () => {
+      renderModes();
+    });
+  }
 
   document.getElementById("askTrainerBtn").addEventListener("click", async () => {
     const topic = document.getElementById("topicSelect").value;

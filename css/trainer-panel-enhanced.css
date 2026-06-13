@@ -1,0 +1,402 @@
+/* ============================================================
+   AI TRAINER PANEL ENHANCED STYLING
+   ============================================================ */
+
+/* ── Live Pulse Indicator ── */
+#trainerPanel .course-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+}
+
+#trainerPanel .course-tag::before {
+  content: "";
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  background-color: #34c759;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.7);
+  animation: pulseLive 1.6s infinite;
+}
+
+@keyframes pulseLive {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(52, 199, 89, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(52, 199, 89, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(52, 199, 89, 0);
+  }
+}
+
+/* ── Gradient Header ── */
+#trainerPanel h2 {
+  background: linear-gradient(135deg, var(--clr-brand) 0%, #00d2ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+}
+
+/* ── Flash Mode Card ── */
+#trainerPanel .flash-mode-card {
+  position: relative;
+  background: linear-gradient(135deg, rgba(10, 132, 255, 0.04) 0%, rgba(0, 210, 255, 0.02) 100%);
+  border: 1px solid rgba(10, 132, 255, 0.15);
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 32px rgba(10, 132, 255, 0.04);
+  padding: 1.25rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  overflow: hidden;
+}
+
+#trainerPanel .flash-mode-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(10, 132, 255, 0.3);
+  box-shadow: 0 12px 40px rgba(10, 132, 255, 0.08);
+}
+
+#trainerPanel .flash-mode-card h3 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--clr-brand);
+  margin-top: 0.4rem;
+}
+
+#trainerPanel .flash-mode-card p {
+  font-size: 0.8rem;
+  color: var(--clr-text-2);
+}
+
+#trainerPanel .flash-points span {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  color: var(--clr-text-2);
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  transition: all 0.2s ease;
+}
+
+#trainerPanel .flash-mode-card:hover .flash-points span {
+  border-color: rgba(10, 132, 255, 0.2);
+  color: var(--clr-brand);
+}
+
+/* ── Mac-Style Terminal Window ── */
+#trainerPanel .trainer-prompt {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+#trainerPanel .terminal-window {
+  border-radius: 1rem;
+  background: #141416;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+#trainerPanel .terminal-header {
+  display: flex;
+  align-items: center;
+  background: #1f1f23;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+#trainerPanel .terminal-dots {
+  display: flex;
+  gap: 0.45rem;
+}
+
+#trainerPanel .terminal-dots .dot {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+}
+
+#trainerPanel .terminal-dots .dot.red { background-color: #ff5f56; }
+#trainerPanel .terminal-dots .dot.yellow { background-color: #ffbd2e; }
+#trainerPanel .terminal-dots .dot.green { background-color: #27c93f; }
+
+#trainerPanel .terminal-title {
+  margin-left: 1rem;
+  font-family: Menlo, Monaco, Consolas, "Fira Code", monospace;
+  font-size: 0.7rem;
+  color: #8e8e93;
+  letter-spacing: 0.02em;
+}
+
+#trainerPanel #trainerPrompt {
+  background-color: #141416 !important;
+  color: #e4e4e7 !important;
+  font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace !important;
+  font-size: 0.78rem !important;
+  line-height: 1.7 !important;
+  padding: 1.25rem !important;
+  margin: 0;
+  border: none;
+  max-height: 20rem;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+
+/* Custom Scrollbar for Terminal */
+#trainerPanel #trainerPrompt::-webkit-scrollbar {
+  width: 6px;
+}
+#trainerPanel #trainerPrompt::-webkit-scrollbar-track {
+  background: #141416;
+}
+#trainerPanel #trainerPrompt::-webkit-scrollbar-thumb {
+  background: #2c2c2e;
+  border-radius: 3px;
+}
+#trainerPanel #trainerPrompt::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3c;
+}
+
+/* ── Interactive Answer Mode Chips ── */
+#trainerPanel .mode-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.85rem;
+  margin-top: 1.25rem;
+}
+
+#trainerPanel .mode-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--clr-bg-2);
+  border: 1px solid var(--clr-border);
+  border-radius: 1rem;
+  padding: 0.9rem 1.1rem;
+  color: var(--clr-text-2);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.01);
+  width: 100%;
+}
+
+#trainerPanel .mode-item .mode-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-text-3);
+  transition: color 0.2s ease, transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+#trainerPanel .mode-item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(10, 132, 255, 0.25);
+  color: var(--clr-text);
+  background: var(--clr-surface);
+  box-shadow: 0 4px 14px rgba(10, 132, 255, 0.05);
+}
+
+#trainerPanel .mode-item:hover .mode-icon {
+  color: var(--clr-brand);
+  transform: scale(1.08);
+}
+
+#trainerPanel .mode-item.active {
+  background: linear-gradient(135deg, rgba(10, 132, 255, 0.08) 0%, rgba(0, 210, 255, 0.04) 100%);
+  border-color: var(--clr-brand);
+  color: var(--clr-brand);
+  box-shadow: 0 6px 20px rgba(10, 132, 255, 0.08);
+}
+
+#trainerPanel .mode-item.active .mode-icon {
+  color: var(--clr-brand);
+}
+
+/* ── Modern Dropdown Selects ── */
+#trainerPanel select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.1rem;
+  padding-right: 2.5rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--clr-border-2);
+  background-color: var(--clr-input-bg);
+  color: var(--clr-text);
+  font-weight: 550;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+#trainerPanel select:focus {
+  border-color: var(--clr-brand);
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
+}
+
+#trainerPanel label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--clr-text-3);
+  font-weight: 750;
+  margin-top: 1rem;
+}
+
+/* ── Interactive Textarea ── */
+#trainerPanel textarea {
+  border-radius: 0.85rem;
+  border: 1px solid var(--clr-border-2);
+  background-color: var(--clr-input-bg);
+  padding: 0.9rem 1.1rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  transition: all 0.25s ease;
+  min-height: 7.5rem;
+}
+
+#trainerPanel textarea:focus {
+  border-color: var(--clr-brand);
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.15);
+}
+
+/* ── Ask Zentom Primary Button ── */
+#trainerPanel #askTrainerBtn {
+  background: linear-gradient(135deg, var(--clr-brand) 0%, #0056b3 100%);
+  border-radius: 0.85rem;
+  font-weight: 800;
+  font-size: 0.92rem;
+  padding: 0.95rem;
+  letter-spacing: 0.01em;
+  box-shadow: 0 4px 18px rgba(10, 132, 255, 0.2);
+  transition: all 0.22s ease;
+}
+
+#trainerPanel #askTrainerBtn:hover {
+  background: linear-gradient(135deg, #007aff 0%, #0056b3 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(10, 132, 255, 0.3);
+}
+
+#trainerPanel #askTrainerBtn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 10px rgba(10, 132, 255, 0.15);
+}
+
+/* ── Voice Input Button ── */
+#trainerPanel .voice-input-control {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.65rem;
+}
+
+#trainerPanel .voice-input-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--clr-bg);
+  border: 1px solid var(--clr-border);
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--clr-text-2);
+  transition: all 0.2s ease;
+}
+
+#trainerPanel .voice-input-button svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  fill: currentColor;
+}
+
+#trainerPanel .voice-input-button:hover {
+  background: var(--clr-surface);
+  border-color: var(--clr-border-2);
+  color: var(--clr-text);
+}
+
+#trainerPanel .voice-input-button[data-state="listening"] {
+  background: rgba(255, 69, 58, 0.1);
+  border-color: rgba(255, 69, 58, 0.3);
+  color: #ff453a;
+}
+
+#trainerPanel .voice-input-button[data-state="listening"] svg {
+  animation: pulseVoice 1.2s infinite;
+}
+
+@keyframes pulseVoice {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+#trainerPanel .voice-input-status {
+  font-size: 0.7rem;
+  color: var(--clr-text-3);
+  font-weight: 600;
+}
+
+/* ── AI Response Box ── */
+#trainerPanel .mock-answer {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.01) 0%, rgba(255, 255, 255, 0) 100%);
+  border: 1px dashed rgba(10, 132, 255, 0.3);
+  border-left: 4px solid var(--clr-brand);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  margin-top: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s ease;
+  animation: slideFadeIn 0.3s ease-out;
+}
+
+@keyframes slideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#trainerPanel .mock-answer strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--clr-brand);
+  margin-bottom: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+/* Light / Dark Mode adaptive backgrounds */
+html[data-theme="light"] #trainerPanel .mock-answer {
+  background: #ffffff;
+  border-color: #bce1ff;
+  box-shadow: 0 6px 24px rgba(10, 132, 255, 0.05);
+}
+
+html[data-theme="dark"] #trainerPanel .mock-answer {
+  background: #1c1c1e;
+  border-color: rgba(10, 132, 255, 0.25);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+}
