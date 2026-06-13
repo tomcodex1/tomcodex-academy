@@ -170,7 +170,7 @@ class DiscussionForums {
         title: 'Best practices for security in Salesforce',
         forumName: 'Administration Questions',
         author: 'Security Expert',
-        preview: 'I wanted to share some security best practices I've learned while working with multiple Salesforce orgs...',
+        preview: 'I wanted to share some security best practices I\'ve learned while working with multiple Salesforce orgs...',
         replyCount: 8,
         viewCount: 42,
         createdAt: new Date(Date.now() - 3600000).toISOString()
@@ -190,7 +190,7 @@ class DiscussionForums {
         title: 'Complex flow vs. Apex decision',
         forumName: 'Flow & Automation',
         author: 'Flow Specialist',
-        preview: 'When should you choose complex Flow over Apex for automation? Let's discuss the pros and cons...',
+        preview: 'When should you choose complex Flow over Apex for automation? Let\'s discuss the pros and cons...',
         replyCount: 6,
         viewCount: 34,
         createdAt: new Date(Date.now() - 10800000).toISOString()

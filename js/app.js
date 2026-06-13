@@ -861,6 +861,8 @@ const crmStages = [
     moduleIndex: 0,
     moduleName: "POC Module 1",
     url: "course-poc.html?module=0"
+  }
+];
  const pocProjects = {
   student: {
     title: "Student Success CRM",

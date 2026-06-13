@@ -156,7 +156,7 @@ class PeerReviewSystem {
     const userReviews = this.reviews.filter(review => review.author === this.currentUser.name);
 
     if (userReviews.length === 0) {
-      userReviewsContainer.innerHTML = '<p>You haven't submitted any reviews yet.</p>';
+      userReviewsContainer.innerHTML = '<p>You haven\'t submitted any reviews yet.</p>';
       return;
     }
 
