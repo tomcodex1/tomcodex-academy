@@ -9,6 +9,7 @@ import { registerAiEvaluatorRoute } from "./server/ai-evaluator-route.example.js
 import { registerAiCodeReviewRoute } from "./server/ai-code-review-route.example.js";
 import { registerAiInterviewRoute } from "./server/ai-interview-route.example.js";
 import { registerAiResumeRoute } from "./server/ai-resume-route.js";
+import { registerAiATSRoute } from "./server/ai-ats-route.js";
 import { registerAiTranscriptionRoute } from "./server/ai-transcription-route.js";
 import { registerElevenLabsSpeechRoute } from "./server/elevenlabs-speech-route.js";
 import { createAcademyAiHandler, aiEngine, buildSkillPassportUpdate, moduleProgression, evaluateCertificateEligibility } from "zentom-ai-core";
@@ -1124,6 +1125,7 @@ registerAiTrainerRoute(app);
 registerAiEvaluatorRoute(app);
 registerAiCodeReviewRoute(app);
 registerAiResumeRoute(app);
+registerAiATSRoute(app);
 registerAiInterviewRoute(app);
 registerAiTranscriptionRoute(app);
 registerElevenLabsSpeechRoute(app);

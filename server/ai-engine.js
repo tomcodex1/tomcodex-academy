@@ -600,6 +600,102 @@ Return ONLY valid JSON:
     };
   }
 
+  // ── 7.6 ATS Checker ──────────────────────────────────────────────────────
+  async handleATSCheck({ resumeText, jobDescription = "" }, key) {
+    const safeResume = String(resumeText || "").slice(0, 8000);
+    const safeJD = String(jobDescription || "").slice(0, 4000);
+
+    if (!safeResume || safeResume.length < 50) {
+      throw Object.assign(new Error("Resume text is too short to analyse."), { statusCode: 400 });
+    }
+
+    const jdSection = safeJD
+      ? `\nJob Description to compare against:\n${safeJD}\n`
+      : "\nNo specific job description provided — evaluate against general Salesforce ATS best practices.\n";
+
+    const prompt = `You are an expert ATS (Applicant Tracking System) recruiter bot specialising in Salesforce roles. Analyse the following resume and return a comprehensive ATS compatibility report.
+
+Resume Text:
+${safeResume}
+${jdSection}
+Evaluate on these 4 dimensions and return ONLY valid JSON:
+
+{
+  "score": <overall 0-100 integer>,
+  "grade": "<Excellent|Good|Fair|Needs Work>",
+  "sections": {
+    "keywords": {
+      "score": <0-100>,
+      "found": ["<keyword>"],
+      "missing": ["<keyword>"]
+    },
+    "formatting": {
+      "score": <0-100>,
+      "issues": ["<issue description>"]
+    },
+    "impact": {
+      "score": <0-100>,
+      "suggestions": ["<suggestion>"]
+    },
+    "completeness": {
+      "score": <0-100>,
+      "missingSections": ["<section name>"]
+    }
+  },
+  "topRecommendations": ["<actionable recommendation>"],
+  "strengths": ["<strength point>"]
+}
+
+Scoring guidelines:
+- keywords: check for Salesforce-relevant terms (Apex, LWC, Flow, SOQL, Triggers, Named Credentials, Agentforce, SLDS, etc.) and any job-description keywords if provided
+- formatting: check for clean section headers, bullet points, no tables/graphics (ATS unfriendly), no excessive special characters
+- impact: check for quantifiable metrics, action verbs (Designed, Implemented, Reduced, Increased, Automated), STAR method
+- completeness: check for presence of Summary, Skills, Experience/Projects, Certifications sections
+- Provide 3-5 topRecommendations and 2-4 strengths
+- Keep each string concise (under 120 characters)`;
+
+    const { text } = await this.callGemini({
+      key,
+      contents: [{ parts: [{ text: prompt }] }],
+      jsonMode: true
+    });
+
+    const result = this.parseJSON(text, {});
+
+    const score = Number(result.score) || 60;
+    const grade = result.grade || (score >= 80 ? "Good" : score >= 60 ? "Fair" : "Needs Work");
+    const sections = result.sections || {};
+
+    return {
+      score,
+      grade,
+      sections: {
+        keywords: {
+          score: Number(sections.keywords?.score) || 60,
+          found: Array.isArray(sections.keywords?.found) ? sections.keywords.found.slice(0, 15) : [],
+          missing: Array.isArray(sections.keywords?.missing) ? sections.keywords.missing.slice(0, 10) : []
+        },
+        formatting: {
+          score: Number(sections.formatting?.score) || 70,
+          issues: Array.isArray(sections.formatting?.issues) ? sections.formatting.issues.slice(0, 5) : []
+        },
+        impact: {
+          score: Number(sections.impact?.score) || 65,
+          suggestions: Array.isArray(sections.impact?.suggestions) ? sections.impact.suggestions.slice(0, 5) : []
+        },
+        completeness: {
+          score: Number(sections.completeness?.score) || 70,
+          missingSections: Array.isArray(sections.completeness?.missingSections) ? sections.completeness.missingSections.slice(0, 5) : []
+        }
+      },
+      topRecommendations: Array.isArray(result.topRecommendations) ? result.topRecommendations.slice(0, 5) : ["Add quantifiable metrics to bullet points.", "Include a dedicated Skills section."],
+      strengths: Array.isArray(result.strengths) ? result.strengths.slice(0, 4) : ["Resume submitted for review."],
+      source: "centralized-ai-engine",
+      provider: "gemini",
+      model: this.getModel()
+    };
+  }
+
   // ── 8. Main run() entry point ─────────────────────────────────────────────
   async run(task, params, request) {
     const key = this.resolveKey(request);
@@ -613,6 +709,7 @@ Return ONLY valid JSON:
       "code-review": p => this.handleCodeReview(p, key),
       interview: p => this.handleInterview(p, key),
       resume: p => this.handleResume(p, key),
+      "ats-check": p => this.handleATSCheck(p, key),
       transcribe: p => this.handleTranscribe(p, key)
     };
 
@@ -652,7 +749,7 @@ export function registerCentralAiRoute(app) {
       provider: process.env.AI_PROVIDER || "gemini",
       serverKeyConfigured: hasServerKey,
       personalKeyActive: hasPersonalKey,
-      tasks: ["train", "generate-questions", "evaluate-mastery", "verify-lab", "code-review", "interview", "transcribe"]
+      tasks: ["train", "generate-questions", "evaluate-mastery", "verify-lab", "code-review", "interview", "resume", "ats-check", "transcribe"]
     });
   });
 }

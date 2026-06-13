@@ -206,6 +206,9 @@
     setupProjectListener();
     renderAchievements();
     renderHistory();
+    setupTabListeners();
+    setupTemplatesView();
+    setupATSTab();
 
     if (el("resumeForm")) el("resumeForm").addEventListener("submit", handleGenerate);
     if (el("clearHistoryBtn")) el("clearHistoryBtn").addEventListener("click", clearHistory);
@@ -492,6 +495,685 @@
     window.TomCodexLearning?.record("task", 10, `Generated Salesforce ${roleName} resume points for ${projectName}`);
   }
 
+  // Default mock projects for templates
+  const DEFAULT_MOCK_PROJECTS = {
+    developer: [
+      {
+        title: "Student Success CRM (Capstone Project)",
+        role: "Salesforce Developer",
+        summary: "Designed and implemented a custom relational data model utilizing Custom Objects, Master-Detail relationships, and Page Layouts to track students, cohorts, and applications.",
+        bulletPoints: [
+          "Built record-triggered Salesforce Flows to automate Lead assignment and student notification routing, increasing admissions operational efficiency.",
+          "Implemented Apex Triggers and Helper classes with trigger-handler patterns for bulkified record processing, maintaining governor-limit safety.",
+          "Developed external REST API integrations using Named Credentials and JSON parsers to synchronize student payment records with endpoints."
+        ],
+        skills: ["Data Modeling", "Salesforce Flows", "Apex Development", "REST Integrations", "Security Sharing Rules"]
+      },
+      {
+        title: "Apex & Integration Services (Programmatic)",
+        role: "Salesforce Developer",
+        summary: "Engineered high-performance backend Apex services and outbound REST API integrations on the Salesforce platform.",
+        bulletPoints: [
+          "Developed outbound REST integration services utilizing Salesforce Named Credentials and OAuth 2.0 to secure external API access.",
+          "Parsed complex nested JSON payment data payloads asynchronously using Batchable Apex classes to update CRM data nightly.",
+          "Created generic error handling utilities and custom debug loggers in Apex to track integration failures and reduce debug cycle time."
+        ],
+        skills: ["Outbound REST APIs", "Named Credentials", "Asynchronous Apex", "Apex Triggers", "JSON Deserialization"]
+      },
+      {
+        title: "LWC Portal Development (UI Component)",
+        role: "Salesforce Developer",
+        summary: "Constructed dynamic, responsive user experiences using Lightning Web Components (LWC) to enhance internal operations.",
+        bulletPoints: [
+          "Developed responsive user interface layouts with LWC, utilizing Lightning Design System (SLDS) styling to align with Salesforce branding guidelines.",
+          "Implemented Salesforce wire service and dynamic Apex controller adapters to query and display filterable record datatables.",
+          "Optimized front-end components using custom events and DOM parent-child communications, improving page load performance."
+        ],
+        skills: ["Lightning Web Components", "Salesforce Lightning Design System", "Wire Service", "Apex Adapters", "Event Propagation"]
+      }
+    ],
+    admin: [
+      {
+        title: "Student Success CRM (Capstone Project)",
+        role: "Salesforce Administrator",
+        summary: "Configured and administered the Student Success CRM system to optimize student lifecycle management and admissions operations.",
+        bulletPoints: [
+          "Administered custom objects, page layouts, and search configurations to support dynamic tracking of 5,000+ student applications.",
+          "Configured Lead and Case assignment rules along with complex validation rules to ensure data cleanliness and automated routing.",
+          "Established organizational security protocols, implementing custom Profiles, Permission Sets, and Role Hierarchy structures.",
+          "Designed custom Analytics Dashboards and Salesforce Reports to track cohort enrollment velocity and financial progress indicators."
+        ],
+        skills: ["User Administration", "Security Sharing Model", "Reports & Dashboards", "Validation Rules", "Data Loaders", "Flow Automation"]
+      },
+      {
+        title: "Agentforce Service Agent (AI Autonomous)",
+        role: "Salesforce Administrator",
+        summary: "Configured and monitored autonomous Agentforce support agents to handle user queries and record automations.",
+        bulletPoints: [
+          "Configured Agentforce agent parameters, setting up topic scopes, system prompts, and classification instructions.",
+          "Mapped existing Salesforce Flows as agent actions, enabling automated record retrieval and email notifications.",
+          "Monitored agent conversation transcripts and accuracy metrics in Agentforce console to tune and correct instructions."
+        ],
+        skills: ["Agentforce Config", "Flow Tools Mapping", "Transcript Auditing", "AI Profiles & Permissions"]
+      }
+    ],
+    agentforce: [
+      {
+        title: "Agentforce Service Agent (AI Autonomous)",
+        role: "Salesforce Agentforce Specialist",
+        summary: "Built and specialized autonomous Agentforce conversational agents to manage admissions query queues.",
+        bulletPoints: [
+          "Designed Agentforce Agent topics, configuring natural language prompts and instruction guidelines, reaching 90% accuracy.",
+          "Linked Salesforce admissions Flows as agent actions, enabling AI agents to search cohorts and schedule interviews.",
+          "Conducted testing runs and prompt tuning iterations to establish safety guardrails against prompt injection risks."
+        ],
+        skills: ["Agentforce Specialist", "Topic Classifiers", "Flow Actions Integration", "Prompt Engineering", "Conversational Safety"]
+      },
+      {
+        title: "Student Success CRM (Capstone Project)",
+        role: "Salesforce AI Integrator",
+        summary: "Integrated autonomous AI capabilities into the Student Success CRM to assist admissions coordinators and students.",
+        bulletPoints: [
+          "Coordinated with development teams to identify CRM actions suitable for automation via autonomous AI agents.",
+          "Configured security profiles and least-privilege permission models to govern AI agent access boundaries within the CRM.",
+          "Monitored pilot user testing metrics and compiled recommendations to optimize agent actions and reduce human intervention rate."
+        ],
+        skills: ["Agentforce Integration", "Admissions CRM", "Security Boundaries", "AI Governance", "UAT Pilot Feedback"]
+      }
+    ]
+  };
+
+  let activeTemplate = "developer";
+
+  // Get professional summary text based on active template
+  function getSummaryForTemplate(template) {
+    if (template === "admin") {
+      return "Detail-oriented Salesforce Administrator with extensive experience configuring platform security sharing rules, custom layouts, and reports. Proficient in designing advanced low-code Salesforce Flow automations to streamline CRM workflows and ensure clean data integrity.";
+    } else if (template === "agentforce") {
+      return "Innovative Salesforce professional specializing in autonomous AI integrations, prompt engineering, and conversational design. Expert at configuring Agentforce agents to automate CRM record updates and customer support workflows using natural language prompts.";
+    }
+    return "Hands-on Salesforce Developer with experience designing custom relational database schemas, bulkified Apex triggers, integrations, and responsive Lightning Web Components (LWC). Skilled in implementing both declarative flow automation and programmatic solutions while adhering to platform governor limits.";
+  }
+
+  // Get certifications list based on active template
+  function getCertificationsForTemplate(template) {
+    if (template === "admin") {
+      return "Salesforce Certified Administrator, Salesforce Certified Advanced Administrator, Salesforce Certified AI Associate";
+    } else if (template === "agentforce") {
+      return "Salesforce Certified AI Associate, Salesforce Certified Agentforce Specialist, Salesforce Certified Administrator";
+    }
+    return "Salesforce Certified Platform Developer I, Salesforce Certified Administrator, Salesforce Certified AI Associate";
+  }
+
+  // Get skills list based on active template
+  function getSkillsForTemplate(template) {
+    if (template === "admin") {
+      return "Salesforce Flow, User Administration, Security (Profiles/Permission Sets/Roles), Reports & Dashboards, Validation Rules, Data Loader, Case Management";
+    } else if (template === "agentforce") {
+      return "Agentforce Service Agent, Topic Classifications, Prompt Templates, Invocable Apex Actions, Salesforce Flow, AI Governance, Conversational Guardrails";
+    }
+    return "Apex (Triggers, Batch, Integration), Lightning Web Components (LWC), JavaScript, Salesforce Flow, Data Loader, Named Credentials, Security Sharing Rules";
+  }
+
+  // Setup tabs logic
+  function setupTabListeners() {
+    const tabPointsBtn = el("tabPointsBtn");
+    const tabTemplatesBtn = el("tabTemplatesBtn");
+    const tabATSBtn = el("tabATSBtn");
+    const pointsTabContent = el("pointsTabContent");
+    const templatesTabContent = el("templatesTabContent");
+    const atsTabContent = el("atsTabContent");
+
+    if (!tabPointsBtn || !tabTemplatesBtn) return;
+
+    const ALL_TABS = [tabPointsBtn, tabTemplatesBtn, tabATSBtn].filter(Boolean);
+    const ALL_CONTENTS = [pointsTabContent, templatesTabContent, atsTabContent].filter(Boolean);
+
+    function deactivateAll() {
+      ALL_TABS.forEach(btn => {
+        btn.classList.remove("border-brand-500", "text-brand-600");
+        btn.classList.add("border-transparent", "text-slate-500", "hover:text-slate-800");
+      });
+      ALL_CONTENTS.forEach(c => c?.classList.add("hidden"));
+    }
+
+    function activateTab(btn, content) {
+      deactivateAll();
+      btn.classList.remove("border-transparent", "text-slate-500", "hover:text-slate-800");
+      btn.classList.add("border-brand-500", "text-brand-600");
+      content?.classList.remove("hidden");
+    }
+
+    tabPointsBtn.addEventListener("click", () => activateTab(tabPointsBtn, pointsTabContent));
+
+    tabTemplatesBtn.addEventListener("click", () => {
+      activateTab(tabTemplatesBtn, templatesTabContent);
+      updateTplHistoryDropdown();
+      renderLiveResume();
+    });
+
+    if (tabATSBtn) {
+      tabATSBtn.addEventListener("click", () => activateTab(tabATSBtn, atsTabContent));
+    }
+
+    // Check query params on load
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("tab") === "templates") {
+      activateTab(tabTemplatesBtn, templatesTabContent);
+      updateTplHistoryDropdown();
+      renderLiveResume();
+    } else if (urlParams.get("tab") === "ats") {
+      if (tabATSBtn) activateTab(tabATSBtn, atsTabContent);
+    }
+  }
+
+  // Populate history in templates tab dropdown
+  function updateTplHistoryDropdown() {
+    const dropdown = el("tplProjectHistory");
+    if (!dropdown) return;
+
+    const history = loadHistory();
+    dropdown.innerHTML = '<option value="default_mock">Load Sample Mock Data</option>';
+
+    history.forEach((item, idx) => {
+      const dateStr = new Date(item.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      dropdown.innerHTML += `
+        <option value="${idx}">Saved run: ${item.projectName} (${item.role}) - ${dateStr}</option>
+      `;
+    });
+  }
+
+  // Setup template select buttons, inputs, and copy buttons
+  function setupTemplatesView() {
+    const devBtn = el("selectTplDevBtn");
+    const adminBtn = el("selectTplAdminBtn");
+    const aiBtn = el("selectTplAiBtn");
+
+    function updateTemplateButtons() {
+      [devBtn, adminBtn, aiBtn].forEach(btn => {
+        if (!btn) return;
+        btn.classList.remove("border-brand-500");
+        btn.classList.add("border-slate-200");
+      });
+
+      let activeBtn = devBtn;
+      if (activeTemplate === "admin") activeBtn = adminBtn;
+      else if (activeTemplate === "agentforce") activeBtn = aiBtn;
+
+      if (activeBtn) {
+        activeBtn.classList.remove("border-slate-200");
+        activeBtn.classList.add("border-brand-500");
+      }
+    }
+
+    if (devBtn) devBtn.addEventListener("click", () => {
+      activeTemplate = "developer";
+      updateTemplateButtons();
+      const tplTitle = el("tplTitle");
+      if (tplTitle && (tplTitle.value === "Salesforce Administrator" || tplTitle.value === "Salesforce Agentforce & AI Specialist")) {
+        tplTitle.value = "Salesforce Developer";
+      }
+      renderLiveResume();
+    });
+
+    if (adminBtn) adminBtn.addEventListener("click", () => {
+      activeTemplate = "admin";
+      updateTemplateButtons();
+      const tplTitle = el("tplTitle");
+      if (tplTitle && (tplTitle.value === "Salesforce Developer" || tplTitle.value === "Salesforce Agentforce & AI Specialist")) {
+        tplTitle.value = "Salesforce Administrator";
+      }
+      renderLiveResume();
+    });
+
+    if (aiBtn) aiBtn.addEventListener("click", () => {
+      activeTemplate = "agentforce";
+      updateTemplateButtons();
+      const tplTitle = el("tplTitle");
+      if (tplTitle && (tplTitle.value === "Salesforce Developer" || tplTitle.value === "Salesforce Administrator")) {
+        tplTitle.value = "Salesforce Agentforce & AI Specialist";
+      }
+      renderLiveResume();
+    });
+
+    // Input changes
+    const inputs = ["tplName", "tplTitle", "tplEmail", "tplPhone", "tplLocation", "tplLinkedIn"];
+    inputs.forEach(id => {
+      const input = el(id);
+      if (input) {
+        input.addEventListener("input", renderLiveResume);
+      }
+    });
+
+    // Dropdown change
+    const historyDropdown = el("tplProjectHistory");
+    if (historyDropdown) {
+      historyDropdown.addEventListener("change", renderLiveResume);
+    }
+
+    // Copy actions
+    const copyTextBtn = el("copyTplTextBtn");
+    if (copyTextBtn) {
+      copyTextBtn.addEventListener("click", () => {
+        const name = el("tplName")?.value || "";
+        const title = el("tplTitle")?.value || "";
+        const email = el("tplEmail")?.value || "";
+        const phone = el("tplPhone")?.value || "";
+        const locationVal = el("tplLocation")?.value || "";
+        const linkedin = el("tplLinkedIn")?.value || "";
+        const projects = getCompiledProjects();
+        const text = compileResumeToText(name, title, email, phone, locationVal, linkedin, projects, activeTemplate);
+        copyText(text, copyTextBtn);
+      });
+    }
+
+    const copyHtmlBtn = el("copyTplHtmlBtn");
+    if (copyHtmlBtn) {
+      copyHtmlBtn.addEventListener("click", () => {
+        const preview = el("liveResumePreview");
+        if (preview) {
+          copyText(preview.innerHTML.trim(), copyHtmlBtn);
+        }
+      });
+    }
+  }
+
+  // Get list of projects based on active template and selected history project
+  function getCompiledProjects() {
+    let projects = JSON.parse(JSON.stringify(DEFAULT_MOCK_PROJECTS[activeTemplate]));
+    const historyVal = el("tplProjectHistory")?.value;
+    
+    if (historyVal && historyVal !== "default_mock") {
+      const historyIndex = parseInt(historyVal, 10);
+      const history = loadHistory();
+      const historyItem = history[historyIndex];
+
+      if (historyItem) {
+        let matched = false;
+        projects.forEach(p => {
+          const cleanHistoryName = historyItem.projectName.toLowerCase();
+          const cleanProjTitle = p.title.toLowerCase();
+          if (cleanProjTitle.includes(cleanHistoryName) || cleanHistoryName.includes(cleanProjTitle.split(" (")[0].toLowerCase())) {
+            p.role = historyItem.role;
+            p.summary = historyItem.summary;
+            p.bulletPoints = historyItem.bulletPoints;
+            p.skills = historyItem.skills;
+            matched = true;
+          }
+        });
+
+        if (!matched) {
+          projects.unshift({
+            title: historyItem.projectName,
+            role: historyItem.role,
+            summary: historyItem.summary,
+            bulletPoints: historyItem.bulletPoints,
+            skills: historyItem.skills
+          });
+        }
+      }
+    }
+    return projects;
+  }
+
+  // Compile text representation of resume
+  function compileResumeToText(name, title, email, phone, locationVal, linkedin, projects, activeTemplate) {
+    const summary = getSummaryForTemplate(activeTemplate);
+    const certs = getCertificationsForTemplate(activeTemplate);
+    const skills = getSkillsForTemplate(activeTemplate);
+
+    let text = `${name.toUpperCase()}\n${title.toUpperCase()}\n`;
+    text += `${email} | ${phone} | ${locationVal} | ${linkedin}\n\n`;
+    
+    text += `PROFESSIONAL SUMMARY\n`;
+    text += `${summary}\n\n`;
+    
+    text += `CERTIFICATIONS\n`;
+    text += `${certs}\n\n`;
+    
+    text += `TECHNICAL SKILLS\n`;
+    text += `Skills: ${skills}\n\n`;
+    
+    text += `PROJECTS & EXPERIENCE\n`;
+    projects.forEach(p => {
+      text += `* ${p.title} (${p.role})\n`;
+      text += `  ${p.summary}\n`;
+      p.bulletPoints.forEach(bp => {
+        text += `  - ${bp}\n`;
+      });
+      text += `\n`;
+    });
+
+    return text.trim();
+  }
+
+  // Render live preview
+  function renderLiveResume() {
+    const preview = el("liveResumePreview");
+    if (!preview) return;
+
+    const name = el("tplName")?.value || "Vijay Kumar";
+    const title = el("tplTitle")?.value || "Salesforce Developer";
+    const email = el("tplEmail")?.value || "vijay@example.com";
+    const phone = el("tplPhone")?.value || "+1 (555) 019-2834";
+    const locationVal = el("tplLocation")?.value || "San Francisco, CA";
+    const linkedin = el("tplLinkedIn")?.value || "linkedin.com/in/vijay-salesforce";
+
+    const projects = getCompiledProjects();
+
+    preview.innerHTML = `
+      <div style="text-align: center; border-bottom: 1.5px solid #475569; padding-bottom: 8px; margin-bottom: 12px;">
+        <h1 style="font-size: 20px; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.2;">${name}</h1>
+        <div style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px;">${title}</div>
+        <div style="font-size: 10px; color: #64748b; margin-top: 4px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+          <span>${email}</span> &bull; 
+          <span>${phone}</span> &bull; 
+          <span>${locationVal}</span> &bull; 
+          <span><a href="https://${linkedin}" target="_blank" style="color: #0f172a; text-decoration: underline;">${linkedin}</a></span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <!-- Professional Summary -->
+        <div>
+          <h2 style="font-size: 11px; font-weight: 700; color: #0f172a; border-bottom: 1px solid #94a3b8; padding-bottom: 2px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Professional Summary</h2>
+          <p style="font-size: 10px; color: #334155; margin: 0; line-height: 1.5;">${getSummaryForTemplate(activeTemplate)}</p>
+        </div>
+
+        <!-- Certifications -->
+        <div>
+          <h2 style="font-size: 11px; font-weight: 700; color: #0f172a; border-bottom: 1px solid #94a3b8; padding-bottom: 2px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Certifications</h2>
+          <p style="font-size: 10px; color: #334155; margin: 0; line-height: 1.5;">${getCertificationsForTemplate(activeTemplate)}</p>
+        </div>
+
+        <!-- Technical Skills -->
+        <div>
+          <h2 style="font-size: 11px; font-weight: 700; color: #0f172a; border-bottom: 1px solid #94a3b8; padding-bottom: 2px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Technical Skills</h2>
+          <p style="font-size: 10px; color: #334155; margin: 0; line-height: 1.5;"><strong>Skills:</strong> ${getSkillsForTemplate(activeTemplate)}</p>
+        </div>
+
+        <!-- Projects / Experience -->
+        <div>
+          <h2 style="font-size: 11px; font-weight: 700; color: #0f172a; border-bottom: 1px solid #94a3b8; padding-bottom: 2px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em;">Projects &amp; Experience</h2>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            ${projects.map(p => `
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px;">
+                  <strong style="font-size: 10.5px; color: #0f172a;">${p.title}</strong>
+                  <span style="font-size: 9.5px; color: #64748b; font-style: italic;">${p.role}</span>
+                </div>
+                <p style="font-size: 9.5px; color: #475569; margin: 0 0 4px 0; line-height: 1.4; font-style: italic;">${p.summary}</p>
+                <ul style="list-style-type: disc; padding-left: 14px; margin: 0; display: flex; flex-direction: column; gap: 2px;">
+                  ${p.bulletPoints.map(bp => `<li style="font-size: 9.5px; color: #334155; line-height: 1.4;">${bp}</li>`).join("")}
+                </ul>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   // On DOM Load
   document.addEventListener("DOMContentLoaded", init);
+
+  // ── ATS Checker ────────────────────────────────────────────────────────────
+
+  const ATS_ENDPOINT = "/api/ai/ats-check";
+
+  // Salesforce-focused keyword list for offline fallback
+  const SF_KEYWORDS = [
+    "apex", "lwc", "lightning web components", "flow", "salesforce flow",
+    "soql", "sosl", "triggers", "batch apex", "scheduled apex",
+    "named credentials", "rest api", "integration", "oauth",
+    "agentforce", "einstein", "slds", "lightning design system",
+    "data loader", "reports", "dashboards", "profiles", "permission sets",
+    "role hierarchy", "validation rules", "process builder",
+    "experience cloud", "community", "visualforce", "aura"
+  ];
+
+  const IMPACT_VERBS = [
+    "designed", "implemented", "developed", "built", "created", "engineered",
+    "configured", "optimised", "automated", "reduced", "increased", "improved",
+    "achieved", "deployed", "established", "streamlined", "integrated", "migrated",
+    "coordinated", "maintained", "monitored", "authored", "refactored"
+  ];
+
+  const REQUIRED_SECTIONS = ["summary", "skills", "experience", "project", "certification", "education"];
+
+  function setupATSTab() {
+    const analyseBtn = el("atsAnalyseBtn");
+    const resumeInput = el("atsResumeInput");
+    const charCountEl = el("atsCharCount");
+
+    if (resumeInput && charCountEl) {
+      resumeInput.addEventListener("input", () => {
+        const len = resumeInput.value.length;
+        charCountEl.textContent = `${len.toLocaleString()} character${len !== 1 ? "s" : ""}`;
+      });
+    }
+
+    if (analyseBtn) {
+      analyseBtn.addEventListener("click", handleATSAnalyse);
+    }
+  }
+
+  async function handleATSAnalyse() {
+    const resumeText = (el("atsResumeInput")?.value || "").trim();
+    const jobDescription = (el("atsJobInput")?.value || "").trim();
+
+    if (resumeText.length < 50) {
+      el("atsResumeInput")?.focus();
+      el("atsResumeInput")?.classList.add("border-rose-400");
+      setTimeout(() => el("atsResumeInput")?.classList.remove("border-rose-400"), 2000);
+      return;
+    }
+
+    const btn = el("atsAnalyseBtn");
+    if (btn) { btn.disabled = true; btn.textContent = "Analysing…"; }
+
+    el("atsEmptyState")?.classList.add("hidden");
+    el("atsResultState")?.classList.add("hidden");
+    el("atsLoadingState")?.classList.remove("hidden");
+
+    let result = null;
+
+    try {
+      const response = await fetch(ATS_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resumeText, jobDescription })
+      });
+      const data = await response.json();
+      if (!response.ok || typeof data.score !== "number") throw new Error(data.error || "ATS check failed");
+      result = data;
+    } catch {
+      result = localATSCheck(resumeText, jobDescription);
+    }
+
+    el("atsLoadingState")?.classList.add("hidden");
+    renderATSResults(result);
+
+    if (btn) { btn.disabled = false; btn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Analyse Resume`; }
+
+    window.TomCodexLearning?.record("task", 5, "Used ATS Resume Checker");
+  }
+
+  // Offline fallback — client-side rule-based ATS scoring
+  function localATSCheck(text, jobDescription) {
+    const lower = text.toLowerCase();
+
+    // Keywords
+    const foundKw = SF_KEYWORDS.filter(kw => lower.includes(kw));
+    const missingKw = SF_KEYWORDS.filter(kw => !lower.includes(kw)).slice(0, 8);
+    const kwScore = Math.min(100, Math.round((foundKw.length / Math.max(SF_KEYWORDS.length * 0.5, 1)) * 100));
+
+    // Formatting — check for bullet points, headers
+    const hasBullets = /[-•*]\s+\w/.test(text);
+    const hasHeaders = /\n[A-Z][A-Z\s]{3,}\n/.test(text);
+    const hasSpecialChars = /[|}{<>@#$]{3,}/.test(text);
+    let fmtScore = 70;
+    if (hasBullets) fmtScore += 15;
+    if (hasHeaders) fmtScore += 10;
+    if (hasSpecialChars) fmtScore -= 15;
+    fmtScore = Math.min(100, Math.max(0, fmtScore));
+    const fmtIssues = [];
+    if (!hasBullets) fmtIssues.push("No bullet points detected — use dashes or bullets for ATS readability.");
+    if (!hasHeaders) fmtIssues.push("No clear section headers detected — add uppercase section titles.");
+    if (hasSpecialChars) fmtIssues.push("Special characters detected — remove tables or symbols ATS cannot parse.");
+
+    // Impact — action verbs + metrics
+    const verbsFound = IMPACT_VERBS.filter(v => lower.includes(v));
+    const hasMetrics = /\d+\s*(%|percent|users|records|hours|days|reduction|improvement)/i.test(text);
+    let impScore = Math.min(100, Math.round((verbsFound.length / 6) * 70) + (hasMetrics ? 30 : 0));
+    const impSuggestions = [];
+    if (verbsFound.length < 4) impSuggestions.push("Add more action verbs (Designed, Implemented, Automated, etc.).");
+    if (!hasMetrics) impSuggestions.push("Quantify impact with metrics (e.g. 'reduced processing time by 40%').");
+
+    // Completeness
+    const missingSections = REQUIRED_SECTIONS.filter(s => !lower.includes(s));
+    const cmpScore = Math.min(100, Math.round(((REQUIRED_SECTIONS.length - missingSections.length) / REQUIRED_SECTIONS.length) * 100));
+
+    const score = Math.round((kwScore + fmtScore + impScore + cmpScore) / 4);
+    const grade = score >= 80 ? "Good" : score >= 65 ? "Fair" : "Needs Work";
+
+    return {
+      score,
+      grade,
+      sections: {
+        keywords: { score: kwScore, found: foundKw.slice(0, 12), missing: missingKw },
+        formatting: { score: fmtScore, issues: fmtIssues },
+        impact: { score: impScore, suggestions: impSuggestions },
+        completeness: { score: cmpScore, missingSections: missingSections.map(s => s.charAt(0).toUpperCase() + s.slice(1)) }
+      },
+      topRecommendations: [
+        ...missingKw.slice(0, 2).map(kw => `Add missing keyword: "${kw.charAt(0).toUpperCase() + kw.slice(1)}"`),
+        ...fmtIssues.slice(0, 1),
+        ...impSuggestions.slice(0, 1),
+        ...missingSections.slice(0, 1).map(s => `Add a dedicated "${s.charAt(0).toUpperCase() + s.slice(1)}" section.`)
+      ].filter(Boolean).slice(0, 5),
+      strengths: [
+        foundKw.length > 5 ? `Strong Salesforce keyword coverage (${foundKw.length} matched)` : null,
+        hasBullets ? "Good use of bullet points for readability" : null,
+        verbsFound.length >= 4 ? `Action verbs well-used (${verbsFound.length} found)` : null,
+        hasMetrics ? "Quantified achievements detected" : null
+      ].filter(Boolean).slice(0, 4),
+      source: "local-rules"
+    };
+  }
+
+  function getBarClass(score) {
+    if (score >= 80) return "bar-green";
+    if (score >= 65) return "bar-blue";
+    if (score >= 50) return "bar-amber";
+    return "bar-red";
+  }
+
+  function setBar(barId, scoreId, score) {
+    const bar = el(barId);
+    const scoreEl = el(scoreId);
+    if (bar) {
+      bar.className = `ats-bar-fill ${getBarClass(score)}`;
+      requestAnimationFrame(() => { bar.style.width = `${score}%`; });
+    }
+    if (scoreEl) scoreEl.textContent = `${score}/100`;
+  }
+
+  function renderATSResults(data) {
+    el("atsResultState")?.classList.remove("hidden");
+
+    // Score ring animation
+    const score = data.score || 0;
+    const ring = el("atsRingFill");
+    const scoreNum = el("atsScoreNum");
+    const gradeBadge = el("atsGradeBadge");
+    const engineLabel = el("atsEngineLabel");
+
+    if (ring) {
+      const circumference = 2 * Math.PI * 55; // r=55
+      const offset = circumference - (score / 100) * circumference;
+      ring.style.strokeDasharray = circumference;
+
+      // Grade-based ring colour
+      const gradeClass = score >= 80 ? "score-excellent" : score >= 65 ? "score-good" : score >= 50 ? "score-fair" : "score-poor";
+      ring.className = `ring-fill ${gradeClass}`;
+      requestAnimationFrame(() => { ring.style.strokeDashoffset = offset; });
+    }
+
+    if (scoreNum) scoreNum.textContent = score;
+
+    if (gradeBadge) {
+      const gradeMap = { "Excellent": "excellent", "Good": "good", "Fair": "fair", "Needs Work": "needs-work" };
+      const g = data.grade || "Fair";
+      gradeBadge.textContent = g;
+      gradeBadge.className = `ats-grade-badge ${gradeMap[g] || "fair"}`;
+    }
+
+    if (engineLabel) {
+      engineLabel.textContent = data.source === "centralized-ai-engine" ? "AI-Powered Analysis" : "Offline Rule-Based Analysis";
+    }
+
+    // Category bars
+    const s = data.sections || {};
+    setBar("atsKwBar", "atsKwScore", s.keywords?.score ?? 0);
+    setBar("atsFmtBar", "atsFmtScore", s.formatting?.score ?? 0);
+    setBar("atsImpBar", "atsImpScore", s.impact?.score ?? 0);
+    setBar("atsCmpBar", "atsCmpScore", s.completeness?.score ?? 0);
+
+    // Keyword chips
+    const kwChips = el("atsKwChips");
+    if (kwChips) {
+      const foundChips = (s.keywords?.found || []).map(k => `<span class="ats-chip found">✓ ${k}</span>`).join("");
+      const missingChips = (s.keywords?.missing || []).map(k => `<span class="ats-chip missing">✗ ${k}</span>`).join("");
+      kwChips.innerHTML = foundChips + missingChips;
+    }
+
+    // Formatting chips
+    const fmtChips = el("atsFmtChips");
+    if (fmtChips) {
+      fmtChips.innerHTML = (s.formatting?.issues || []).map(i => `<span class="ats-chip issue">⚠ ${i}</span>`).join("") || "<span class=\"ats-chip found\">✓ No major formatting issues</span>";
+    }
+
+    // Impact chips
+    const impChips = el("atsImpChips");
+    if (impChips) {
+      impChips.innerHTML = (s.impact?.suggestions || []).map(sg => `<span class="ats-chip tip">💡 ${sg}</span>`).join("");
+    }
+
+    // Completeness chips
+    const cmpChips = el("atsCmpChips");
+    if (cmpChips) {
+      const missingSec = s.completeness?.missingSections || [];
+      cmpChips.innerHTML = missingSec.length
+        ? missingSec.map(sec => `<span class="ats-chip missing">✗ Missing: ${sec}</span>`).join("")
+        : "<span class=\"ats-chip found\">✓ All key sections present</span>";
+    }
+
+    // Recommendations
+    const recList = el("atsRecList");
+    if (recList) {
+      recList.innerHTML = (data.topRecommendations || []).map(r => `
+        <div class="ats-rec-card">
+          <div class="ats-rec-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          </div>
+          <span class="ats-rec-text">${r}</span>
+        </div>
+      `).join("");
+    }
+
+    // Strengths
+    const strengthList = el("atsStrengthList");
+    if (strengthList) {
+      strengthList.innerHTML = (data.strengths || []).map(s => `
+        <div class="ats-strength-card">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 mt-0.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span class="ats-strength-text">${s}</span>
+        </div>
+      `).join("");
+    }
+
+    el("atsResultState")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
 })();

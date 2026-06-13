@@ -861,8 +861,28 @@ export function registerHostedAcademyAiCoreRoute(app) {
     }
   });
 
-  app.post("/api/academy/verify-lab", async (request, response, next) => {
+  app.post("/api/ai/ats-check", async (request, response) => {
+    const session = readSession(request);
+    if (!session) return response.status(401).json({ error: "Student sign-in is required." });
+
+    const resumeText = String(request.body?.resumeText || "").trim().slice(0, 8000);
+    const jobDescription = String(request.body?.jobDescription || "").trim().slice(0, 4000);
+
+    if (!resumeText || resumeText.length < 50) {
+      return response.status(400).json({ error: "Please provide resume text (at least 50 characters) to analyse." });
+    }
+
+    try {
+      const result = await aiEngine.run("ats-check", { resumeText, jobDescription }, request);
+      return response.json(result);
+    } catch (error) {
+      return response.status(502).json({ error: error.message || "ATS checker service failed." });
+    }
+  });
+
+ app.post("/api/academy/verify-lab", async (request, response, next) => {
     let userId = request.body?.userId;
+
     let tier = request.body?.tier;
 
     const session = readSession(request);
