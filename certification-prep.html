@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>document.documentElement.dataset.theme="light"</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Practice the Salesforce Administrator Certification with our 60 MCQ Exam Simulator." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://tomcodex-academy.vercel.app/certification-prep.html" />
+  <title>Salesforce Administrator Certification Practice | TomCodeX AI Academy</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { brand: { 50: "#eef8ff", 100: "#d9f0ff", 500: "#087ea4", 600: "#056b8d", 700: "#075875", 950: "#062c3a" }, ink: "#172b4d" },
+        fontFamily: { sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"] }
+      }}
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/certification-prep.css" />
+  <link rel="stylesheet" href="css/floating-guide.css" />
+  <link rel="stylesheet" href="css/floating-guide-auto.css" />
+  <script src="js/academy-guard.js"></script>
+</head>
+<body class="bg-slate-50 font-sans text-ink antialiased">
+  <header class="border-b border-slate-200 bg-white">
+    <div class="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3 lg:px-8">
+      <a href="index.html" class="flex items-center gap-2">
+        <img src="assets/tomcodex-logo.svg" alt="Tom Codex" class="h-12 w-auto sm:h-14">
+        <span class="hidden border-l border-slate-300 pl-3 text-sm font-bold sm:inline">AI Academy</span>
+      </a>
+      <nav class="ml-auto flex items-center gap-4 text-sm font-bold">
+        <a href="analytics.html" class="hidden text-slate-500 hover:text-brand-600 sm:block">Analytics</a>
+        <a href="dashboard.html" class="rounded-lg border border-brand-600 px-4 py-2 text-brand-700 hover:bg-brand-50">Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-7xl px-5 py-10 lg:px-8">
+    <!-- Landing State Setup -->
+    <div id="setupState" class="space-y-6">
+      <div class="rounded-2xl bg-brand-950 p-8 text-white shadow-xl">
+        <span class="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-cyan-200">
+          Salesforce Certified Administrator (SU26)
+        </span>
+        <h1 class="mt-4 text-3xl font-extrabold tracking-tight sm:text-4xl">
+          Certification Exam Practice Simulator
+        </h1>
+        <p class="mt-3 max-w-3xl text-base text-slate-300 leading-relaxed">
+          Prepare for the official Salesforce Admin Exam with our premium 60-question multiple choice simulator. Track your accuracy by exam domains, analyze explanations, and build real test consistency.
+        </p>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-[1fr_.42fr]">
+        <!-- Config Panel -->
+        <div class="prep-card">
+          <h2 class="text-xl font-bold text-brand-950 border-b border-slate-100 pb-3">Configure Practice Session</h2>
+          
+          <div class="mt-5 space-y-4">
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Exam Mode</label>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <label class="flex flex-col p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-sm text-slate-800">Standard Simulation</span>
+                    <input type="radio" name="examMode" value="standard" checked class="h-4 w-4 text-brand-600">
+                  </div>
+                  <span class="text-xs text-slate-500 mt-2">60 questions, timed 105 minutes. Resembles the real certification test environment.</span>
+                </label>
+                
+                <label class="flex flex-col p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-sm text-slate-800">Quick Practice Drill</span>
+                    <input type="radio" name="examMode" value="quick" class="h-4 w-4 text-brand-600">
+                  </div>
+                  <span class="text-xs text-slate-500 mt-2">15 questions, timed 20 minutes. Great for quick topic review sessions.</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="pt-3">
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Answering Style</label>
+              <div class="grid gap-3 sm:grid-cols-2">
+                <label class="flex flex-col p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-sm text-slate-800">Exam Simulation</span>
+                    <input type="radio" name="feedbackStyle" value="exam" checked class="h-4 w-4 text-brand-600">
+                  </div>
+                  <span class="text-xs text-slate-500 mt-2">Submit all answers together. Exposes correct answers and detailed explanations at the end.</span>
+                </label>
+
+                <label class="flex flex-col p-4 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer hover:bg-slate-100 transition">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-sm text-slate-800">Real-time Review</span>
+                    <input type="radio" name="feedbackStyle" value="instant" class="h-4 w-4 text-brand-600">
+                  </div>
+                  <span class="text-xs text-slate-500 mt-2">Show feedback immediately after submitting each individual question. Best for learning.</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <button id="startExamBtn" class="mt-6 w-full rounded-xl bg-brand-600 py-3.5 text-center font-extrabold text-white hover:bg-brand-700 transition" type="button">
+            Start Practice Session
+          </button>
+        </div>
+
+        <!-- History Dashboard -->
+        <div class="prep-card flex flex-col justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-brand-950 border-b border-slate-100 pb-3">Your Performance</h2>
+            <div class="mt-4 grid grid-cols-2 gap-4 text-center">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Best Score</span>
+                <strong id="bestScoreText" class="text-2xl font-black text-brand-600">—</strong>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-500">Average Score</span>
+                <strong id="avgScoreText" class="text-2xl font-black text-brand-600">—</strong>
+              </div>
+            </div>
+            
+            <div class="mt-5">
+              <span class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Practice History</span>
+              <div id="historyList" class="space-y-2 overflow-y-auto max-h-48">
+                <p class="text-xs text-slate-400 text-center py-6">No previous attempts. Start an exam to record your history.</p>
+              </div>
+            </div>
+          </div>
+          
+          <button id="clearHistoryBtn" class="mt-4 w-full text-xs font-bold text-rose-600 hover:underline hidden" type="button">
+            Clear Attempt History
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Test State -->
+    <div id="testState" class="hidden prep-layout">
+      <!-- Main Question Panel -->
+      <div class="space-y-4">
+        <div class="prep-card">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
+            <div>
+              <span id="questionCategory" class="inline-flex rounded-full bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-600">
+                Configuration and Setup
+              </span>
+              <span id="activeQuestionNum" class="text-xs font-extrabold text-slate-400 ml-2">Question 1 of 60</span>
+            </div>
+            
+            <label class="flag-label" id="flagContainer">
+              <input type="checkbox" id="flagToggle" />
+              <span>🚩 Mark for Review</span>
+            </label>
+          </div>
+
+          <h2 id="questionText" class="text-lg font-bold text-slate-800 leading-relaxed">
+            Question text loading...
+          </h2>
+
+          <div id="optionsContainer" class="option-list">
+            <!-- Render options dynamically -->
+          </div>
+
+          <!-- Instant explanation (shown only in instant mode when checked) -->
+          <div id="instantExplanation" class="hidden explanation-box">
+            <strong id="instantResultLabel" class="block font-bold text-sm mb-1"></strong>
+            <p id="instantExplanationText" class="text-sm leading-relaxed"></p>
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex items-center justify-between">
+          <button id="prevBtn" class="rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 transition" type="button">
+            Previous
+          </button>
+          
+          <button id="checkAnswerBtn" class="hidden rounded-xl bg-brand-500 px-6 py-2.5 text-sm font-extrabold text-white hover:bg-brand-600 transition" type="button">
+            Check Answer
+          </button>
+
+          <button id="nextBtn" class="rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-extrabold text-white hover:bg-brand-700 transition" type="button">
+            Next
+          </button>
+        </div>
+      </div>
+
+      <!-- Sidebar Controls (Grid, Timer) -->
+      <aside class="space-y-4">
+        <!-- Timer Card -->
+        <div class="prep-card text-center">
+          <span class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Time Remaining</span>
+          <div id="examTimer" class="timer-display">105:00</div>
+          
+          <button id="submitExamBtn" class="mt-4 w-full rounded-xl bg-rose-600 py-3 text-sm font-bold text-white hover:bg-rose-700 transition" type="button">
+            Submit Practice Exam
+          </button>
+        </div>
+
+        <!-- Question Grid Card -->
+        <div class="prep-card">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-3">
+            <span class="text-sm font-bold text-slate-800">Question Grid</span>
+            <span id="answeredCount" class="text-xs font-bold text-slate-500">0 / 60 Answered</span>
+          </div>
+          
+          <div id="qGrid" class="q-grid">
+            <!-- Square buttons 1 to 60 injected by JS -->
+          </div>
+
+          <div class="mt-4 flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wide">
+            <span class="flex items-center gap-1"><i class="w-2.5 h-2.5 rounded bg-slate-200 inline-block border border-slate-300"></i> Answered</span>
+            <span class="flex items-center gap-1"><i class="w-2.5 h-2.5 rounded border border-brand inline-block"></i> Active</span>
+            <span class="flex items-center gap-1"><i class="w-2.5 h-2.5 rounded border border-amber-600 inline-block"></i> Flagged</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Results State -->
+    <div id="resultState" class="hidden space-y-6">
+      <div class="prep-card text-center py-8">
+        <div class="flex justify-center">
+          <div id="resultScoreRing" class="flex h-28 w-28 items-center justify-center rounded-full text-3xl font-black text-white bg-brand-600 shadow-lg">
+            0%
+          </div>
+        </div>
+        
+        <h2 id="resultTitle" class="mt-5 text-2xl font-black text-slate-800">Exam Completed</h2>
+        <p id="resultSummary" class="mt-2 text-slate-500 text-sm max-w-lg mx-auto">
+          You answered 0 out of 60 questions correctly.
+        </p>
+
+        <div class="mt-6 flex flex-wrap justify-center gap-3">
+          <button id="reviewExamBtn" class="rounded-xl bg-brand-600 px-6 py-3 text-sm font-bold text-white hover:bg-brand-700 transition" type="button">
+            Review Answers &amp; Explanations
+          </button>
+          <button id="exitExamBtn" class="rounded-xl border border-slate-200 bg-white px-6 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 transition" type="button">
+            Return to Setup
+          </button>
+        </div>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-[1fr_.42fr]">
+        <!-- Question Review list -->
+        <div id="reviewContainer" class="prep-card hidden space-y-4">
+          <h2 class="text-xl font-bold text-brand-950 border-b border-slate-100 pb-3">Detailed Question Review</h2>
+          <div id="reviewList" class="space-y-6 divide-y divide-slate-100">
+            <!-- Review items injected here -->
+          </div>
+        </div>
+
+        <!-- Domain Breakdown -->
+        <div class="prep-card">
+          <h2 class="text-xl font-bold text-brand-950 border-b border-slate-100 pb-3">Domain Mastery Breakdown</h2>
+          <div id="domainProgressContainer" class="category-progress">
+            <!-- Domain bars injected here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/learner-sync.js"></script>
+  <script src="js/learning-records.js"></script>
+  <script src="js/admin-prep-questions.js"></script>
+  <script src="js/certification-prep.js"></script>
+  <script src="js/floating-guide.js"></script>
+  <script src="js/theme-toggle.js"></script>
+  <script src="js/site-nav.js"></script>
+</body>
+</html>

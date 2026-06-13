@@ -45,7 +45,7 @@
       ["#", "Resume Project Generator", "Generate project resume points (Coming Soon)"]
     ] },
     { label: "Certification Prep", items: [
-      ["#", "Salesforce Administrator", "60 MCQ simulator (Coming Soon)"],
+      ["certification-prep.html", "Salesforce Administrator", "60 MCQ simulator"],
       ["#", "Platform App Builder", "Certification simulator (Coming Soon)"],
       ["#", "Roadmap & Plan", "Certification schedule (Coming Soon)"]
     ] },
