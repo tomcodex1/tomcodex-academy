@@ -103,7 +103,6 @@
               ${group.items.map(([href, label, detail]) => `<a href="${href}"><strong>${label}</strong><small>${detail}</small></a>`).join("")}
             </div>
           </details>`).join("")}
-        <button class="tc-theme-toggle" type="button" aria-label="Switch to light mode" title="Light mode">☀️</button>
         ${role ? `
           <details class="site-nav-group site-account-group">
             <summary class="site-login-link">${accountLabel}<span aria-hidden="true">&#9662;</span></summary>
