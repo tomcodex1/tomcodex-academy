@@ -32,7 +32,7 @@ process.env.FOUNDER_DAILY_AI_LIMIT ||= "1000";
 
 app.use((_request, response, next) => {
   response.set({
-    "Content-Security-Policy": "default-src 'self'; script-src 'self' https://cdn.tailwindcss.com 'unsafe-inline'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' data:; media-src 'self' blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+    "Content-Security-Policy": "default-src 'self' blob: data:; script-src 'self' https://cdn.tailwindcss.com 'unsafe-inline' blob:; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
     "Permissions-Policy": "camera=(), geolocation=(), payment=(), usb=()",
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "X-Content-Type-Options": "nosniff",

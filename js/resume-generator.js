@@ -7,6 +7,8 @@
 
   const el = (id) => document.getElementById(id);
 
+  let isHtmlView = false;
+
   // Pre-populated achievements data
   const PROJECT_ACHIEVEMENTS = {
     capstone: [
@@ -769,10 +771,39 @@
     const copyHtmlBtn = el("copyTplHtmlBtn");
     if (copyHtmlBtn) {
       copyHtmlBtn.addEventListener("click", () => {
-        const preview = el("liveResumePreview");
-        if (preview) {
-          copyText(preview.innerHTML.trim(), copyHtmlBtn);
+        isHtmlView = !isHtmlView;
+        
+        if (isHtmlView) {
+          copyHtmlBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            <span>Preview Mode</span>
+          `;
+          copyHtmlBtn.classList.remove("text-cyan-600", "hover:text-cyan-700");
+          copyHtmlBtn.classList.add("text-brand-600", "hover:text-brand-700");
+          
+          // Copy code to clipboard automatically when entering HTML view
+          const htmlContent = getHtmlRepresentation();
+          navigator.clipboard.writeText(htmlContent.trim());
+          
+          // Briefly flash green icon
+          const origContent = copyHtmlBtn.innerHTML;
+          copyHtmlBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" class="text-emerald-600"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span class="text-emerald-600">Copied HTML!</span>
+          `;
+          setTimeout(() => {
+            copyHtmlBtn.innerHTML = origContent;
+          }, 1200);
+        } else {
+          copyHtmlBtn.innerHTML = `
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+            <span>Copy HTML</span>
+          `;
+          copyHtmlBtn.classList.remove("text-brand-600", "hover:text-brand-700");
+          copyHtmlBtn.classList.add("text-cyan-600", "hover:text-cyan-700");
         }
+        
+        renderLiveResume();
       });
     }
 
@@ -856,11 +887,8 @@
     return text.trim();
   }
 
-  // Render live preview
-  function renderLiveResume() {
-    const preview = el("liveResumePreview");
-    if (!preview) return;
-
+  // Compile HTML representation of resume
+  function getHtmlRepresentation() {
     const name = el("tplName")?.value || "Vijay Kumar";
     const title = el("tplTitle")?.value || "Salesforce Developer";
     const email = el("tplEmail")?.value || "vijay@example.com";
@@ -870,8 +898,8 @@
 
     const projects = getCompiledProjects();
 
-    preview.innerHTML = `
-      <div style="text-align: center; border-bottom: 1.5px solid #475569; padding-bottom: 8px; margin-bottom: 12px;">
+    return `
+      <div style="text-align: center; border-bottom: 1.5px solid #475569; padding-bottom: 8px; margin-bottom: 12px; font-family: serif;">
         <h1 style="font-size: 20px; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.2;">${name}</h1>
         <div style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px;">${title}</div>
         <div style="font-size: 10px; color: #64748b; margin-top: 4px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
@@ -882,7 +910,7 @@
         </div>
       </div>
 
-      <div style="display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; flex-direction: column; gap: 12px; font-family: serif;">
         <!-- Professional Summary -->
         <div>
           <h2 style="font-size: 11px; font-weight: 700; color: #0f172a; border-bottom: 1px solid #94a3b8; padding-bottom: 2px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em;">Professional Summary</h2>
@@ -923,10 +951,46 @@
     `;
   }
 
+  // HTML escaping helper
+  function escapeHtml(html) {
+    return html
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // Render live preview
+  function renderLiveResume() {
+    const preview = el("liveResumePreview");
+    if (!preview) return;
+
+    const compiledHtml = getHtmlRepresentation();
+
+    if (isHtmlView) {
+      preview.innerHTML = `
+        <div style="font-family: monospace; font-size: 10px; color: #334155; white-space: pre-wrap; word-break: break-all; line-height: 1.4; background-color: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+          ${escapeHtml(compiledHtml.trim())}
+        </div>
+      `;
+    } else {
+      preview.innerHTML = compiledHtml;
+    }
+  }
+
   // Download Resume as PDF using html2pdf.js
   function downloadPDF() {
     const element = el("liveResumePreview");
     if (!element) return;
+
+    // Temporarily switch off HTML view so PDF prints the actual resume sheet, not raw code
+    const wasHtmlView = isHtmlView;
+    if (wasHtmlView) {
+      isHtmlView = false;
+      renderLiveResume();
+    }
+
     const name = el("tplName")?.value || "Vijay Kumar";
     const title = el("tplTitle")?.value || "Resume";
     const opt = {
@@ -937,15 +1001,18 @@
       jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
     
-    html2pdf().set(opt).from(element).save();
+    html2pdf().set(opt).from(element).save().then(() => {
+      if (wasHtmlView) {
+        isHtmlView = true;
+        renderLiveResume();
+      }
+    });
+
     window.TomCodexLearning?.record("task", 5, "Downloaded Resume as PDF");
   }
 
   // Download Resume as Word Document (.doc)
   function downloadWord() {
-    const preview = el("liveResumePreview");
-    if (!preview) return;
-
     const name = el("tplName")?.value || "Vijay Kumar";
     const title = el("tplTitle")?.value || "Resume";
     const filename = `${name.replace(/\s+/g, '_')}_${title.replace(/\s+/g, '_')}_Resume.doc`;
@@ -975,7 +1042,7 @@
           <body>`;
     const footer = "</body></html>";
     
-    const resumeHtml = preview.innerHTML;
+    const resumeHtml = getHtmlRepresentation();
     const sourceHTML = header + resumeHtml + footer;
 
     const blob = new Blob(['\ufeff' + sourceHTML], {
