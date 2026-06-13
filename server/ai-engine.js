@@ -550,6 +550,56 @@ Return only the transcription text, no labels or metadata.`;
     return { transcript: text.trim(), source: "centralized-ai-engine", provider: "gemini", model: "gemini-2.5-flash" };
   }
 
+  // ── 7.5 Resume Generator ──────────────────────────────────────────────────
+  async handleResume({ project, role, achievements = [], tone = "STAR", customNotes = "" }, key) {
+    const safeProject = String(project || "").slice(0, 500);
+    const safeRole = String(role || "").slice(0, 500);
+    const safeAchievements = Array.isArray(achievements) ? achievements.map(a => String(a).slice(0, 500)) : [];
+    const safeTone = String(tone || "STAR").slice(0, 100);
+    const safeNotes = String(customNotes || "").slice(0, 4000);
+
+    const prompt = `You are an expert Salesforce Resume Writer. Your task is to generate professional, impactful resume points for a candidate.
+Project name: ${safeProject}
+Target Role: ${safeRole}
+Selected achievements / tasks completed:
+${safeAchievements.map(a => `- ${a}`).join("\n")}
+Custom details / technologies used: ${safeNotes}
+Required Tone/Style: ${safeTone}
+
+Generate:
+1. A concise professional project summary description (1-2 sentences) for the "Projects" section of a resume.
+2. Exactly 3 to 5 highly polished, action-oriented resume bullet points using the ${safeTone} methodology. Focus on technical challenges, solutions, and (where possible) simulated business outcomes/metrics (e.g. reduced load time by 30%, improved data accuracy, automated 90% of manual steps).
+3. A list of 4 to 8 core skills/keywords to highlight (e.g. Apex, LWC, Flow Builder).
+
+Return ONLY valid JSON:
+{
+  "summary": "<project summary>",
+  "bulletPoints": [
+    "<bullet point 1>",
+    "<bullet point 2>",
+    "<bullet point 3>"
+  ],
+  "skills": ["Skill1", "Skill2", "Skill3"]
+}`;
+
+    const { text } = await this.callGemini({
+      key,
+      contents: [{ parts: [{ text: prompt }] }],
+      jsonMode: true
+    });
+    const result = this.parseJSON(text, {});
+    return {
+      summary: result.summary || `Designed and developed the ${safeProject} system to streamline student workflows and CRM administration.`,
+      bulletPoints: Array.isArray(result.bulletPoints) ? result.bulletPoints.slice(0, 6) : [
+        `Configured and customized the ${safeProject} data model using Salesforce custom objects, lookup relationships, and page layouts.`,
+        `Automated core business logic and routing configurations with Flow Builder, reducing manual processing time.`,
+        `Created programmatic components and Apex triggers adhering to security and governor limits.`
+      ],
+      skills: Array.isArray(result.skills) ? result.skills.slice(0, 8) : ["Salesforce CRM", "Flow Builder", "Custom Objects", "Apex"],
+      source: "centralized-ai-engine", provider: "gemini", model: this.getModel()
+    };
+  }
+
   // ── 8. Main run() entry point ─────────────────────────────────────────────
   async run(task, params, request) {
     const key = this.resolveKey(request);
@@ -562,6 +612,7 @@ Return only the transcription text, no labels or metadata.`;
       "verify-lab": p => this.handleVerifyLab(p, key),
       "code-review": p => this.handleCodeReview(p, key),
       interview: p => this.handleInterview(p, key),
+      resume: p => this.handleResume(p, key),
       transcribe: p => this.handleTranscribe(p, key)
     };
 

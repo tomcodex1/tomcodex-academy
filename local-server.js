@@ -8,6 +8,7 @@ import { registerAiTrainerRoute } from "./server/ai-trainer-route.example.js";
 import { registerAiEvaluatorRoute } from "./server/ai-evaluator-route.example.js";
 import { registerAiCodeReviewRoute } from "./server/ai-code-review-route.example.js";
 import { registerAiInterviewRoute } from "./server/ai-interview-route.example.js";
+import { registerAiResumeRoute } from "./server/ai-resume-route.js";
 import { registerAiTranscriptionRoute } from "./server/ai-transcription-route.js";
 import { registerElevenLabsSpeechRoute } from "./server/elevenlabs-speech-route.js";
 import { createAcademyAiHandler, aiEngine, buildSkillPassportUpdate, moduleProgression, evaluateCertificateEligibility } from "zentom-ai-core";
@@ -917,6 +918,7 @@ const protectedAcademyPages = [
   "personalized-paths.html",
   "interview.html",
   "code-review-ai.html",
+  "resume-generator.html",
   "study-groups.html",
   "discussion-forums.html",
   "peer-review.html",
@@ -1121,6 +1123,7 @@ app.post("/api/ai/run", async (request, response, next) => {
 registerAiTrainerRoute(app);
 registerAiEvaluatorRoute(app);
 registerAiCodeReviewRoute(app);
+registerAiResumeRoute(app);
 registerAiInterviewRoute(app);
 registerAiTranscriptionRoute(app);
 registerElevenLabsSpeechRoute(app);

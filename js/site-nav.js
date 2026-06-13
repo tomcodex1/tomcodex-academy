@@ -41,7 +41,7 @@
       ["course-admin.html", "AI Mastery Test", "15-question module evaluation"],
       ["interview.html", "AI Interviewer", "Technical and behavioral mock interviews"],
       ["code-review-ai.html", "Code Review AI", "Review Apex/LWC code and flows"],
-      ["#", "Resume Project Generator", "Generate project resume points (Coming Soon)"]
+      ["resume-generator.html", "Resume Project Generator", "Generate project resume points"]
     ] },
     { label: "Certifications", items: [
       ["certification-prep.html#certPathways", "Certification Prep", "Study pathways and roadmaps"],
