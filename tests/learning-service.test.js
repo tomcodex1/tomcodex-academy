@@ -82,4 +82,64 @@ describe("LearningService", () => {
     storage.setItem.mockImplementation(() => { throw new Error("quota"); });
     expect(() => createService(storage).saveState()).not.toThrow();
   });
+
+  test("exposes correct configuration getters", () => {
+    const service = createService();
+    expect(service.getSkillMeters()).toBeDefined();
+    expect(service.getDailyChecklist()).toBeDefined();
+    expect(service.getHabits()).toBeDefined();
+    expect(service.getStudyBlocks()).toBeDefined();
+    expect(service.getAnswerModes()).toBeDefined();
+    expect(service.getTrainerPrompt()).toBeDefined();
+    expect(service.getProjectOutputs()).toBeDefined();
+    expect(service.getPhases()).toBeDefined();
+    expect(service.getContinuousStageTemplates()).toBeDefined();
+    expect(service.getStats()).toBeDefined();
+  });
+
+  test("calculates habit progress correctly", () => {
+    const service = createService();
+    const initialProgress = service.getHabitProgress();
+    expect(initialProgress.completed).toBe(0);
+    expect(initialProgress.progress).toBe(0);
+
+    service.updateCompletedHabits(0, true);
+    const updatedProgress = service.getHabitProgress();
+    expect(updatedProgress.completed).toBe(1);
+    expect(updatedProgress.progress).toBeGreaterThan(0);
+  });
+
+  test("manages learning track enrollment", () => {
+    const storage = createStorage();
+    const service = createService(storage);
+
+    const tracks = service.getLearningTracks();
+    expect(tracks).toBeDefined();
+    expect(tracks.length).toBeGreaterThan(0);
+
+    const result = service.enrollInTrack("apex", "course-apex.html");
+    expect(result.enrolled).toBe(true);
+    expect(result.isNewEnrollment).toBe(true);
+
+    const updatedTracks = service.getLearningTracks();
+    const apexTrack = updatedTracks.find(t => t.track === "apex");
+    expect(apexTrack.enrolled).toBe(true);
+    expect(apexTrack.action).toBe("Continue track →");
+
+    const reEnrollResult = service.enrollInTrack("apex", "course-apex.html");
+    expect(reEnrollResult.isNewEnrollment).toBe(false);
+  });
+
+  test("auto-enrolls in a track when score is high", () => {
+    const storage = createStorage();
+    const scores = { "apex-1": { score: 85 } };
+    storage.setItem(`tomcodex.apexMasteryScores.v1`, JSON.stringify(scores));
+
+    const service = createService(storage);
+    const tracks = service.getLearningTracks();
+    const apexTrack = tracks.find(t => t.track === "apex");
+    expect(apexTrack.completed).toBe(1);
+    expect(apexTrack.enrolled).toBe(true);
+  });
 });
+
