@@ -43,9 +43,8 @@
       ["code-review-ai.html", "Code Review AI", "Review Apex/LWC code and flows"],
       ["#", "Resume Project Generator", "Generate project resume points (Coming Soon)"]
     ] },
-    { label: "Certification Prep", items: [
+    { label: "Salesforce Certified Admin", items: [
       ["certification-prep.html", "Salesforce Administrator", "60 MCQ simulator"],
-      ["#", "Platform App Builder", "Certification simulator (Coming Soon)"],
       ["#", "Roadmap & Plan", "Certification schedule (Coming Soon)"]
     ] },
     { label: "Progress", items: [
